@@ -1,4 +1,4 @@
-# cotacol-site
+# Cotacol Web App
 An attempt to learn Blazor, by setting up a Cotacol web site
 
 ## Identity login
