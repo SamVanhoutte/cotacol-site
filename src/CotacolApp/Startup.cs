@@ -61,7 +61,7 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme    = "Strava";
                 })
-                //.AddCookie()
+                .AddCookie()
                 .AddOAuth("Strava","Strava",
                 options =>
                 {
