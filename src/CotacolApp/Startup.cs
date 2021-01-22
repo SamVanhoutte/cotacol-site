@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -15,6 +19,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 
 namespace CotacolApp
@@ -35,50 +41,67 @@ namespace CotacolApp
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            
+
             // Strava authentication
-             services.AddAuthentication().AddOAuth("Strava",
-                oAuthOptions =>
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme    = "Strava";
+                })
+                .AddCookie()
+                .AddOAuth("Strava",
+                options =>
                 {
                     //http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write
                     //https://www.strava.com/oauth/authorize?client_id=54778&scope=read&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fsignin-strava&state=CfDJ8JoKNYGkoJRGiyjnLkJiaUXjUWR4qUReuvnpsCJPXslZ-CQ8zd_K_29IzJFzt3FOh_ARdAIChh1omQs_e-sTuGf06AgozflcyVSbLRtr4kenuHkd0i-TDE0OglQgZWCw4OdZ3D6flAsl1SvtBpZCUPa9h6OXn50HlcpZmnsz_LnoyLxviJlLkCU2Iipq9iWsZ6ze0kQLXgGSZF7yPZU_Xw0nGpPtelrgKW-az60jJJao-T9CdrEBBTcX-8TwPF-6kQrySYHmyvWfzxsTVBr7dp-bq4QGcF2-pZTdRtkym2SRwVYWQi9H4WNZW3zy8VMq1Q
-                    oAuthOptions.ClientId = "54778"; //Configuration["strava-app-id"];
-                    oAuthOptions.ClientSecret =
-                        "29dec80b378c4cb04be78d1defba2a7458b72b26"; //Configuration["strava-app-secret"];
-                    oAuthOptions.Scope.Clear();
-                    oAuthOptions.Scope.Add(
+                    options.ClientId = "54778"; //Configuration["strava-app-id"];
+                    options.ClientSecret = "29dec80b378c4cb04be78d1defba2a7458b72b26"; //Configuration["strava-app-secret"];
+                    options.CallbackPath = "/StravaLogin"; //"/signin-strava";
+                    
+                    options.SignInScheme = IdentityConstants.ExternalScheme;
+                    
+                    options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
+                    options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
+                    options.UserInformationEndpoint = "https://www.strava.com/api/v3/athlete";
+                    
+                    options.Scope.Clear();
+                    options.Scope.Add(
                         "read,read_all,activity:read_all,activity:read,activity:write,profile:write");
-                    oAuthOptions.CallbackPath = "/cols"; //"/signin-strava";
-                    oAuthOptions.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
-                    oAuthOptions.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
-                    //oAuthOptions.SignInScheme = IdentityConstants.ExternalScheme;
-                    oAuthOptions.Events = new OAuthEvents()
+
+                    options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                    options.ClaimActions.MapJsonKey(ClaimTypes.Name, "username");
+                    options.ClaimActions.MapJsonKey("FirstName", "username");
+                    options.ClaimActions.MapJsonKey("LastName", "username");
+                    options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "sex");
+                    options.ClaimActions.MapJsonKey("ProfilePicture", "profile_medium");
+                    
+                    options.Events = new OAuthEvents
                     {
-                        OnRemoteFailure = loginFailureHandler =>
+                        OnCreatingTicket = async context =>
                         {
-                            Console.WriteLine("Remote Error");
-                            Console.WriteLine(loginFailureHandler.Failure.Message);
-                            var authProperties =
-                                oAuthOptions.StateDataFormat.Unprotect(loginFailureHandler.Request.Query["state"]);
-                            loginFailureHandler.Response.Redirect("/Identity/Account/Login");
-                            loginFailureHandler.HandleResponse();
-                            return Task.FromResult(0);
-                        }, 
-                        OnAccessDenied = handler =>
-                        {
-                            Console.WriteLine(handler.Response.StatusCode);
-                            return Task.FromResult(0);
+                            var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+
+                            var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                            response.EnsureSuccessStatusCode();
+
+                            var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                            context.RunClaimActions(user.RootElement);
                         }
                     };
-                    oAuthOptions.Validate();
+                    options.Validate();
                 });
-            
-            
-            
+
+            services.AddHttpContextAccessor();
+
             // Dependency injectoin
             services
                 .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>
