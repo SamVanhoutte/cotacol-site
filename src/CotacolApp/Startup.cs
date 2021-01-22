@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
+using CotacolApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -42,7 +43,12 @@ namespace CotacolApp
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = false;
+                    options.SignIn.RequireConfirmedEmail = false;
+                    options.SignIn.RequireConfirmedPhoneNumber = false;
+                })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             
             services.AddRazorPages();
@@ -51,12 +57,12 @@ namespace CotacolApp
             // Strava authentication
             services.AddAuthentication(options =>
                 {
-                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
+                    //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme    = "Strava";
                 })
-                .AddCookie()
-                .AddOAuth("Strava",
+                //.AddCookie()
+                .AddOAuth("Strava","Strava",
                 options =>
                 {
                     //http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write
@@ -77,8 +83,8 @@ namespace CotacolApp
 
                     options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                     options.ClaimActions.MapJsonKey(ClaimTypes.Name, "username");
-                    options.ClaimActions.MapJsonKey("FirstName", "username");
-                    options.ClaimActions.MapJsonKey("LastName", "username");
+                    options.ClaimActions.MapJsonKey("FirstName", "firstname");
+                    options.ClaimActions.MapJsonKey("LastName", "lastname");
                     options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "sex");
                     options.ClaimActions.MapJsonKey("ProfilePicture", "profile_medium");
                     
@@ -92,9 +98,9 @@ namespace CotacolApp
 
                             var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
                             response.EnsureSuccessStatusCode();
-
-                            var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                            context.RunClaimActions(user.RootElement);
+                            var claimsJson = await response.Content.ReadAsStringAsync();
+                            //context.RunClaimActions(user.RootElement);
+                            context.AddClaims(claimsJson);
                         }
                     };
                     options.Validate();
