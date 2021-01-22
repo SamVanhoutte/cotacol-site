@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
+using CotacolApp.Interfaces;
 using CotacolApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -114,6 +115,8 @@ namespace CotacolApp
                 >();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<ICotacolClient, CotacolApiClient>();
+            services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

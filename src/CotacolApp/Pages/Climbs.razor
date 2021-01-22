@@ -1,0 +1,79 @@
+@page "/climbs"
+
+@using CotacolApp.Interfaces
+@using CotacolApp.Models
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+
+<h3>Climbs</h3>
+
+<p>1000 Cotacol climbs for you to conquer.</p>
+
+@if (climbs == null)
+{
+    <p>
+        <em>Loading climbs...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Province</th>
+            <th>Surface</th>
+            <th>Points</th>
+            <th>Link</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var climb in climbs)
+        {
+            <tr>
+                <td>@climb.Id</td>
+                @if (climb.Done)
+                {
+                    <td><b>@climb.Name.ToUpper()</b></td>
+                }
+                else
+                {
+                    <td>@climb.Name</td>
+                }
+                <td>@climb.Province</td>
+                <td>@climb.Surface</td>
+                <td>@climb.CotacolPoints</td>
+                <td>
+                    <a href="@climb.Url">segment</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+
+    private IEnumerable<UserClimb> climbs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            climbs = await CotacolUserClient.GetClimbDataAsync(user.GetUserId());
+        }
+        else
+        {
+            climbs = (await CotacolClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
+        }
+    }
+
+}
