@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace CotacolApp.Models.CotacolApi
 {
     
-    public record Climb
+    public class Climb
     {
         public string Id { get; init; }
         [JsonProperty("cotacol_points")]
@@ -17,7 +17,7 @@ namespace CotacolApp.Models.CotacolApi
 
         public  UserClimb ToUserClimb()
         {
-            return new UserClimb
+            return new()
             {
                 Id = Id, Name = Name, CotacolPoints = CotacolPoints, Province = Province,
                 Surface = Surface, SegmentConfidence = SegmentConfidence, Url = Url

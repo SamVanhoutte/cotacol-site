@@ -3,7 +3,7 @@ using CotacolApp.Models.CotacolApi;
 
 namespace CotacolApp.Models
 {
-    public record UserClimb : Climb
+    public class UserClimb : Climb
     {
         public UserClimb():base()
         {

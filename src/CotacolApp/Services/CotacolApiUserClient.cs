@@ -7,6 +7,7 @@ using CotacolApp.Models.CotacolApi;
 using CotacolApp.Settings;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using SQLitePCL;
 
 namespace CotacolApp.Services
@@ -16,8 +17,10 @@ namespace CotacolApp.Services
         private CotacolApiSettings _settings;
         private IHttpContextAccessor _context;
         private ICotacolClient _cotacolDataClient;
+        private ILogger<CotacolApiUserClient> _logger;
 
-        public CotacolApiUserClient(IHttpContextAccessor contextAccessor, ICotacolClient cotacolDataClient)
+        public CotacolApiUserClient(IHttpContextAccessor contextAccessor, ICotacolClient cotacolDataClient,
+            ILogger<CotacolApiUserClient> logger)
         {
             // TODO : options
             _settings = new CotacolApiSettings
@@ -26,6 +29,7 @@ namespace CotacolApp.Services
             };
             _context = contextAccessor;
             _cotacolDataClient = cotacolDataClient;
+            _logger = logger;
         }
 
         private string GetUserId()
@@ -39,21 +43,21 @@ namespace CotacolApp.Services
             var colsDone = await GetColsAsync(userId);
             var allClimbs = (await _cotacolDataClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
 
+            _logger.LogInformation($"User {userId} has {colsDone.Count()} conquored climbs");
+            var result = new List<UserClimb>();
             foreach (var climb in allClimbs)
             {
-                if (colsDone.Any(c => c.CotacolId.Equals(climb.Id)))
+                var achievement = colsDone.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
+                climb.Done = achievement != null;
+                if (achievement != null)
                 {
-                    climb.Done = true;
+                    climb.FirstAchievement = achievement.AchievementDate;
                 }
-            }
-            // foreach (var userColAchievement in colsDone)
-            // {
-            //     var doneClimb = allClimbs.First(climb => climb.Id.Equals(userColAchievement.CotacolId));
-            //     doneClimb.Done = true;
-            //     doneClimb.FirstAchievement = userColAchievement.AchievementDate;
-            // }
 
-            return allClimbs.ToList();
+                result.Add(climb);
+            }
+            _logger.LogInformation($"Returned cotacols with {result.Count(c => c.Done)} marked climbs");
+            return result;
         }
 
         public async Task<List<UserColAchievement>> GetColsAsync(string userId)
