@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -20,15 +21,19 @@ using Microsoft.Extensions.Hosting;
 using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
 using CotacolApp.Interfaces;
+using CotacolApp.Models.CotacolApi;
 using CotacolApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CotacolApp
 {
     public class Startup
     {
+        private ICotacolClient _cotacolClient; 
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -70,7 +75,9 @@ namespace CotacolApp
                     //https://www.strava.com/oauth/authorize?client_id=54778&scope=read&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fsignin-strava&state=CfDJ8JoKNYGkoJRGiyjnLkJiaUXjUWR4qUReuvnpsCJPXslZ-CQ8zd_K_29IzJFzt3FOh_ARdAIChh1omQs_e-sTuGf06AgozflcyVSbLRtr4kenuHkd0i-TDE0OglQgZWCw4OdZ3D6flAsl1SvtBpZCUPa9h6OXn50HlcpZmnsz_LnoyLxviJlLkCU2Iipq9iWsZ6ze0kQLXgGSZF7yPZU_Xw0nGpPtelrgKW-az60jJJao-T9CdrEBBTcX-8TwPF-6kQrySYHmyvWfzxsTVBr7dp-bq4QGcF2-pZTdRtkym2SRwVYWQi9H4WNZW3zy8VMq1Q
                     options.ClientId = "54778"; //Configuration["strava-app-id"];
                     options.ClientSecret = "29dec80b378c4cb04be78d1defba2a7458b72b26"; //Configuration["strava-app-secret"];
-                    options.CallbackPath = "/StravaLogin"; //"/signin-strava";
+                    options.CallbackPath = "/stravalogin"; //"/signin-strava";
+
+                    options.SaveTokens = true; // Save the auth/refresh token for later retrieval
                     
                     options.SignInScheme = IdentityConstants.ExternalScheme;
                     
@@ -97,11 +104,33 @@ namespace CotacolApp
                             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
 
+                            
                             var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
                             response.EnsureSuccessStatusCode();
                             var claimsJson = await response.Content.ReadAsStringAsync();
                             //context.RunClaimActions(user.RootElement);
-                            context.AddClaims(claimsJson);
+                            var userSettings = context.AddClaims(claimsJson);
+                            
+                            var tokens = context.Properties.GetTokens().ToList();
+                            foreach (var authenticationToken in tokens)
+                            {
+                                Console.WriteLine($"{authenticationToken.Name} : {authenticationToken.Value}");
+                            }
+                            // register user here
+                            Console.WriteLine($"Cotacol client instance found? {_cotacolClient!=null}");
+                            if (_cotacolClient != null)
+                            {
+                                await _cotacolClient.SetupUserAsync(new UserSetupRequest
+                                {
+                                    CotacolHunter = true,
+                                    UserId = GetValue( userSettings, "userId"),
+                                    UserName = GetValue( userSettings, "userName"),
+                                    FullName = $"{GetValue( userSettings, "firstName")} {GetValue( userSettings, "lastName")}",
+                                    EmailAddress = GetValue( userSettings, "email"),
+                                    PremiumUser = false,
+                                    StravaRefreshToken = tokens.FirstOrDefault(token=>token.Name.Equals("refresh_token"))?.Value
+                                });
+                            }
                         }
                     };
                     options.Validate();
@@ -119,9 +148,19 @@ namespace CotacolApp
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        private string GetValue(IDictionary<string, string> settings, string setting, string defaultValue = null)
         {
+            if (settings?.ContainsKey(setting)??false)
+            {
+                return settings[setting];
+            }
+
+            return defaultValue;
+        }
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ICotacolClient cotacolClient)
+        {
+            _cotacolClient = cotacolClient;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

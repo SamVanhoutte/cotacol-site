@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
@@ -57,14 +59,16 @@ namespace CotacolApp.Services
             return info;
         }
 
-        public static void AddClaims(this OAuthCreatingTicketContext context, string claimsJson)
+        public static IDictionary<string, string> AddClaims(this OAuthCreatingTicketContext context, string claimsJson)
         {
             var data = JObject.Parse(claimsJson);
 
-
+            var userSettings = new Dictionary<string, string>();
+            
             var userId = (string) data["id"];
             if (!string.IsNullOrEmpty(userId))
             {
+                userSettings.Add("userId", userId);
                 context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
@@ -72,6 +76,7 @@ namespace CotacolApp.Services
             var firstName = (string) data["firstname"];
             if (!string.IsNullOrEmpty(firstName))
             {
+                userSettings.Add("firstName", firstName);
                 context.Identity.AddClaim(new Claim("FirstName", firstName, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
@@ -79,6 +84,7 @@ namespace CotacolApp.Services
             var lastName = (string) data["lastname"];
             if (!string.IsNullOrEmpty(lastName))
             {
+                userSettings.Add("lastName", lastName);
                 context.Identity.AddClaim(new Claim("LastName", lastName, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
@@ -86,6 +92,7 @@ namespace CotacolApp.Services
             var userName = (string) data["username"];
             if (!string.IsNullOrEmpty(userName))
             {
+                userSettings.Add("userName", userName);
                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, userName, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
@@ -93,6 +100,7 @@ namespace CotacolApp.Services
             var email = (string) data["email"];
             if (!string.IsNullOrEmpty(email))
             {
+                userSettings.Add("email", email);
                 context.Identity.AddClaim(new Claim(ClaimTypes.Email, email, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
@@ -100,9 +108,12 @@ namespace CotacolApp.Services
             var pictureUrl = (string) data["profile_medium"];
             if (!string.IsNullOrEmpty(pictureUrl))
             {
+                userSettings.Add("profilePicture", pictureUrl);
                 context.Identity.AddClaim(new Claim("profile-picture", pictureUrl, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
             }
+
+            return userSettings;
         }
     }
 }

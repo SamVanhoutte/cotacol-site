@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using CotacolApp.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -83,8 +84,8 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
-                    info.LoginProvider);
+                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
+                     info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
 
@@ -94,8 +95,14 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             }
             else
             {
+                _logger.LogInformation($"User {info.Principal.GetUserName()} logged in & does not have an account");
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
+                // AccessTokens
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+                _logger.LogInformation($"New user tokens received {accessToken} - {refreshToken}");
+
                 ProviderDisplayName = info.ProviderDisplayName;
                 if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
                 {
@@ -128,6 +135,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
+                        
                         var userId = await _userManager.GetUserIdAsync(user);
                         //TODO : email verification
                         // var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

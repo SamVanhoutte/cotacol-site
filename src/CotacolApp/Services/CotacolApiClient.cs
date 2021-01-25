@@ -30,5 +30,14 @@ namespace CotacolApp.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public async Task<bool> SetupUserAsync(UserSetupRequest userSettings)
+        {
+            var response = await $"{_settings.BaseUrl}/user/{userSettings.UserId}"
+                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+                .PostJsonAsync(userSettings);
+
+            return response.ResponseMessage.IsSuccessStatusCode;
+        }
     }
 }
