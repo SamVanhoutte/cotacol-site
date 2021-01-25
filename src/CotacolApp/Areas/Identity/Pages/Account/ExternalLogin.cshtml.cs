@@ -6,6 +6,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using CotacolApp.Interfaces;
+using CotacolApp.Models.CotacolApi;
+using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -22,17 +25,19 @@ namespace CotacolApp.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<CotacolUser> _signInManager;
+        private readonly UserManager<CotacolUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
         private IHttpContextAccessor _contextAccessor;
+        private ICotacolClient _cotacolClient;
 
         public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
+            SignInManager<CotacolUser> signInManager,
             IHttpContextAccessor contextAccessor,
-            UserManager<IdentityUser> userManager,
+            UserManager<CotacolUser> userManager,
             ILogger<ExternalLoginModel> logger,
+            ICotacolClient cotacolClient,
             IEmailSender emailSender)
         {
             _contextAccessor = contextAccessor;
@@ -40,6 +45,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
+            _cotacolClient = cotacolClient;
         }
 
         [BindProperty] public InputModel Input { get; set; }
@@ -84,8 +90,8 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
-                     info.LoginProvider);
+                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
+                    info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
 
@@ -125,7 +131,30 @@ namespace CotacolApp.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser {Id = info.GetUserId(), UserName = info.GetUserName(), Email = Input.Email};
+                var user = new CotacolUser
+                {
+                    Id = info.GetUserId(), UserName = info.GetUserName(), Email = Input.Email,
+                    FirstName = info.Principal.GetClaim(IdentityExtensions.FirstNameClaim), LastName = info.Principal.GetClaim(IdentityExtensions.LastNameClaim),
+                    ProfilePicture = info.Principal.GetClaim(IdentityExtensions.ProfilePictureClaim)
+                };
+
+                // register user here
+                if (_cotacolClient != null)
+                {
+                    _logger.LogTrace($"Setting up user {info.Principal.GetUserId()} on Cotacol API");
+                    await _cotacolClient.SetupUserAsync(new UserSetupRequest
+                    {
+                        CotacolHunter = true,
+                        UserId = user.Id,
+                        UserName = user.UserName,
+                        FullName =
+                            $"{user.FirstName} {user.LastName}",
+                        EmailAddress = user.Email,
+                        PremiumUser = false,
+                        StravaRefreshToken = info.AuthenticationTokens
+                            .FirstOrDefault(token => token.Name.Equals("refresh_token"))?.Value
+                    });
+                }
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -135,7 +164,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        
+
                         var userId = await _userManager.GetUserIdAsync(user);
                         //TODO : email verification
                         // var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -155,8 +184,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                         //     return RedirectToPage("./RegisterConfirmation", new {Email = Input.Email});
                         // }
 
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-                        _logger.LogInformation($"User {user.UserName} sign in result: {_signInManager.IsSignedIn(info.Principal)}");
+                        await _signInManager.SignInAsync(user, isPersistent: true, info.LoginProvider);
+                        _logger.LogInformation(
+                            $"User {user.UserName} sign in result: {_signInManager.IsSignedIn(info.Principal)}");
                         return LocalRedirect(returnUrl);
                     }
                 }

@@ -22,6 +22,7 @@ using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
 using CotacolApp.Interfaces;
 using CotacolApp.Models.CotacolApi;
+using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,8 +33,7 @@ namespace CotacolApp
 {
     public class Startup
     {
-        private ICotacolClient _cotacolClient; 
-        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -49,7 +49,7 @@ namespace CotacolApp
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddDefaultIdentity<CotacolUser>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = false;
                     options.SignIn.RequireConfirmedEmail = false;
@@ -111,26 +111,7 @@ namespace CotacolApp
                             //context.RunClaimActions(user.RootElement);
                             var userSettings = context.AddClaims(claimsJson);
                             
-                            var tokens = context.Properties.GetTokens().ToList();
-                            foreach (var authenticationToken in tokens)
-                            {
-                                Console.WriteLine($"{authenticationToken.Name} : {authenticationToken.Value}");
-                            }
-                            // register user here
-                            Console.WriteLine($"Cotacol client instance found? {_cotacolClient!=null}");
-                            if (_cotacolClient != null)
-                            {
-                                await _cotacolClient.SetupUserAsync(new UserSetupRequest
-                                {
-                                    CotacolHunter = true,
-                                    UserId = GetValue( userSettings, "userId"),
-                                    UserName = GetValue( userSettings, "userName"),
-                                    FullName = $"{GetValue( userSettings, "firstName")} {GetValue( userSettings, "lastName")}",
-                                    EmailAddress = GetValue( userSettings, "email"),
-                                    PremiumUser = false,
-                                    StravaRefreshToken = tokens.FirstOrDefault(token=>token.Name.Equals("refresh_token"))?.Value
-                                });
-                            }
+                            
                         }
                     };
                     options.Validate();
@@ -140,7 +121,7 @@ namespace CotacolApp
 
             // Dependency injectoin
             services
-                .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>
+                .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<CotacolUser>
                 >();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
@@ -148,19 +129,10 @@ namespace CotacolApp
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
         }
 
-        private string GetValue(IDictionary<string, string> settings, string setting, string defaultValue = null)
-        {
-            if (settings?.ContainsKey(setting)??false)
-            {
-                return settings[setting];
-            }
 
-            return defaultValue;
-        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ICotacolClient cotacolClient)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            _cotacolClient = cotacolClient;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

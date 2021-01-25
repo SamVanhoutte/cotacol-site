@@ -33,6 +33,7 @@ namespace CotacolApp.Services
 
         public async Task<bool> SetupUserAsync(UserSetupRequest userSettings)
         {
+            // TODO : valdiation of required props
             var response = await $"{_settings.BaseUrl}/user/{userSettings.UserId}"
                 .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
                 .PostJsonAsync(userSettings);
