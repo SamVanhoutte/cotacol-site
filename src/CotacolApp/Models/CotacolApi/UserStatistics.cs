@@ -1,6 +1,7 @@
 namespace CotacolApp.Models.CotacolApi
 {
-    public class User    {
+    public class UserStatistics    {
+        public int Position { get; set; }
         public string UserId { get; set; } 
         public string UserName { get; set; } 
         public string FullName { get; set; } 

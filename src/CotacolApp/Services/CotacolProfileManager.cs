@@ -19,10 +19,10 @@ namespace CotacolApp.Services
         private CotacolUser CurrentUser => _userManager.GetUserAsync(_contextAccessor.HttpContext.User).Result;
 
         public bool IsAuthenticated => _contextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
-        public string ProfilePicture => CurrentUser.ProfilePicture;
-        public string Email  => CurrentUser.Email;
-        public string UserId  => CurrentUser.Id;
-        public string UserName  => CurrentUser.UserName;
-        public string FullName => $"{CurrentUser.FirstName} {CurrentUser.LastName}";
+        public string ProfilePicture => CurrentUser?.ProfilePicture;
+        public string Email  => CurrentUser?.Email;
+        public string UserId  => CurrentUser?.Id;
+        public string UserName  => CurrentUser?.UserName;
+        public string FullName => $"{CurrentUser?.FirstName} {CurrentUser?.LastName}";
     }
 }

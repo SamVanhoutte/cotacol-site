@@ -1,0 +1,187 @@
+@page "/stats"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+
+<h1>Crunching numbers</h1>
+
+@if (!UserProfile.IsAuthenticated)
+{
+    <p>
+        <em>Since you are not a registered user, user names and activity details are hidden for user privacy.</em>
+    </p>
+}
+
+@if (stats == null)
+{
+    <p>
+        <em>Loading climbs...</em>
+    </p>
+}
+else
+{
+    <MatTabGroup @bind-ActiveIndex="@tabIndex">
+        <MatTab Label="Leader board">
+            <h3>Leaderboard</h3>
+            <MatTable FilterByColumnName="Name" Items="@stats.Users" class="table" PageSize="100"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortStats">
+                        <MatSortHeader SortId="position">#</MatSortHeader>
+                        <MatSortHeader SortId="name">
+                            <span style="width:600px">Hunter</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="points">Total Points</MatSortHeader>
+                        <MatSortHeader SortId="climbs">Unique Climbs</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Position</td>
+                    <td>
+                        <b>@PrintName(context)</b>
+                    </td>
+                    <td>@context.TotalPoints</td>
+                    <td>@context.UniqueCols</td>
+                </MatTableRow>
+            </MatTable>
+        </MatTab>
+        <MatTab Label="Col popularity">
+
+            <h3>Climb popularity</h3>
+            <MatTable FilterByColumnName="Name" Items="@stats.Cotacols" class="table" PageSize="100"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortStats">
+                        <MatSortHeader SortId="name">
+                            <span style="width:600px">Name</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="userCount">Users</MatSortHeader>
+                        <MatSortHeader SortId="attemptCount ">Total attempts</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>
+                        <b>@context.CotacolName</b>
+                    </td>
+                    <td>@context.UniqueUsers</td>
+                    <td>@context.TotalAttempts</td>
+                </MatTableRow>
+            </MatTable>
+        </MatTab>
+        <MatTab Label="Toughest activities">
+            <h3>Toughest activities</h3>
+            <MatTable Items="@stats.Activities" class="table" PageSize="100"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortStats">
+                        <MatSortHeader SortId="name">Hunter</MatSortHeader>
+                        <MatSortHeader SortId="date">Date</MatSortHeader>
+                        <MatSortHeader SortId="cols">Cols</MatSortHeader>
+                        <MatSortHeader SortId="points">Points</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td style="min-width: 240px">
+                        <b>@PrintName(context)</b>
+                    </td>
+                    <td style="min-width: 240px">
+                        @if (UserProfile.IsAuthenticated)
+                        {
+                            <a href="@context.ActivityUrl" target="_blank">@context.ActivityDate.ToString("D")</a>
+                        }
+                        else
+                        {
+                            @context.ActivityDate.ToString("D")
+                        }
+                    </td>
+                    <td>@context.UniqueCols</td>
+                    <td>@context.TotalPoints</td>
+                </MatTableRow>
+            </MatTable>
+        </MatTab>
+    </MatTabGroup>
+}
+
+@code {
+    private SiteStats stats = null;
+    public int tabIndex = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stats = await CotacolClient.GetStatsAsync();
+    }
+
+    private string GetName(string fullName, string userName)
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            if (!string.IsNullOrEmpty(fullName))
+                return fullName;
+            if (!string.IsNullOrEmpty(userName))
+                return userName;
+            return "Anonymous";
+        }
+        if (!string.IsNullOrEmpty(fullName))
+        {
+            var result = "";
+            foreach (var namePart in fullName.Split(' '))
+            {
+                if (!string.IsNullOrEmpty(namePart))
+                {
+                    var newChar = namePart[0];
+                    if (newChar < 128)
+                        result += newChar;
+                }
+            }
+            return result;
+        }
+        return "Anonymous";
+    }
+
+    private string PrintName(UserStatistics user)
+    {
+        return GetName(user.FullName, user.UserName);
+    }
+
+    private string PrintName(Activity activity)
+    {
+        return GetName(activity.FullName, activity.UserName);
+    }
+
+    private void SortStats(MatSortChangedEvent sort)
+    {
+    // if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && climbs != null)
+    // {
+    //     switch (sort.SortId)
+    //     {
+    //         case "id":
+    //             climbs = sort.Direction == MatSortDirection.Asc ?
+    //                 climbs.OrderBy(c => c.Id) :
+    //                 climbs.OrderByDescending(c => c.Id);
+    //             break;
+    //         case "name":
+    //             climbs = sort.Direction == MatSortDirection.Asc ?
+    //                 climbs.OrderBy(c => c.Name) :
+    //                 climbs.OrderByDescending(c => c.Name);
+    //             break;
+    //         case "province":
+    //             climbs = sort.Direction == MatSortDirection.Asc ?
+    //                 climbs.OrderBy(c => c.Province) :
+    //                 climbs.OrderByDescending(c => c.Province);
+    //             break;
+    //         case "surface":
+    //             climbs = sort.Direction == MatSortDirection.Asc ?
+    //                 climbs.OrderBy(c => c.Surface) :
+    //                 climbs.OrderByDescending(c => c.Surface);
+    //             break;
+    //         case "points":
+    //             climbs = sort.Direction == MatSortDirection.Asc ?
+    //                 climbs.OrderBy(c => c.CotacolPoints) :
+    //                 climbs.OrderByDescending(c => c.CotacolPoints);
+    //             break;
+    //     }
+    // }
+    }
+
+}

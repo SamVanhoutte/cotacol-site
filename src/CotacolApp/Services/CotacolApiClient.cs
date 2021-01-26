@@ -28,9 +28,17 @@ namespace CotacolApp.Services
             return climbs;
         }
 
-        public Task<SiteStats> GetStatsAsync()
+        public async Task<SiteStats> GetStatsAsync()
         {
-            throw new System.NotImplementedException();
+            var stats = await $"{_settings.ApiUrl}/stats"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<SiteStats>();
+            var idx = 1;
+            foreach (var statsUser in stats.Users)
+            {
+                statsUser.Position = idx++;
+            }
+            return stats;
         }
 
         public async Task<bool> SetupUserAsync(UserSetupRequest userSettings)
