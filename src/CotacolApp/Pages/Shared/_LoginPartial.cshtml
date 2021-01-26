@@ -1,7 +1,8 @@
 @using Microsoft.AspNetCore.Identity
+@using CotacolApp.Models.Identity
 
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<CotacolUser> SignInManager
+@inject UserManager<CotacolUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

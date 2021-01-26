@@ -1,6 +1,10 @@
-﻿<AuthorizeView>
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
+        <a href="Identity/Account/Manage"><img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/></a>
         <form method="post" action="Identity/Account/LogOut">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
@@ -10,3 +14,7 @@
         <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+}

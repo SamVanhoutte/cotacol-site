@@ -1,0 +1,167 @@
+@page "/climbs"
+@using MatBlazor
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+
+<h3>Climbs</h3>
+
+<p>1000 Cotacol climbs for you to conquer.</p>
+@if (climbs == null)
+{
+    <p>
+        <em>Loading climbs...</em>
+    </p>
+}
+else
+{
+    <MatChipSet Choice="true" SelectedChipChanged="ApplyFilter">
+        <MatChip Label="All" Id="NoFilter"></MatChip>
+        @if (UserProfile.IsAuthenticated)
+        {
+            <MatChip Label="Done" Id="DoneFilter"></MatChip>
+            <MatChip Label="Planned" Id="PlannedFilter"></MatChip>
+            <MatChip Label="To do" Id="TodoFilter"></MatChip>
+        }
+        <MatChip Label="Top 50" Id="TopFilter"></MatChip>
+        <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
+        <MatChip Label="Highest" Id="HighFilter"></MatChip>
+        <MatChip Label="Longest" Id="LongFilter"></MatChip>
+        <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
+    </MatChipSet>
+    <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000" 
+              AllowSelection="true" SelectionChanged="SelectionChanged" 
+              ShowPaging="false" UseSortHeaderRow="true">
+        <MatTableHeader>
+            <MatSortHeaderRow SortChanged="SortClimbs">
+                <MatSortHeader SortId="id">#</MatSortHeader>
+                <MatSortHeader SortId="name">
+                    <span style="width:600px">Name</span>
+                </MatSortHeader>
+                <MatSortHeader SortId="province">Province</MatSortHeader>
+                <MatSortHeader SortId="surface">Surface</MatSortHeader>
+                <MatSortHeader SortId="points">Points</MatSortHeader>
+                <MatSortHeader>Link</MatSortHeader>
+            </MatSortHeaderRow>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>@context.Id</td>
+            @if (context.Done)
+            {
+                <td>
+                    <b>@context.Name.ToUpper()</b>
+                </td>
+            }
+            else
+            {
+                <td>@context.Name</td>
+            }
+            <td>@context.Province</td>
+            <td>@context.Surface</td>
+            <td>@context.CotacolPoints</td>
+            <td>
+                <a href="@context.Url" target="_blank">
+                    <img src="../../../images/strava-logo-small.png" asp-append-version="true"/>
+                </a>
+            </td>
+        </MatTableRow>
+    </MatTable>
+}
+
+@code {
+    private bool ColSelected = false;
+    private UserClimb SelectedClimb = null;
+    private IEnumerable<UserClimb> climbList;
+    private IEnumerable<UserClimb> climbs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            climbList = await CotacolUserClient.GetClimbDataAsync();
+        }
+        else
+        {
+            climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
+        }
+        climbs = climbList;
+    }
+
+    private void ApplyFilter(MatChip filter)
+    {
+        climbs = climbList;
+
+        switch (filter.Id?.ToLower())
+        {
+            case "nofilter":
+                break;
+            case "donefilter":
+                climbs = climbList.Where(c => c.Done);
+                break;
+            case "todofilter":
+                climbs = climbList.Where(c => !c.Done);
+                break;
+            case "topfilter":
+                climbs = climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
+                break;
+            case "easyfilter":
+                climbs = climbList.OrderBy(c => c.CotacolPoints).Take(50);
+                break;
+            case "highfilter":
+                break;
+            case "longfilter":
+                break;
+            case "steepfilter":
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void SortClimbs(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && climbs != null)
+        {
+            switch (sort.SortId)
+            {
+                case "id":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.Id) :
+                        climbs.OrderByDescending(c => c.Id);
+                    break;
+                case "name":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.Name) :
+                        climbs.OrderByDescending(c => c.Name);
+                    break;
+                case "province":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.Province) :
+                        climbs.OrderByDescending(c => c.Province);
+                    break;
+                case "surface":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.Surface) :
+                        climbs.OrderByDescending(c => c.Surface);
+                    break;
+                case "points":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.CotacolPoints) :
+                        climbs.OrderByDescending(c => c.CotacolPoints);
+                    break;
+            }
+        }
+    }
+
+    private void SelectionChanged(object col)
+    {
+        if (col is UserClimb climb)
+        {
+            SelectedClimb = climb;
+            Console.WriteLine(climb.Name);
+            StateHasChanged();
+        }
+        ColSelected = col != null;
+    }
+
+}

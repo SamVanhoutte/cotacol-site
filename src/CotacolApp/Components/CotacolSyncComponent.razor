@@ -1,0 +1,91 @@
+@using CotacolApp.Models.CotacolApi
+@using MatBlazor
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IMatDialogService MatDialogService
+
+<table class="table">
+    <tbody>
+    <tr>
+        <td>Synchronization status <em>(@syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
+        <td>
+            @if (syncStatus == null)
+            {
+                <p>
+                    <em>Loading...</em>
+                </p>
+            }
+            else
+            {
+                <p>@syncStatus.Processed / @syncStatus.Total (@syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Full synchronization 
+            @if (syncRequestedTime != default)
+            {
+                <em>(@syncRequestedTime.ToString("T"))</em>
+            }
+        </td>
+        <td>
+            <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@syncRequested">Full sync</button><em>@syncMessage</em>
+            <MatSnackbar @bind-IsOpen="@syncRequested">
+                <MatSnackbarContent>Synchronization requested.</MatSnackbarContent>
+                <MatSnackbarActions>
+                    <MatButton Raised="true" OnClick="RefreshSyncStatusAsync">Refresh</MatButton>
+                </MatSnackbarActions>
+            </MatSnackbar>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+@code {
+
+    private SyncStatus syncStatus;
+    private DateTime syncStatusRefreshDate = DateTime.Now;
+    private DateTime syncRequestedTime = default;
+    private bool syncRequested = false;
+    private string syncMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshSyncStatusAsync();
+    }
+
+    private async Task RefreshSyncStatusAsync()
+    {
+        syncStatusRefreshDate = DateTime.Now;
+        syncStatus = await CotacolUserClient.GetSyncStatus();
+        syncRequested = false;
+    }
+
+    private async Task TriggerFullSyncAsync()
+    {
+        var result = await MatDialogService.AskAsync("Synchronization takes long, are you sure you want this?", new string[] {"Yes", "Cancel"});
+        if (result.Equals("Yes", StringComparison.InvariantCultureIgnoreCase))
+        {
+            Console.WriteLine("Trigger sync");
+            syncRequested = true;
+            try
+            {
+                var httpStatus = await CotacolUserClient.SynchronizeAsync();
+                syncRequestedTime = DateTime.Now;
+                if (httpStatus <= 200 && httpStatus >= 300)
+                {
+                    syncRequested = false;
+                    syncMessage = $"❌ (HTTP error {httpStatus}";
+                }
+            }
+            catch (Exception e)
+            {
+                syncMessage = e.Message;
+            }
+        }
+    }
+
+
+
+}

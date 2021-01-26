@@ -6,10 +6,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Flurl.Http" Version="3.0.1" />
+        <PackageReference Include="Guard.Net" Version="1.2.0" />
+        <PackageReference Include="MatBlazor" Version="2.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
+        <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
+        <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.2">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
@@ -21,6 +26,15 @@
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="appsettings.dev.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="wwwroot\images\strava-login.png" />
     </ItemGroup>
 
 </Project>
