@@ -6,8 +6,10 @@ using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Settings;
 using Flurl.Http;
+using GuardNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SQLitePCL;
 
 namespace CotacolApp.Services
@@ -20,16 +22,13 @@ namespace CotacolApp.Services
         private ILogger<CotacolApiUserClient> _logger;
 
         public CotacolApiUserClient(IHttpContextAccessor contextAccessor, ICotacolClient cotacolDataClient,
-            ILogger<CotacolApiUserClient> logger)
+            ILogger<CotacolApiUserClient> logger, IOptions<CotacolApiSettings> settings)
         {
-            // TODO : options
-            _settings = new CotacolApiSettings
-            {
-                BaseUrl = "https://cotacol-hunting.azure-api.net/test/api/v1", SecretKeyName = "x-api-subscription-key"
-            };
+            Guard.NotNull(settings?.Value, nameof(settings));
             _context = contextAccessor;
             _cotacolDataClient = cotacolDataClient;
             _logger = logger;
+            _settings = settings.Value;
         }
 
         private string userId => _context.HttpContext.User.GetUserId();
@@ -59,8 +58,8 @@ namespace CotacolApp.Services
 
         public async Task<List<UserColAchievement>> GetColsAsync()
         {
-            var cols = await $"{_settings.BaseUrl}/user/{userId}/cols"
-                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+            var cols = await $"{_settings.ApiUrl}/user/{userId}/cols"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<UserColAchievement>>();
 
             return cols;
@@ -83,8 +82,8 @@ namespace CotacolApp.Services
 
         public async Task<SyncStatus> GetSyncStatus()
         {
-            var response = await $"{_settings.BaseUrl}/user/{userId}/sync"
-                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+            var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
+                .WithHeader(_settings.SharedKeyHeaderName,  _settings.SharedKeyValue)
                 .GetJsonAsync<SyncStatus>();
             return response;
         }
@@ -92,8 +91,8 @@ namespace CotacolApp.Services
         public async Task<int> SynchronizeAsync(bool fullSync = false)
         {
             _logger.LogInformation($"Sync request for user {userId}");
-            var response = await $"{_settings.BaseUrl}/user/{userId}/sync"
-                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+            var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .AllowAnyHttpStatus()
                 .PostJsonAsync(new SyncRequest {ForceSync = false, FullSync = fullSync, MaxActivityCount = 0});
             _logger.LogInformation($"Sync requested for user {userId} with status {response.StatusCode}");

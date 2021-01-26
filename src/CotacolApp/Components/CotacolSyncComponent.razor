@@ -22,7 +22,13 @@
         </td>
     </tr>
     <tr>
-        <td>Full synchronization</td>
+        <td>
+            Full synchronization
+            @if (syncRequestedTime != default)
+            {
+                <p>(<em>@syncRequestedTime.ToString("T")</em>)</p>
+            }
+        </td>
         <td>
             <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@syncRequested">Full sync</button><em>@syncMessage</em>
         </td>
@@ -34,6 +40,7 @@
 
     private SyncStatus syncStatus;
     private DateTime syncStatusRefreshDate = DateTime.Now;
+    private DateTime syncRequestedTime = default;
     private bool syncRequested = false;
     private string syncMessage = "";
 
@@ -55,13 +62,14 @@
         try
         {
             var httpStatus = await CotacolUserClient.SynchronizeAsync();
+            syncRequestedTime = DateTime.Now;
             if (httpStatus >= 200 && httpStatus < 300)
             {
-                syncMessage = $"👌 ({DateTime.Now:T})";
+                syncMessage = $"👌)";
             }
             else
             {
-                syncMessage = $"❌ ({DateTime.Now:T} - HTTP error {httpStatus})";
+                syncMessage = $"❌ (HTTP error {httpStatus}";
             }
         }
         catch (Exception e)

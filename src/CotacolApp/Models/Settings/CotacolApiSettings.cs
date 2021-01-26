@@ -2,7 +2,9 @@ namespace CotacolApp.Settings
 {
     public class CotacolApiSettings
     {
-        public string BaseUrl { get; set; }
-        public string SecretKeyName { get; set; }
+        public string ApiUrl { get; set; }
+        public string SharedKeyHeaderName { get; set; }
+        public string SharedKeyValue { get; set; }
     }
 }
+
