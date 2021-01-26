@@ -1,6 +1,8 @@
 @using CotacolApp.Models.CotacolApi
+@using MatBlazor
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
+@inject IMatDialogService MatDialogService
 <h3>Synchronization</h3>
 
 
@@ -23,14 +25,20 @@
     </tr>
     <tr>
         <td>
-            Full synchronization
+            Full synchronization 
             @if (syncRequestedTime != default)
             {
-                <p>(<em>@syncRequestedTime.ToString("T")</em>)</p>
+                <em>(@syncRequestedTime.ToString("T"))</em>
             }
         </td>
         <td>
             <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@syncRequested">Full sync</button><em>@syncMessage</em>
+            <MatSnackbar @bind-IsOpen="@syncRequested">
+                <MatSnackbarContent>Synchronization requested.</MatSnackbarContent>
+                <MatSnackbarActions>
+                    <MatButton Raised="true" OnClick="RefreshSyncStatusAsync">Refresh</MatButton>
+                </MatSnackbarActions>
+            </MatSnackbar>
         </td>
     </tr>
     </tbody>
@@ -53,29 +61,33 @@
     {
         syncStatusRefreshDate = DateTime.Now;
         syncStatus = await CotacolUserClient.GetSyncStatus();
+        syncRequested = false;
     }
 
     private async Task TriggerFullSyncAsync()
     {
-        Console.WriteLine("Trigger sync");
-        syncRequested = true;
-        try
+        var result = await MatDialogService.AskAsync("Synchronization takes long, are you sure you want this?", new string[] {"Yes", "Cancel"});
+        if (result.Equals("Yes", StringComparison.InvariantCultureIgnoreCase))
         {
-            var httpStatus = await CotacolUserClient.SynchronizeAsync();
-            syncRequestedTime = DateTime.Now;
-            if (httpStatus >= 200 && httpStatus < 300)
+            Console.WriteLine("Trigger sync");
+            syncRequested = true;
+            try
             {
-                syncMessage = $"👌)";
+                var httpStatus = await CotacolUserClient.SynchronizeAsync();
+                syncRequestedTime = DateTime.Now;
+                if (httpStatus <= 200 && httpStatus >= 300)
+                {
+                    syncRequested = false;
+                    syncMessage = $"❌ (HTTP error {httpStatus}";
+                }
             }
-            else
+            catch (Exception e)
             {
-                syncMessage = $"❌ (HTTP error {httpStatus}";
+                syncMessage = e.Message;
             }
-        }
-        catch (Exception e)
-        {
-            syncMessage = e.Message;
         }
     }
+
+
 
 }

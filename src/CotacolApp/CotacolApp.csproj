@@ -34,7 +34,6 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-      <None Include="wwwroot\images\-strava-login.png" />
       <None Include="wwwroot\images\strava-login.png" />
     </ItemGroup>
 

@@ -26,6 +26,7 @@ using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using CotacolApp.Settings;
+using MatBlazor;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -141,6 +142,7 @@ namespace CotacolApp
             services.AddSingleton<ICotacolClient, CotacolApiClient>();
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
             services.AddSingleton<ISecretReader, KeyVaultReader>();
+            services.AddMatBlazor();
             services
                 .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
                 .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))
