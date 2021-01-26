@@ -20,7 +20,7 @@ else
         @if (UserProfile.IsAuthenticated)
         {
             <MatChip Label="Done" Id="DoneFilter"></MatChip>
-            <MatChip Label="Planned" Id="PlannedFilter"></MatChip>
+            <!--<MatChip Label="Planned" Id="PlannedFilter"></MatChip>-->
             <MatChip Label="To do" Id="TodoFilter"></MatChip>
         }
         <MatChip Label="Top 50" Id="TopFilter"></MatChip>
@@ -29,18 +29,19 @@ else
         <MatChip Label="Longest" Id="LongFilter"></MatChip>
         <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
     </MatChipSet>
-    <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000" 
-              AllowSelection="true" SelectionChanged="SelectionChanged" 
+    <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000"
+              AllowSelection="true" SelectionChanged="SelectionChanged"
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
                 <MatSortHeader SortId="id">#</MatSortHeader>
-                <MatSortHeader SortId="name">
-                    <span style="width:600px">Name</span>
-                </MatSortHeader>
+                <MatSortHeader SortId="name"><span style="width:250px">Name</span></MatSortHeader>
                 <MatSortHeader SortId="province">Province</MatSortHeader>
                 <MatSortHeader SortId="surface">Surface</MatSortHeader>
                 <MatSortHeader SortId="points">Points</MatSortHeader>
+                <MatSortHeader SortId="length">Length</MatSortHeader>
+                <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
+                <MatSortHeader SortId="grade">Grade</MatSortHeader>
                 <MatSortHeader>Link</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
@@ -48,17 +49,20 @@ else
             <td>@context.Id</td>
             @if (context.Done)
             {
-                <td>
+                <td style="max-width: 200px">
                     <b>@context.Name.ToUpper()</b>
                 </td>
             }
             else
             {
-                <td>@context.Name</td>
+                <td style="max-width: 200px">@context.Name</td>
             }
             <td>@context.Province</td>
             <td>@context.Surface</td>
             <td>@context.CotacolPoints</td>
+            <td>@context.Distance</td>
+            <td>@context.ElevationDiff</td>
+            <td>@context.AvgGrade %</td>
             <td>
                 <a href="@context.Url" target="_blank">
                     <img src="../../../images/strava-logo-small.png" asp-append-version="true"/>
@@ -82,7 +86,7 @@ else
         }
         else
         {
-            climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
+            climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
         }
         climbs = climbList;
     }
@@ -108,10 +112,13 @@ else
                 climbs = climbList.OrderBy(c => c.CotacolPoints).Take(50);
                 break;
             case "highfilter":
+                climbs = climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
                 break;
             case "longfilter":
+                climbs = climbList.OrderByDescending(c => c.Distance).Take(50);
                 break;
             case "steepfilter":
+                climbs = climbList.OrderByDescending(c => c.AvgGrade).Take(50);
                 break;
             default:
                 break;
@@ -148,6 +155,21 @@ else
                     climbs = sort.Direction == MatSortDirection.Asc ?
                         climbs.OrderBy(c => c.CotacolPoints) :
                         climbs.OrderByDescending(c => c.CotacolPoints);
+                    break;
+                case "length":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.Distance) :
+                        climbs.OrderByDescending(c => c.Distance);
+                    break;
+                case "elevation":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.ElevationDiff) :
+                        climbs.OrderByDescending(c => c.ElevationDiff);
+                    break;
+                case "grade":
+                    climbs = sort.Direction == MatSortDirection.Asc ?
+                        climbs.OrderBy(c => c.AvgGrade) :
+                        climbs.OrderByDescending(c => c.AvgGrade);
                     break;
             }
         }

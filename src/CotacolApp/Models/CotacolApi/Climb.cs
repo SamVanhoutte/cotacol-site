@@ -15,14 +15,14 @@ namespace CotacolApp.Models.CotacolApi
                 public string SegmentConfidence { get; init; }
         public string Name { get; init; }
 
-        public  UserClimb ToUserClimb()
-        {
-            return new()
-            {
-                Id = Id, Name = Name, CotacolPoints = CotacolPoints, Province = Province,
-                Surface = Surface, SegmentConfidence = SegmentConfidence, Url = Url
-            };
-        }
+        // public  UserClimb ToUserClimb()
+        // {
+        //     return new()
+        //     {
+        //         Id = Id, Name = Name, CotacolPoints = CotacolPoints, Province = Province,
+        //         Surface = Surface, SegmentConfidence = SegmentConfidence, Url = Url
+        //     };
+        // }
     }
     
 

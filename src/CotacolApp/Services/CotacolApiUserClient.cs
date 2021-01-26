@@ -36,7 +36,10 @@ namespace CotacolApp.Services
         public async Task<List<UserClimb>> GetClimbDataAsync()
         {
             var colsDone = await GetColsAsync();
-            var allClimbs = (await _cotacolDataClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
+            var allClimbs = 
+                (await _cotacolDataClient
+                .GetClimbDataAsync())
+                .Select(climb => new UserClimb(climb));
 
             _logger.LogInformation($"User {userId} has {colsDone.Count()} conquered climbs");
             var result = new List<UserClimb>();

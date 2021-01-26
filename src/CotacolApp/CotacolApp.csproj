@@ -36,5 +36,13 @@
     <ItemGroup>
       <None Include="wwwroot\images\strava-login.png" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Remove="StaticData\cotacoldata.json" />
+      <EmbeddedResource Include="StaticData\cotacoldata.json">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
 
 </Project>
