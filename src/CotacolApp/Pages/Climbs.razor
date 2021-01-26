@@ -1,5 +1,6 @@
 @page "/climbs"
 @using MatBlazor
+@using CotacolApp.Models.CotacolApi
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -7,7 +8,6 @@
 <h3>Climbs</h3>
 
 <p>1000 Cotacol climbs for you to conquer.</p>
-<p>Filter: @filter</p>
 @if (climbs == null)
 {
     <p>
@@ -21,13 +21,7 @@ else
         @if (UserProfile.IsAuthenticated)
         {
             <MatChip Label="Done" Id="DoneFilter"></MatChip>
-        }
-        @if (UserProfile.IsAuthenticated)
-        {
             <MatChip Label="Planned" Id="PlannedFilter"></MatChip>
-        }
-        @if (UserProfile.IsAuthenticated)
-        {
             <MatChip Label="To do" Id="TodoFilter"></MatChip>
         }
         <MatChip Label="Top 50" Id="TopFilter"></MatChip>
@@ -36,8 +30,9 @@ else
         <MatChip Label="Longest" Id="LongFilter"></MatChip>
         <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
     </MatChipSet>
-
-    <MatTable Items="@climbs" class="table" PageSize="2000" ShowPaging="false" UseSortHeaderRow="true">
+    <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000" 
+              AllowSelection="true" SelectionChanged="SelectionChanged" 
+              ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
                 <MatSortHeader SortId="id">#</MatSortHeader>
@@ -66,16 +61,19 @@ else
             <td>@context.Surface</td>
             <td>@context.CotacolPoints</td>
             <td>
-                <a href="@context.Url" target="_blank"><img src="../../../images/strava-logo-small.png" asp-append-version="true" /></a>
+                <a href="@context.Url" target="_blank">
+                    <img src="../../../images/strava-logo-small.png" asp-append-version="true"/>
+                </a>
             </td>
         </MatTableRow>
     </MatTable>
 }
 
 @code {
+    private bool ColSelected = false;
+    private UserClimb SelectedClimb = null;
     private IEnumerable<UserClimb> climbList;
     private IEnumerable<UserClimb> climbs;
-    string filter = "all";
 
     protected override async Task OnInitializedAsync()
     {
@@ -154,6 +152,17 @@ else
                     break;
             }
         }
+    }
+
+    private void SelectionChanged(object col)
+    {
+        if (col is UserClimb climb)
+        {
+            SelectedClimb = climb;
+            Console.WriteLine(climb.Name);
+            StateHasChanged();
+        }
+        ColSelected = col != null;
     }
 
 }
