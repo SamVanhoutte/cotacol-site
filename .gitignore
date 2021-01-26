@@ -5,6 +5,8 @@
 
 .idea
 .DS_Store
+src/CotacolApp/app.db
+appsettings.dev.json
 
 # User-specific files
 *.rsuser
@@ -351,4 +353,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-src/CotacolApp/app.db
