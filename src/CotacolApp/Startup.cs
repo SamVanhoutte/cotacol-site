@@ -145,6 +145,20 @@ namespace CotacolApp
                 .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
                 .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))
                 .Configure<KeyVaultSettings>(options => configuration.GetSection("keyvault").Bind(options));
+            
+            // Inject HttpClient, required by MatBlazor components
+            if (services.All(x => x.ServiceType != typeof(HttpClient)))
+            {
+                services.AddScoped(
+                    s =>
+                    {
+                        var navigationManager = s.GetRequiredService<NavigationManager>();
+                        return new HttpClient
+                        {
+                            BaseAddress = new Uri(navigationManager.BaseUri)
+                        };
+                    });
+            }
         }
 
 
