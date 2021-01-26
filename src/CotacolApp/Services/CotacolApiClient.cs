@@ -1,12 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using CotacolApp.Interfaces;
+using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Settings;
 using Flurl.Http;
 using GuardNet;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace CotacolApp.Services
 {
@@ -19,13 +24,33 @@ namespace CotacolApp.Services
             Guard.NotNull(apiSettings?.Value, nameof(apiSettings));
             _settings = apiSettings.Value;
         }
-        public async Task<List<Climb>> GetClimbDataAsync()
+        
+        private async Task<List<ClimbData>> GetColsFromResource()
         {
-            var climbs = await $"{_settings.ApiUrl}/climbs"
+            var assembly = Assembly.GetAssembly(typeof(CotacolApiClient));
+            var resourceName = "CotacolApp.StaticData.cotacoldata.json";
+            await using var stream = assembly.GetManifestResourceStream(resourceName);
+            using var reader = new StreamReader(stream);
+            var result = await reader.ReadToEndAsync();
+            var newClimbs = JsonConvert.DeserializeObject<List<ClimbData>>(result);
+            return newClimbs;
+        }
+        
+        public async Task<List<ClimbData>> GetClimbDataAsync()
+        {
+            var fullData = await GetColsFromResource();
+            
+            var segmentData = await $"{_settings.ApiUrl}/climbs"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<Climb>>();
 
-            return climbs;
+            foreach (var climbData in fullData)
+            {
+                climbData.StravaSegment = segmentData.FirstOrDefault(sd =>
+                    sd.Id.Equals(climbData.Id, StringComparison.InvariantCultureIgnoreCase))?.Url;
+            }
+
+            return fullData;
         }
 
         public async Task<SiteStats> GetStatsAsync()

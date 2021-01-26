@@ -27,7 +27,7 @@ else
             <MatTable FilterByColumnName="Name" Items="@stats.Users" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
-                    <MatSortHeaderRow SortChanged="SortStats">
+                    <MatSortHeaderRow SortChanged="SortLeaders">
                         <MatSortHeader SortId="position">#</MatSortHeader>
                         <MatSortHeader SortId="name">
                             <span style="width:600px">Hunter</span>
@@ -47,17 +47,16 @@ else
             </MatTable>
         </MatTab>
         <MatTab Label="Col popularity">
-
             <h3>Climb popularity</h3>
             <MatTable FilterByColumnName="Name" Items="@stats.Cotacols" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
-                    <MatSortHeaderRow SortChanged="SortStats">
+                    <MatSortHeaderRow SortChanged="SortClimbs">
                         <MatSortHeader SortId="name">
                             <span style="width:600px">Name</span>
                         </MatSortHeader>
                         <MatSortHeader SortId="userCount">Users</MatSortHeader>
-                        <MatSortHeader SortId="attemptCount ">Total attempts</MatSortHeader>
+                        <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
                     </MatSortHeaderRow>
                 </MatTableHeader>
                 <MatTableRow>
@@ -74,7 +73,7 @@ else
             <MatTable Items="@stats.Activities" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
-                    <MatSortHeaderRow SortChanged="SortStats">
+                    <MatSortHeaderRow SortChanged="SortActivities">
                         <MatSortHeader SortId="name">Hunter</MatSortHeader>
                         <MatSortHeader SortId="date">Date</MatSortHeader>
                         <MatSortHeader SortId="cols">Cols</MatSortHeader>
@@ -149,39 +148,67 @@ else
         return GetName(activity.FullName, activity.UserName);
     }
 
-    private void SortStats(MatSortChangedEvent sort)
+    private void SortLeaders(MatSortChangedEvent sort)
     {
-    // if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && climbs != null)
-    // {
-    //     switch (sort.SortId)
-    //     {
-    //         case "id":
-    //             climbs = sort.Direction == MatSortDirection.Asc ?
-    //                 climbs.OrderBy(c => c.Id) :
-    //                 climbs.OrderByDescending(c => c.Id);
-    //             break;
-    //         case "name":
-    //             climbs = sort.Direction == MatSortDirection.Asc ?
-    //                 climbs.OrderBy(c => c.Name) :
-    //                 climbs.OrderByDescending(c => c.Name);
-    //             break;
-    //         case "province":
-    //             climbs = sort.Direction == MatSortDirection.Asc ?
-    //                 climbs.OrderBy(c => c.Province) :
-    //                 climbs.OrderByDescending(c => c.Province);
-    //             break;
-    //         case "surface":
-    //             climbs = sort.Direction == MatSortDirection.Asc ?
-    //                 climbs.OrderBy(c => c.Surface) :
-    //                 climbs.OrderByDescending(c => c.Surface);
-    //             break;
-    //         case "points":
-    //             climbs = sort.Direction == MatSortDirection.Asc ?
-    //                 climbs.OrderBy(c => c.CotacolPoints) :
-    //                 climbs.OrderByDescending(c => c.CotacolPoints);
-    //             break;
-    //     }
-    // }
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && stats != null)
+        {
+            switch (sort.SortId)
+            {
+                case "points":
+                    stats.Users = sort.Direction == MatSortDirection.Asc ?
+                        stats.Users.OrderBy(c => c.TotalPoints).ToList() :
+                        stats.Users.OrderByDescending(c => c.TotalPoints).ToList();
+                    break;
+                case "climbs":
+                    stats.Users = sort.Direction == MatSortDirection.Asc ?
+                        stats.Users.OrderBy(c => c.UniqueCols).ToList() :
+                        stats.Users.OrderByDescending(c => c.UniqueCols).ToList();
+                    break;
+            }
+        }
+    }
+    private void SortActivities(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && stats != null)
+        {
+            switch (sort.SortId)
+            {
+                case "date":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.ActivityDate).ToList() :
+                        stats.Activities.OrderByDescending(c => c.ActivityDate).ToList();
+                    break;
+                case "cols":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.UniqueCols).ToList() :
+                        stats.Activities.OrderByDescending(c => c.UniqueCols).ToList();
+                    break;
+                case "points":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.TotalPoints).ToList() :
+                        stats.Activities.OrderByDescending(c => c.TotalPoints).ToList();
+                    break;
+            }
+        }
+    }
+    private void SortClimbs(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && stats != null)
+        {
+            switch (sort.SortId)
+            {
+                case "userCount":
+                    stats.Cotacols = sort.Direction == MatSortDirection.Asc ?
+                        stats.Cotacols.OrderBy(c => c.UniqueUsers).ToList() :
+                        stats.Cotacols.OrderByDescending(c => c.UniqueUsers).ToList();
+                    break;
+                case "attemptCount":
+                    stats.Cotacols = sort.Direction == MatSortDirection.Asc ?
+                        stats.Cotacols.OrderBy(c => c.TotalAttempts).ToList() :
+                        stats.Cotacols.OrderByDescending(c => c.TotalAttempts).ToList();
+                    break;
+            }
+        }
     }
 
 }
