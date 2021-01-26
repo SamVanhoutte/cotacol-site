@@ -1,11 +1,7 @@
 @page "/climbs"
-
-@using CotacolApp.Interfaces
-@using CotacolApp.Models
-@using CotacolApp.Models.CotacolApi
-@using CotacolApp.Services
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
 
 <h3>Climbs</h3>
 
@@ -56,19 +52,13 @@ else
 }
 
 @code {
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-
     private IEnumerable<UserClimb> climbs;
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated)
+        if (UserProfile.IsAuthenticated)
         {
-            climbs = await CotacolUserClient.GetClimbDataAsync(user.GetUserId());
+            climbs = await CotacolUserClient.GetClimbDataAsync();
         }
         else
         {

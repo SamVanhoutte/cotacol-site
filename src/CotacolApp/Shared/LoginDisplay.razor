@@ -1,12 +1,10 @@
-﻿@using CotacolApp.Services
-@using Microsoft.AspNetCore.Identity
-@using CotacolApp.Models.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Http
-@inject UserManager<CotacolUser> UserManager
-@inject IHttpContextAccessor ContextAccessor
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
 <AuthorizeView>
     <Authorized>
-        Hello <a href="Identity/Account/Manage"><img src="@GetProfilePicture().Result" width="32" alt="Edit profile picture"/></a>
+        <a href="Identity/Account/Manage"><img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/></a>
         <form method="post" action="Identity/Account/LogOut">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
@@ -18,10 +16,5 @@
 </AuthorizeView>
 
 @code {
-    
-    private async Task<string> GetProfilePicture()
-    {
-        var user = await UserManager.GetUserAsync(ContextAccessor.HttpContext.User);
-        return $"{user.ProfilePicture}";
-    }
+
 }

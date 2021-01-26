@@ -1,0 +1,73 @@
+@using CotacolApp.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+<h3>Synchronization</h3>
+
+
+<table class="table">
+    <tbody>
+    <tr>
+        <td>Synchronization status <em>(@syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
+        <td>
+            @if (syncStatus == null)
+            {
+                <p>
+                    <em>Loading...</em>
+                </p>
+            }
+            else
+            {
+                <p>@syncStatus.Processed / @syncStatus.Total (@syncStatus.Status)&nbsp;<button @onclick="@(async () => await RefreshSyncStatusAsync())" class="btn" name="UserSync">🔄</button></p>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>Full synchronization</td>
+        <td>
+            <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@syncRequested">Full sync</button><em>@syncMessage</em>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+@code {
+
+    private SyncStatus syncStatus;
+    private DateTime syncStatusRefreshDate = DateTime.Now;
+    private bool syncRequested = false;
+    private string syncMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshSyncStatusAsync();
+    }
+
+    private async Task RefreshSyncStatusAsync()
+    {
+        syncStatusRefreshDate = DateTime.Now;
+        syncStatus = await CotacolUserClient.GetSyncStatus();
+    }
+
+    private async Task TriggerFullSyncAsync()
+    {
+        Console.WriteLine("Trigger sync");
+        syncRequested = true;
+        try
+        {
+            var httpStatus = await CotacolUserClient.SynchronizeAsync();
+            if (httpStatus >= 200 && httpStatus < 300)
+            {
+                syncMessage = $"👌 ({DateTime.Now:T})";
+            }
+            else
+            {
+                syncMessage = $"❌ ({DateTime.Now:T} - HTTP error {httpStatus})";
+            }
+        }
+        catch (Exception e)
+        {
+            syncMessage = e.Message;
+        }
+    }
+
+}

@@ -32,18 +32,14 @@ namespace CotacolApp.Services
             _logger = logger;
         }
 
-        private string GetUserId()
-        {
-            var authenticatedUser = _context.HttpContext.User.GetUserId();
-            return authenticatedUser;
-        }
+        private string userId => _context.HttpContext.User.GetUserId();
 
-        public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
+        public async Task<List<UserClimb>> GetClimbDataAsync()
         {
-            var colsDone = await GetColsAsync(userId);
+            var colsDone = await GetColsAsync();
             var allClimbs = (await _cotacolDataClient.GetClimbDataAsync()).Select(climb => climb.ToUserClimb());
 
-            _logger.LogInformation($"User {userId} has {colsDone.Count()} conquored climbs");
+            _logger.LogInformation($"User {userId} has {colsDone.Count()} conquered climbs");
             var result = new List<UserClimb>();
             foreach (var climb in allClimbs)
             {
@@ -56,37 +52,52 @@ namespace CotacolApp.Services
 
                 result.Add(climb);
             }
+
             _logger.LogInformation($"Returned cotacols with {result.Count(c => c.Done)} marked climbs");
             return result;
         }
 
-        public async Task<List<UserColAchievement>> GetColsAsync(string userId)
+        public async Task<List<UserColAchievement>> GetColsAsync()
         {
-            var cols = await $"{_settings.BaseUrl}/user/{GetUserId()}/cols"
+            var cols = await $"{_settings.BaseUrl}/user/{userId}/cols"
                 .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
                 .GetJsonAsync<List<UserColAchievement>>();
 
             return cols;
         }
 
-        public Task<List<CotacolActivity>> GetActivitiesAsync(string userId)
+        public Task<List<CotacolActivity>> GetActivitiesAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<UserAchievements> GetAchievementsAsync(string userId)
+        public Task<UserAchievements> GetAchievementsAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<UserProfile> GetProfileAsync(string userId)
+        public Task<UserProfile> GetProfileAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<SyncStatus> GetSyncStatus(string userId)
+        public async Task<SyncStatus> GetSyncStatus()
         {
-            throw new System.NotImplementedException();
+            var response = await $"{_settings.BaseUrl}/user/{userId}/sync"
+                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+                .GetJsonAsync<SyncStatus>();
+            return response;
+        }
+
+        public async Task<int> SynchronizeAsync(bool fullSync = false)
+        {
+            _logger.LogInformation($"Sync request for user {userId}");
+            var response = await $"{_settings.BaseUrl}/user/{userId}/sync"
+                .WithHeader(_settings.SecretKeyName, "8963ff1421164023ac3d789567a58896")
+                .AllowAnyHttpStatus()
+                .PostJsonAsync(new SyncRequest {ForceSync = false, FullSync = fullSync, MaxActivityCount = 0});
+            _logger.LogInformation($"Sync requested for user {userId} with status {response.StatusCode}");
+            return response.StatusCode;
         }
     }
 }

@@ -124,6 +124,7 @@ namespace CotacolApp
                 .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<CotacolUser>
                 >();
             services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddScoped<IUserProfileManager, CotacolProfileManager>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<ICotacolClient, CotacolApiClient>();
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();

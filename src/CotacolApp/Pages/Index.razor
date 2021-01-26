@@ -1,7 +1,11 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<h2>Welcome to your Cotacol Hunting Bucket list</h2>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+<p>The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.</p> 
+<p>Each climb is described by several facts: name, a short description, height, grade, lengte, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.</p>  
+<p>The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396 meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book.  Each hill has a so-called COTACOL score. This score is determined using several parameters: grade, length, road surface. A higher score means a tougher climb.</p>
+<p>More than 30 years later, some cycling &amp; tech enthousiast virtually got together and build apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer as much as Cotacols as possible and automatically flag them when integrating with Strava.</p>
+
+<CotacolSyncComponent />
