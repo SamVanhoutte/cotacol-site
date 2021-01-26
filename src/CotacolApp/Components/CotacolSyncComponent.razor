@@ -19,7 +19,7 @@
             }
             else
             {
-                <p>@syncStatus.Processed / @syncStatus.Total (@syncStatus.Status)&nbsp;<button @onclick="@(async () => await RefreshSyncStatusAsync())" class="btn" name="UserSync">🔄</button></p>
+                <p>@syncStatus.Processed / @syncStatus.Total (@syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
             }
         </td>
     </tr>
