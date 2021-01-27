@@ -26,10 +26,37 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        app-settings-json: '{"strava":{"AccessTokenUrl":"https://www.strava.com/api/v3/oauth/token"},"logging":{"ApplicationInsightsInstrumentationKey":""},"keyvault":{"keyvaultname":"cotacol-hunting"},"api":{"sharedkeyheadername":"x-api-subscription-key"}}' 
+        app-settings-json: '[
+                              {
+                                "name": "api:sharedkeyvalue",
+                                "value": "35eef3ca9d4b4722a75c237f44d5f6ca",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "Development",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientId",
+                                "value": "4987",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientOauthSecret",
+                                "value": "ac8e3bf0400f130a91e1b44faeefb4ed0871e576",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                                "value": "6.9.1",
+                                "slotSetting": false
+                              }
+                            ]'
       id: settings
 
   build:
+    needs: configure
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
@@ -47,6 +74,7 @@ jobs:
       working-directory: ${{env.working-directory}}
 
   deploy:
+    needs: build
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
