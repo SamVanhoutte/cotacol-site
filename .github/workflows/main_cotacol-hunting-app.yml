@@ -11,6 +11,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: windows-latest
+    env:
+      working-directory: src/CotacolApp
 
     steps:
     - uses: actions/checkout@master
