@@ -13,6 +13,8 @@ jobs:
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
+      app-name: cotacol-hunting-app
+      slot-name: production
 
     steps:
     - uses: actions/checkout@master
@@ -33,7 +35,36 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'cotacol-hunting-app'
-        slot-name: 'production'
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
         package: ${{env.DOTNET_ROOT}}/myapp 
+
+    - name: Configure Azure Web App
+      uses: azure/appservice-settings@v1
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        app-settings-json: '{
+                              "strava": {
+                                "clientOauthSecret": "${{ secrets.StravaOAuthSecret }}",
+                                "clientId": "${{ secrets.StravaClientId }}",
+                                "AccessTokenUrl": "https://www.strava.com/api/v3/oauth/token"
+                              },
+                              "logging": {
+                                "ApplicationInsightsInstrumentationKey": ""
+                              },
+                              "keyvault": {
+                                "keyvaultname": "cotacol-hunting"
+                              },
+                              "api": {
+                                "apiurl": "https://cotacol-hunting.azure-api.net/api/v1",
+                                "sharedkeyheadername": "x-api-subscription-key",
+                                "sharedkeyvalue": "${{ secrets.CotacolApiSecret }}"
+                              }
+                            }' 
+      id: settings
+
+    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+
+
