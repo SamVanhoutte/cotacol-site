@@ -50,21 +50,7 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        app-settings-json: '{
-                              "strava": {
-                                "AccessTokenUrl": "https://www.strava.com/api/v3/oauth/token"
-                              },
-                              "logging": {
-                                "ApplicationInsightsInstrumentationKey": ""
-                              },
-                              "keyvault": {
-                                "keyvaultname": "cotacol-hunting"
-                              },
-                              "api": {
-                                "apiurl": "https://cotacol-hunting.azure-api.net/api/v1",
-                                "sharedkeyheadername": "x-api-subscription-key"
-                              }
-                            }' 
+        app-settings-json: '{"strava":{"clientOauthSecret":"${{ secrets.StravaOAuthSecret }}","clientId":"${{ secrets.StravaClientId }}","AccessTokenUrl":"https://www.strava.com/api/v3/oauth/token"},"logging":{"ApplicationInsightsInstrumentationKey":""},"keyvault":{"keyvaultname":"cotacol-hunting"},"api":{"apiurl":"https://cotacol-hunting.azure-api.net/api/v1","sharedkeyheadername":"x-api-subscription-key","sharedkeyvalue":"${{ secrets.CotacolApiSecret }}"}}' 
       id: settings
 
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
