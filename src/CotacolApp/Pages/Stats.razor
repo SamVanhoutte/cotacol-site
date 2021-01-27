@@ -23,7 +23,7 @@ else
 {
     <MatTabGroup @bind-ActiveIndex="@tabIndex">
         <MatTab Label="Leader board">
-            <h3>Leaderboard</h3>
+            <h2>Leaderboard</h2>
             <MatTable FilterByColumnName="Name" Items="@stats.Users" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
@@ -47,7 +47,7 @@ else
             </MatTable>
         </MatTab>
         <MatTab Label="Col popularity">
-            <h3>Climb popularity</h3>
+            <h2>Climb popularity</h2>
             <MatTable FilterByColumnName="Name" Items="@stats.Cotacols" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
@@ -69,7 +69,7 @@ else
             </MatTable>
         </MatTab>
         <MatTab Label="Toughest activities">
-            <h3>Toughest activities</h3>
+            <h2>Toughest activities</h2>
             <MatTable Items="@stats.Activities" class="table" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>

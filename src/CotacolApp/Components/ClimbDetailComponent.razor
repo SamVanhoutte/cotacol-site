@@ -1,0 +1,128 @@
+@using MatBlazor
+@using System.Globalization
+@inject IUserProfileManager UserProfile
+
+<style>
+    .demo-mat-card {
+        max-width: 400px;
+    }
+
+    .demo-mat-card-content {
+        padding: 1rem;
+    }
+
+    .demo-mat-card-clean-margin {
+        margin: 0px;
+        color: #000000;
+    }
+    
+    .cooper-card-clean-margin {
+        font-family: 'Cooper Black', serif;
+        margin: 0px;
+        color: #000000;
+    }
+    
+    .cooper {
+        font-family: 'Cooper Black', serif;
+        color: #000000;
+        margin-top: 0px;
+        margin-bottom: 1px;
+    }
+</style>
+<div style="height: 80px">&nbsp;</div>
+<MatCard class="demo-mat-card" Style="width: 260px">
+    <MatCardContent>
+        <MatCardMedia Wide="true" ImageUrl="images/climb-profile.png"></MatCardMedia>
+        <div class="demo-mat-card-content">
+            <MatHeadline6 class="demo-mat-card-clean-margin">
+                @Cotacol?.Name
+            </MatHeadline6>
+            <MatSubtitle2 class="cooper-card-clean-margin">
+                #<span>@Cotacol?.Id</span>&nbsp;<span>@Cotacol?.City</span>, <span>@Cotacol?.Province</span>
+            </MatSubtitle2>
+        </div>
+
+        <MatBody2 class="demo-mat-card-content demo-mat-card-clean-margin">
+            @if (UserProfile.IsAuthenticated)
+            {
+                <hr/>
+                <MatSlideToggle TValue="bool" Label="     Done" @bind-Value="@CotacolDone" Disabled="true"></MatSlideToggle>
+                @if (CotacolDone)
+                {
+                    <div>
+                        <span class="iconify" data-icon="clarity:date-solid-alerted" data-inline="false"></span>&nbsp;
+                        <span class="cooper">@(Cotacol.FirstAchievement.ToString("dd MMM, yyyy"))</span>
+                    </div>
+                    <div>
+                        <span class="iconify" data-icon="grommet-icons:achievement" data-inline="false"></span>&nbsp;
+                        <span class="cooper">@(TimeSpan.FromSeconds(Cotacol.Duration).ToString("g"))</span>
+                    </div>
+                    <div>
+                        <span class="iconify" data-icon="fluent:text-word-count-20-filled" data-inline="false"></span>&nbsp;
+                        <span class="cooper">@(Cotacol.Attempts) attempts</span>
+                    </div>                    
+                }
+            }
+            @if (Cotacol != null)
+            {
+                <hr/>
+                <div>
+                    <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
+                    <span class="cooper">@(Cotacol?.CotacolPoints) pts</span>
+                </div>
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            <span class="iconify" data-icon="system-uicons:height" data-inline="false"></span>&nbsp;
+                            <span class="cooper">@(Cotacol?.ElevationDiff.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."}))m</span>
+                        </td>
+                        <td>
+                            <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
+                            <span class="cooper">@(Cotacol?.AvgGrade)%</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="iconify" data-icon="mdi:map-marker-distance" data-inline="false"></span>&nbsp;
+                            <span class="cooper">@(Cotacol?.Distance.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."}))m</span>
+
+                        </td>
+                        <td>
+                            <span class="iconify" data-icon="mdi:road-variant" data-inline="false"></span>&nbsp;
+                            <span class="cooper">@(Cotacol?.Surface)</span>
+                        </td>
+                    </tr>
+                </table>
+            }
+        </MatBody2>
+    </MatCardContent>
+    <MatCardActions>
+        <MatCardActionButtons>
+            <MatButton Link="@(Cotacol?.StravaSegment)" Target="_blank">Strava</MatButton>
+            <MatButton Link="@CotacolUrl" Target="_blank">Cotacol.cc</MatButton>
+        </MatCardActionButtons>
+
+        <MatCardActionIcons>
+            <MatIconButton Icon="@MatIconNames.Favorite" OnClick="BookMarkClimb"></MatIconButton>
+        </MatCardActionIcons>
+    </MatCardActions>
+</MatCard>
+
+@code {
+
+    [Parameter]
+    public UserClimb Cotacol { get; set; }
+
+    private bool CotacolDone
+    {
+        get { return Cotacol?.Done ?? false; }
+        set { }
+    }
+
+    private string CotacolUrl => $"https://cotacol.cc/#/climbs/{Cotacol?.Id}/";
+
+    private void BookMarkClimb()
+    {
+    }
+
+}

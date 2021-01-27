@@ -1,7 +1,7 @@
 ﻿@page "/"
 @inject IUserProfileManager UserProfile
 
-<h2>Your Cotacol Bucket list</h2>
+<h1>Your Cotacol Bucket list</h1>
 
 @if (UserProfile.IsAuthenticated)
 {
@@ -12,7 +12,7 @@ else
     <a class="nav-link text-dark" href="Identity/Account/Login">Enable strava integration for the full experience</a>
 }
 
-<h3>A bit of history</h3>
+<h2>A bit of history</h2>
 
 <p>The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.</p> 
 <p>Each climb is described by several facts: name, a short description, height, grade, lengte, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.</p>  

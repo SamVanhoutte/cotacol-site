@@ -1,20 +1,13 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,16 +15,11 @@ using Microsoft.Extensions.Hosting;
 using CotacolApp.Areas.Identity;
 using CotacolApp.Data;
 using CotacolApp.Interfaces;
-using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using CotacolApp.Settings;
 using MatBlazor;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace CotacolApp
 {

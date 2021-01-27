@@ -4,7 +4,7 @@
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 
-<h3>Climbs</h3>
+<h1>Climbs</h1>
 
 <p>1000 Cotacol climbs for you to conquer.</p>
 @if (climbs == null)
@@ -15,61 +15,75 @@
 }
 else
 {
-    <MatChipSet Choice="true" SelectedChipChanged="ApplyFilter">
-        <MatChip Label="All" Id="NoFilter"></MatChip>
-        @if (UserProfile.IsAuthenticated)
-        {
-            <MatChip Label="Done" Id="DoneFilter"></MatChip>
-            <!--<MatChip Label="Planned" Id="PlannedFilter"></MatChip>-->
-            <MatChip Label="To do" Id="TodoFilter"></MatChip>
-        }
-        <MatChip Label="Top 50" Id="TopFilter"></MatChip>
-        <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
-        <MatChip Label="Highest" Id="HighFilter"></MatChip>
-        <MatChip Label="Longest" Id="LongFilter"></MatChip>
-        <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
-    </MatChipSet>
-    <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000"
-              AllowSelection="true" SelectionChanged="SelectionChanged"
-              ShowPaging="false" UseSortHeaderRow="true">
-        <MatTableHeader>
-            <MatSortHeaderRow SortChanged="SortClimbs">
-                <MatSortHeader SortId="id">#</MatSortHeader>
-                <MatSortHeader SortId="name"><span style="width:250px">Name</span></MatSortHeader>
-                <MatSortHeader SortId="province">Province</MatSortHeader>
-                <MatSortHeader SortId="surface">Surface</MatSortHeader>
-                <MatSortHeader SortId="points">Points</MatSortHeader>
-                <MatSortHeader SortId="length">Length</MatSortHeader>
-                <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
-                <MatSortHeader SortId="grade">Grade</MatSortHeader>
-                <MatSortHeader>Link</MatSortHeader>
-            </MatSortHeaderRow>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Id</td>
-            @if (context.Done)
-            {
-                <td style="max-width: 200px">
-                    <b>@context.Name.ToUpper()</b>
-                </td>
-            }
-            else
-            {
-                <td style="max-width: 200px">@context.Name</td>
-            }
-            <td>@context.Province</td>
-            <td>@context.Surface</td>
-            <td>@context.CotacolPoints</td>
-            <td>@context.Distance</td>
-            <td>@context.ElevationDiff</td>
-            <td>@context.AvgGrade %</td>
-            <td>
-                <a href="@context.Url" target="_blank">
-                    <img src="../../../images/strava-logo-small.png" asp-append-version="true"/>
-                </a>
-            </td>
-        </MatTableRow>
-    </MatTable>
+    <MatDrawerContainer>
+        <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@ColSelected" Style="width: 270px">
+            <MatIconButton OnClick="CloseClimb">
+                <MatIcon>@MatIconNames.Close</MatIcon>
+            </MatIconButton>
+            <ClimbDetailComponent Cotacol="@SelectedClimb"/>
+        </MatDrawer>
+        <MatDrawerContent>
+            <MatChipSet Choice="true" SelectedChipChanged="ApplyFilter">
+                <MatChip Label="All" Id="NoFilter"></MatChip>
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <MatChip Label="Done" Id="DoneFilter"></MatChip>
+                    <!--<MatChip Label="Planned" Id="PlannedFilter"></MatChip>-->
+                    <MatChip Label="To do" Id="TodoFilter"></MatChip>
+                }
+                <MatChip Label="Top 50" Id="TopFilter"></MatChip>
+                <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
+                <MatChip Label="Highest" Id="HighFilter"></MatChip>
+                <MatChip Label="Longest" Id="LongFilter"></MatChip>
+                <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
+            </MatChipSet>
+            <div style="overflow-y: scroll; height:100vh;">
+                <MatTable FilterByColumnName="Name" Items="@climbs" class="table" PageSize="2000"
+                      AllowSelection="true" SelectionChanged="SelectionChanged"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortClimbs">
+                        <MatSortHeader SortId="id">#</MatSortHeader>
+                        <MatSortHeader SortId="name">
+                            <span style="width:250px">Name</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="province">Province</MatSortHeader>
+                        <MatSortHeader SortId="surface">Surface</MatSortHeader>
+                        <MatSortHeader SortId="points">Points</MatSortHeader>
+                        <MatSortHeader SortId="length">Length</MatSortHeader>
+                        <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
+                        <MatSortHeader SortId="grade">Grade</MatSortHeader>
+                        <MatSortHeader>Link</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Id</td>
+                    @if (context.Done)
+                    {
+                        <td style="max-width: 200px">
+                            <b>@context.Name.ToUpper()</b>
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="max-width: 200px">@context.Name</td>
+                    }
+                    <td>@context.Province</td>
+                    <td>@context.Surface</td>
+                    <td>@context.CotacolPoints</td>
+                    <td>@context.Distance</td>
+                    <td>@context.ElevationDiff</td>
+                    <td>@context.AvgGrade %</td>
+                    <td>
+                        <a href="@context.Url" target="_blank">
+                            <img src="images/strava-logo-small.png" asp-append-version="true"/>
+                        </a>
+                    </td>
+                </MatTableRow>
+            </MatTable>
+            </div>
+        </MatDrawerContent>
+    </MatDrawerContainer>
 }
 
 @code {
@@ -184,6 +198,12 @@ else
             StateHasChanged();
         }
         ColSelected = col != null;
+    }
+
+    private void CloseClimb()
+    {
+        SelectedClimb = null;
+        StateHasChanged();
     }
 
 }

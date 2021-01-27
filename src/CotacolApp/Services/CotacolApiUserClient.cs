@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ using GuardNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SQLitePCL;
 
 namespace CotacolApp.Services
 {
@@ -35,23 +35,33 @@ namespace CotacolApp.Services
 
         public async Task<List<UserClimb>> GetClimbDataAsync()
         {
-            var colsDone = await GetColsAsync();
-            var allClimbs = 
+            var achievements = await GetAchievementsAsync();
+            var allClimbs =
                 (await _cotacolDataClient
-                .GetClimbDataAsync())
+                    .GetClimbDataAsync())
                 .Select(climb => new UserClimb(climb));
+            
+            var stats =
+                (await _cotacolDataClient
+                    .GetStatsAsync());
 
-            _logger.LogInformation($"User {userId} has {colsDone.Count()} conquered climbs");
+            _logger.LogInformation($"User {userId} has {achievements.ColResults.Count()} conquered climbs");
             var result = new List<UserClimb>();
             foreach (var climb in allClimbs)
             {
-                var achievement = colsDone.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
+                // First check users results for the climb
+                var achievement = achievements.ColResults.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
                 climb.Done = achievement != null;
                 if (achievement != null)
                 {
-                    climb.FirstAchievement = achievement.AchievementDate;
+                    climb.FirstAchievement = achievement.Achievements.OrderBy(a => a.AchievementDate).FirstOrDefault()
+                        ?.AchievementDate ?? default;
+                    climb.Attempts = achievement.Achievements.Count;
+                    climb.Duration = achievement.Achievements.Min(a => TimeSpan.Parse(a.Duration).TotalSeconds);
                 }
 
+                // Now update with the stats
+                // TODO
                 result.Add(climb);
             }
 
@@ -73,9 +83,13 @@ namespace CotacolApp.Services
             throw new System.NotImplementedException();
         }
 
-        public Task<UserAchievements> GetAchievementsAsync()
+        public async Task<UserAchievements> GetAchievementsAsync()
         {
-            throw new System.NotImplementedException();
+            var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<UserAchievements>();
+
+            return achievements;
         }
 
         public Task<UserProfile> GetProfileAsync()
@@ -86,7 +100,7 @@ namespace CotacolApp.Services
         public async Task<SyncStatus> GetSyncStatus()
         {
             var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
-                .WithHeader(_settings.SharedKeyHeaderName,  _settings.SharedKeyValue)
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<SyncStatus>();
             return response;
         }
