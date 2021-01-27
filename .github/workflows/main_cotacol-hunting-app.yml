@@ -52,8 +52,6 @@ jobs:
         slot-name: ${{env.slot-name}}
         app-settings-json: '{
                               "strava": {
-                                "clientOauthSecret": "${{ secrets.StravaOAuthSecret }}",
-                                "clientId": "${{ secrets.StravaClientId }}",
                                 "AccessTokenUrl": "https://www.strava.com/api/v3/oauth/token"
                               },
                               "logging": {
@@ -64,8 +62,7 @@ jobs:
                               },
                               "api": {
                                 "apiurl": "https://cotacol-hunting.azure-api.net/api/v1",
-                                "sharedkeyheadername": "x-api-subscription-key",
-                                "sharedkeyvalue": "${{ secrets.CotacolApiSecret }}"
+                                "sharedkeyheadername": "x-api-subscription-key"
                               }
                             }' 
       id: settings
