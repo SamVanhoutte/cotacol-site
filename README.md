@@ -4,7 +4,7 @@ An attempt to learn Blazor, by setting up a Cotacol web site
 ## Identity login
 
 1. Set up razor server app, with individual identiy
-1. Scaffolded two pages, based on this article: https://andrewlock.net/customising-aspnetcore-identity-without-editing-the-pagemodel/:
+1. Scaffolded two pages, based on this article: https://andrewlock.net/customising-aspnetcore-identity-without-editing-the-pagemodel/ 
     - Account.Login, which enables the customization of the actual login page `dotnet aspnet-codegenerator identity -dc CotacolApp.Data.ApplicationDbContext --files "Account.Login"`
     - Account.ExternalLogin, which enables the customization of the actual strava page `dotnet aspnet-codegenerator identity -dc CotacolApp.Data.ApplicationDbContext --files "Account.ExternalLogin"`
 
