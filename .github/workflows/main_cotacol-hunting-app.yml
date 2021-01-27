@@ -9,7 +9,50 @@ on:
       - main
 
 jobs:
+
+  build:
+    runs-on: windows-latest
+    env:
+      working-directory: src/CotacolApp
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.102'
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+      working-directory: ${{env.working-directory}}
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    env:
+      app-name: cotacol-hunting-app
+      slot-name: production  
+      working-directory: src/CotacolApp
+
+    steps:
+    - name: dotnet publish
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      working-directory: ${{env.working-directory}}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        package: ${{env.DOTNET_ROOT}}/myapp 
+
+
+    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+
   configure:
+    needs: deploy
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
@@ -79,47 +122,3 @@ jobs:
                                 "slotSetting": false
                               }
                             ]'
-
-  build:
-    needs: configure
-    runs-on: windows-latest
-    env:
-      working-directory: src/CotacolApp
-
-    steps:
-    - uses: actions/checkout@master
-
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.102'
-
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
-      working-directory: ${{env.working-directory}}
-
-  deploy:
-    needs: build
-    runs-on: windows-latest
-    env:
-      app-name: cotacol-hunting-app
-      slot-name: production  
-      working-directory: src/CotacolApp
-
-    steps:
-    - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-      working-directory: ${{env.working-directory}}
-
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{env.app-name}}
-        slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
-
-
-    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
-
-
