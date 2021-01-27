@@ -40,6 +40,11 @@ jobs:
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
         package: ${{env.DOTNET_ROOT}}/myapp 
 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
     - name: Configure Azure Web App
       uses: azure/appservice-settings@v1
       with:
