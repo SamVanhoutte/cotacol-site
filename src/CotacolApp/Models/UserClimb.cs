@@ -1,5 +1,4 @@
 using System;
-using CotacolApp.Models.CotacolApi;
 
 namespace CotacolApp.Models
 {
@@ -29,6 +28,6 @@ namespace CotacolApp.Models
         public bool Done { get; set; }
         public DateTime FirstAchievement { get; set; }
         public int Attempts { get; set; }
-        public int Duration { get; set; }
+        public double Duration { get; set; }
     }
 }
