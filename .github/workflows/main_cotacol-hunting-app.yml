@@ -23,13 +23,49 @@ jobs:
 
     - name: Configure Azure Web App
       uses: azure/appservice-settings@v1
+      id: settings
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
         app-settings-json: '[
                               {
                                 "name": "api:sharedkeyvalue",
-                                "value": "35eef3ca9d4b4722a75c237f44d5f6ca",
+                                "value": "${{ secrets.CotacolApiSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:sharedkeyheadername",
+                                "value": "x-api-subscription-key",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:apiurl",
+                                "value": "https://cotacol-hunting.azure-api.net/api/v1",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:keyvaultname",
+                                "value": "cotacol-hunting",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "logging:ApplicationInsightsInstrumentationKey",
+                                "value": "",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientId",
+                                "value": "${{ secrets.StravaClientId }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientOauthSecret",
+                                "value": "${{ secrets.StravaOAuthSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:AccessTokenUrl",
+                                "value": "https://www.strava.com/api/v3/oauth/token",
                                 "slotSetting": false
                               },
                               {
@@ -38,22 +74,11 @@ jobs:
                                 "slotSetting": false
                               },
                               {
-                                "name": "strava:clientId",
-                                "value": "4987",
-                                "slotSetting": false
-                              },
-                              {
-                                "name": "strava:clientOauthSecret",
-                                "value": "ac8e3bf0400f130a91e1b44faeefb4ed0871e576",
-                                "slotSetting": false
-                              },
-                              {
                                 "name": "WEBSITE_NODE_DEFAULT_VERSION",
                                 "value": "6.9.1",
                                 "slotSetting": false
                               }
                             ]'
-      id: settings
 
   build:
     needs: configure
@@ -79,6 +104,7 @@ jobs:
     env:
       app-name: cotacol-hunting-app
       slot-name: production  
+      working-directory: src/CotacolApp
 
     steps:
     - name: dotnet publish
