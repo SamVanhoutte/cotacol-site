@@ -9,10 +9,9 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  configure:
     runs-on: windows-latest
     env:
-      working-directory: src/CotacolApp
       app-name: cotacol-hunting-app
       slot-name: production
 
@@ -27,9 +26,15 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        app-settings-json: '{"strava":{"clientOauthSecret":"${{ secrets.StravaOAuthSecret }}","clientId":"${{ secrets.StravaClientId }}","AccessTokenUrl":"https://www.strava.com/api/v3/oauth/token"},"logging":{"ApplicationInsightsInstrumentationKey":""},"keyvault":{"keyvaultname":"cotacol-hunting"},"api":{"apiurl":"https://cotacol-hunting.azure-api.net/api/v1","sharedkeyheadername":"x-api-subscription-key","sharedkeyvalue":"${{ secrets.CotacolApiSecret }}"}}' 
+        app-settings-json: '{"strava":{"AccessTokenUrl":"https://www.strava.com/api/v3/oauth/token"},"logging":{"ApplicationInsightsInstrumentationKey":""},"keyvault":{"keyvaultname":"cotacol-hunting"},"api":{"sharedkeyheadername":"x-api-subscription-key"}}' 
       id: settings
 
+  build:
+    runs-on: windows-latest
+    env:
+      working-directory: src/CotacolApp
+
+    steps:
     - uses: actions/checkout@master
 
     - name: Set up .NET Core
@@ -41,6 +46,13 @@ jobs:
       run: dotnet build --configuration Release
       working-directory: ${{env.working-directory}}
 
+  deploy:
+    runs-on: windows-latest
+    env:
+      app-name: cotacol-hunting-app
+      slot-name: production  
+
+    steps:
     - name: dotnet publish
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
       working-directory: ${{env.working-directory}}
