@@ -10,10 +10,12 @@ on:
 
 jobs:
 
-  build:
+  build-and-deploy:
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
+      app-name: cotacol-hunting-app
+      slot-name: production  
 
     steps:
     - uses: actions/checkout@master
@@ -27,15 +29,6 @@ jobs:
       run: dotnet build --configuration Release
       working-directory: ${{env.working-directory}}
 
-  deploy:
-    needs: build
-    runs-on: windows-latest
-    env:
-      app-name: cotacol-hunting-app
-      slot-name: production  
-      working-directory: src/CotacolApp
-
-    steps:
     - name: dotnet publish
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
       working-directory: ${{env.working-directory}}
@@ -52,7 +45,7 @@ jobs:
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
 
   configure:
-    needs: deploy
+    needs: build-and-deploy
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
