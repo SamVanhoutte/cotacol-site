@@ -20,6 +20,7 @@ using CotacolApp.Services;
 using CotacolApp.Settings;
 using MatBlazor;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace CotacolApp
 {
@@ -155,6 +156,11 @@ namespace CotacolApp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseRewriter(
+                new RewriteOptions()
+                    .AddRedirectToWwwPermanent()
+                
+            );
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

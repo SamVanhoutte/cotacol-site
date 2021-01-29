@@ -6,6 +6,8 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
+using CotacolApp.Settings;
+using Flurl;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +16,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CotacolApp.Areas.Identity.Pages.Account
 {
@@ -26,6 +29,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
         private readonly ILogger<ExternalLoginModel> _logger;
         private IHttpContextAccessor _contextAccessor;
         private ICotacolClient _cotacolClient;
+        private CotacolApiSettings _apiSettings;
 
         public ExternalLoginModel(
             SignInManager<CotacolUser> signInManager,
@@ -33,6 +37,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             UserManager<CotacolUser> userManager,
             ILogger<ExternalLoginModel> logger,
             ICotacolClient cotacolClient,
+            IOptions<CotacolApiSettings> apiSettings,
             IEmailSender emailSender)
         {
             _contextAccessor = contextAccessor;
@@ -41,6 +46,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _cotacolClient = cotacolClient;
+            _apiSettings = apiSettings.Value;
         }
 
         [BindProperty] public InputModel Input { get; set; }
@@ -65,6 +71,19 @@ namespace CotacolApp.Areas.Identity.Pages.Account
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
+            if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
+            {
+                var fullUrl = Url.PageLink("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
+
+                // Remove trailing slash of domain
+                if (_apiSettings.RedirectDomain.EndsWith("/"))
+                    _apiSettings.RedirectDomain =
+                        _apiSettings.RedirectDomain.Remove(_apiSettings.RedirectDomain.Length - 1, 1);
+                // Ensure leading slash of relative url
+                if (!redirectUrl.StartsWith("/")) redirectUrl = "/" + redirectUrl;
+                // Stitch together
+                redirectUrl = _apiSettings.RedirectDomain + redirectUrl;
+            }
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }

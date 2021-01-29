@@ -6,11 +6,11 @@
 }
 
 <div class="row">
-    
+
     <div class="col-md-6 col-md-offset-2">
         <section>
             <h4>Log in with Strava.</h4>
-            <hr />
+            <hr/>
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
                 {
@@ -26,10 +26,19 @@
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
                             <p>
-                                <button type="submit" class="btn" name="Strava" value="Strava" title="Log in using your Strava account"><img src="images/strava-login.png" asp-append-version="true" /></button>
+                                <button type="submit" class="btn" name="Strava" value="Strava" title="Log in using your Strava account">
+                                    <img src="/images/strava-login.png" asp-append-version="true"/>
+                                </button>
                             </p>
                         </div>
                     </form>
+                    <div>
+                        <p>
+                            <a href="http://www.strava.com/oauth/authorize?client_id=54778&response_type=code&redirect_uri=https://cotacol-hunting-workers-tst.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=ccwebapplocal&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">
+                                <button type="submit" class="btn" name="Strava" value="Strava" title="Log in using your Strava account">OAuth authentication</button>
+                            </a>
+                        </p>
+                    </div>
                 }
             }
         </section>
@@ -37,5 +46,5 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }

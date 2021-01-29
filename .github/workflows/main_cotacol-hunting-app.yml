@@ -80,6 +80,11 @@ jobs:
                                 "slotSetting": false
                               },
                               {
+                                "name": "api:redirectdomain",
+                                "value": "https://cotacol-hunting-app.azurewebsites.net/",
+                                "slotSetting": true
+                              },
+                              {
                                 "name": "keyvault:keyvaultname",
                                 "value": "cotacol-hunting",
                                 "slotSetting": false

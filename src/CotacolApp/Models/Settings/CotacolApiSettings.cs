@@ -5,6 +5,7 @@ namespace CotacolApp.Settings
         public string ApiUrl { get; set; }
         public string SharedKeyHeaderName { get; set; }
         public string SharedKeyValue { get; set; }
+        public string RedirectDomain { get; set; }
     }
 }
 
