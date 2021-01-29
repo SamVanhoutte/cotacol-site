@@ -73,6 +73,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
             if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
             {
+                _logger.LogInformation($"Redirect domain configured with value '{_apiSettings?.RedirectDomain}'");
                 var fullUrl = Url.PageLink("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
 
                 // Remove trailing slash of domain
@@ -84,6 +85,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 // Stitch together
                 redirectUrl = _apiSettings.RedirectDomain + redirectUrl;
             }
+            _logger.LogInformation($"OAuth login requested and configured URL {redirectUrl}");
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
