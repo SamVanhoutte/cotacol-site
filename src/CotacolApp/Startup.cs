@@ -21,6 +21,15 @@ using CotacolApp.Settings;
 using MatBlazor;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using Serilog.Configuration;
+using Serilog.Core;
 
 namespace CotacolApp
 {
@@ -45,8 +54,13 @@ namespace CotacolApp
                 .AddEnvironmentVariables();
 
             var configuration = cfgBuilder.Build();
+            
             var stravaSettings = new StravaSettings();
             configuration.GetSection("strava").Bind(stravaSettings);
+            
+            var logSettings = new LogSettings();
+            configuration.GetSection("logging").Bind(logSettings);
+
             
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
@@ -126,6 +140,15 @@ namespace CotacolApp
                 >();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddOptions();
+            services.AddLogging(loggingbuilder =>
+            {
+                loggingbuilder.ClearProvidersExceptFunctionProviders();
+                if (!string.IsNullOrEmpty(logSettings.ApplicationInsightsInstrumentationKey))
+                {
+                    loggingbuilder.AddSerilog(
+                        CreateLogConfiguration(logSettings.ApplicationInsightsInstrumentationKey));
+                }
+            });
             services.AddScoped<IUserProfileManager, CotacolProfileManager>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<ICotacolClient, CotacolApiClient>();
@@ -182,6 +205,21 @@ namespace CotacolApp
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+        }
+        
+        private Logger CreateLogConfiguration(string instrumentationKey)
+        {
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .Enrich.WithComponentName("Cotacol web app")
+                .Enrich.WithVersion()
+                .WriteTo.Console(LogEventLevel.Information)
+                .WriteTo.AzureApplicationInsights(instrumentationKey, LogEventLevel.Verbose)
+                .CreateLogger();
+
+            return logger;
         }
     }
 }

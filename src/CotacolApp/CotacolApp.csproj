@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Arcus.Observability.Telemetry.AzureFunctions" Version="2.0.0" />
+        <PackageReference Include="Arcus.Observability.Telemetry.Serilog.Sinks.ApplicationInsights" Version="2.0.0" />
         <PackageReference Include="Flurl.Http" Version="3.0.1" />
         <PackageReference Include="Guard.Net" Version="1.2.0" />
         <PackageReference Include="MatBlazor" Version="2.8.0" />
@@ -25,7 +27,12 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+        <PackageReference Include="Serilog.Extensions.Logging.ApplicationInsights" Version="1.1.0" />
+        <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     </ItemGroup>
     <ItemGroup>
         <None Update="appsettings.dev.json">

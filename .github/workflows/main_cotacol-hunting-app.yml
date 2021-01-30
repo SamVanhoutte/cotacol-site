@@ -91,7 +91,7 @@ jobs:
                               },
                               {
                                 "name": "logging:ApplicationInsightsInstrumentationKey",
-                                "value": "",
+                                "value": "${{ secrets.ApplicationInsightsInstrumentationKey }}",
                                 "slotSetting": false
                               },
                               {
