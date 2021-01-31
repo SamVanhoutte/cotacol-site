@@ -81,7 +81,7 @@ jobs:
                               },
                               {
                                 "name": "api:redirectdomain",
-                                "value": "https://cotacol-hunting-app.azurewebsites.net/",
+                                "value": "cotacol-hunting-app.azurewebsites.net",
                                 "slotSetting": true
                               },
                               {
