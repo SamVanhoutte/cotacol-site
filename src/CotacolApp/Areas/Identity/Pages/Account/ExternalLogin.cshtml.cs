@@ -71,20 +71,20 @@ namespace CotacolApp.Areas.Identity.Pages.Account
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
-            if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
-            {
-                _logger.LogInformation($"Redirect domain configured with value '{_apiSettings?.RedirectDomain}'");
-                var fullUrl = Url.PageLink("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
-
-                // Remove trailing slash of domain
-                if (_apiSettings.RedirectDomain.EndsWith("/"))
-                    _apiSettings.RedirectDomain =
-                        _apiSettings.RedirectDomain.Remove(_apiSettings.RedirectDomain.Length - 1, 1);
-                // Ensure leading slash of relative url
-                if (!redirectUrl.StartsWith("/")) redirectUrl = "/" + redirectUrl;
-                // Stitch together
-                redirectUrl = _apiSettings.RedirectDomain + redirectUrl;
-            }
+            // if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
+            // {
+            //     _logger.LogInformation($"Redirect domain configured with value '{_apiSettings?.RedirectDomain}'");
+            //     var fullUrl = Url.PageLink("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
+            //
+            //     // Remove trailing slash of domain
+            //     if (_apiSettings.RedirectDomain.EndsWith("/"))
+            //         _apiSettings.RedirectDomain =
+            //             _apiSettings.RedirectDomain.Remove(_apiSettings.RedirectDomain.Length - 1, 1);
+            //     // Ensure leading slash of relative url
+            //     if (!redirectUrl.StartsWith("/")) redirectUrl = "/" + redirectUrl;
+            //     // Stitch together
+            //     redirectUrl = _apiSettings.RedirectDomain + redirectUrl;
+            // }
             _logger.LogInformation($"OAuth login requested and configured URL {redirectUrl}");
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
