@@ -34,11 +34,14 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Configuration;
 using Serilog.Core;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace CotacolApp
 {
     public class Startup
     {
+        private ILogger<Startup> _logger;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -129,6 +132,7 @@ namespace CotacolApp
                                     // Check to update redirect 
                                     if(!string.IsNullOrEmpty( apiSettings.RedirectDomain))
                                     {
+                                        _logger?.LogInformation($"Redirect domain configured to {apiSettings.RedirectDomain}");
                                         var oauthUrl = new UriBuilder(new Uri(context.RedirectUri));
                                         var queryCollection = HttpUtility.ParseQueryString(oauthUrl.Query);
                                         var redirectUrl = queryCollection["redirect_uri"];
@@ -145,6 +149,8 @@ namespace CotacolApp
 
                                             queryCollection["redirect_url"] = redirect.Uri.ToString();
                                             oauthUrl.Query = queryCollection.ToString();
+
+                                            _logger?.LogInformation($"Will redirect user to login url {oauthUrl.Uri.ToString()}");
 
                                             context.Response.Redirect(oauthUrl.Uri.ToString());
                                         }
@@ -218,8 +224,9 @@ namespace CotacolApp
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            _logger = logger;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
