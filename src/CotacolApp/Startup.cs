@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,8 +20,10 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using CotacolApp.Settings;
+using Flurl.Http;
 using MatBlazor;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -54,14 +58,16 @@ namespace CotacolApp
                 .AddEnvironmentVariables();
 
             var configuration = cfgBuilder.Build();
-            
+
             var stravaSettings = new StravaSettings();
             configuration.GetSection("strava").Bind(stravaSettings);
-            
+
             var logSettings = new LogSettings();
             configuration.GetSection("logging").Bind(logSettings);
 
-            
+            var apiSettings = new CotacolApiSettings();
+            configuration.GetSection("api").Bind(apiSettings);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -88,6 +94,8 @@ namespace CotacolApp
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
+                        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
                         options.CallbackPath = "/stravalogin"; //"/signin-strava";
@@ -113,6 +121,39 @@ namespace CotacolApp
 
                         options.Events = new OAuthEvents
                         {
+                            OnRedirectToAuthorizationEndpoint = context =>
+                            {
+                                if (!string.IsNullOrEmpty(apiSettings.RedirectDomain))
+                                {
+                                    //https://www.strava.com/oauth/authorize?client_id=4987&scope=read,read_all,activity%3Aread_all,activity%3Aread,activity%3Awrite,profile%3Awrite&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fstravalogin&state=CfDJ8JoKNYGkoJRGiyjnLkJiaUUsy-Gdj3aacJxb_e1s6KOf3Afptjsi2QVvoszk3mZVi3x_8bgk0pKToWT7zkhgvcuFUgfRGN4-R8mENXrnj-R6p4RmNvj9z_svZfoUSPCPI7SJi2_Z34fh_IqiQr18KJ6nPJW6ZjInPhx9o-OyKamgn9gHxjhnVKgmDqelh38ARBpwYm_qLENo8caaBNpcfSKdfGT49uf7qlqxgmC5QYTMfqeFibaT2dR4B6aN-51baqmUnDd5MQrwEdypyusBzewTJS24WwmByB_CouErqXrOmVnQ3Llb8w06fq5PHhb6iA
+                                    // Check to update redirect 
+                                    if(!string.IsNullOrEmpty( apiSettings.RedirectDomain))
+                                    {
+                                        var oauthUrl = new UriBuilder(new Uri(context.RedirectUri));
+                                        var queryCollection = HttpUtility.ParseQueryString(oauthUrl.Query);
+                                        var redirectUrl = queryCollection["redirect_uri"];
+                                        if (redirectUrl != null)
+                                        {
+                                            var redirect = new UriBuilder(new Uri(redirectUrl))
+                                            {
+                                                Host = apiSettings.RedirectDomain
+                                            };
+                                            if (apiSettings.RedirectPort > 0)
+                                            {
+                                                redirect.Port = apiSettings.RedirectPort;
+                                            }
+
+                                            queryCollection["redirect_url"] = redirect.Uri.ToString();
+                                            oauthUrl.Query = queryCollection.ToString();
+
+                                            context.Response.Redirect(oauthUrl.Uri.ToString());
+                                        }
+                                    };
+
+                                }
+
+                                return Task.CompletedTask;
+                            },
                             OnCreatingTicket = async context =>
                             {
                                 var request = new HttpRequestMessage(HttpMethod.Get,
@@ -159,7 +200,7 @@ namespace CotacolApp
                 .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
                 .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))
                 .Configure<KeyVaultSettings>(options => configuration.GetSection("keyvault").Bind(options));
-            
+
             // Inject HttpClient, required by MatBlazor components
             if (services.All(x => x.ServiceType != typeof(HttpClient)))
             {
@@ -206,7 +247,7 @@ namespace CotacolApp
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
-        
+
         private Logger CreateLogConfiguration(string instrumentationKey)
         {
             var logger = new LoggerConfiguration()
