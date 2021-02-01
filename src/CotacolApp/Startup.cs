@@ -23,6 +23,7 @@ using CotacolApp.Settings;
 using Flurl.Http;
 using MatBlazor;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Logging;
@@ -85,6 +86,8 @@ namespace CotacolApp
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            //services.AddDataProtection()
+            //        .PersistKeysToFileSystem(new DirectoryInfo(Configuration["KeyPersistenceLocation"]));
 
             // Strava authentication
             services.AddAuthentication(options =>
@@ -93,11 +96,11 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie()
+                .AddCookie( options => options.Cookie.SameSite = SameSiteMode.None)
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
-                        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                        options.CorrelationCookie.SameSite = SameSiteMode.None;
 
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
