@@ -175,18 +175,18 @@ namespace CotacolApp
                                 //context.RunClaimActions(user.RootElement);
                                 var userSettings = context.AddClaims(claimsJson);
                             },
-                            OnRemoteFailure = context =>
-                            {
-                                _logger?.LogError(context.Failure,
-                                    $"Error when authenticating against Strava: {context.Failure?.Message}");
-                                if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
-                                {
-                                    context.Response.Redirect("/AppName"); // redirect without trailing slash
-                                    context.HandleResponse();
-                                }
-
-                                return Task.CompletedTask;
-                            }
+                            // OnRemoteFailure = context =>
+                            // {
+                            //     _logger?.LogError(context.Failure,
+                            //         $"Error when authenticating against Strava: {context.Failure?.Message}");
+                            //     if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
+                            //     {
+                            //         context.Response.Redirect("/AppName"); // redirect without trailing slash
+                            //         context.HandleResponse();
+                            //     }
+                            //
+                            //     return Task.CompletedTask;
+                            // }
                         };
                         options.Validate();
                     });
