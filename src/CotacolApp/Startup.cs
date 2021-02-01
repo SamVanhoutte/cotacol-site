@@ -147,7 +147,7 @@ namespace CotacolApp
                                                 redirect.Port = apiSettings.RedirectPort;
                                             }
 
-                                            queryCollection["redirect_url"] = redirect.Uri.ToString();
+                                            queryCollection["redirect_uri"] = redirect.Uri.ToString();
                                             oauthUrl.Query = queryCollection.ToString();
 
                                             _logger?.LogInformation($"Will redirect user to login url {oauthUrl.Uri.ToString()}");
