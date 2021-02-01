@@ -14,21 +14,18 @@ namespace CotacolApp.Pages
         {
             _logger = logger;
         }
+
         public void OnGet()
         {
             _logger?.LogInformation($"StravaLogin endpoint called (GET)");
             Console.WriteLine("ok");
         }
-        
-        public async Task<IActionResult> OnPost()
+
+        public Task<IActionResult> OnPost()
         {
-            // if (SignInManager<>.IsSignedIn(User))
-            // {
-            //     await SignInManager.SignOutAsync();
-            // }
             _logger?.LogInformation($"StravaLogin endpoint called (POST)");
 
-            return Redirect("~/");
+            return Task.FromResult<IActionResult>(Redirect("~/"));
         }
     }
 }

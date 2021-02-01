@@ -21,22 +21,15 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
 using CotacolApp.Settings;
-using Flurl.Http;
 using MatBlazor;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using Serilog.Configuration;
 using Serilog.Core;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace CotacolApp
 {
@@ -181,6 +174,18 @@ namespace CotacolApp
                                 var claimsJson = await response.Content.ReadAsStringAsync();
                                 //context.RunClaimActions(user.RootElement);
                                 var userSettings = context.AddClaims(claimsJson);
+                            },
+                            OnRemoteFailure = context =>
+                            {
+                                _logger?.LogError(context.Failure,
+                                    $"Error when authenticating against Strava: {context.Failure?.Message}");
+                                if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
+                                {
+                                    context.Response.Redirect("/AppName"); // redirect without trailing slash
+                                    context.HandleResponse();
+                                }
+
+                                return Task.CompletedTask;
                             }
                         };
                         options.Validate();
@@ -246,6 +251,7 @@ namespace CotacolApp
                 app.UseHsts();
             }
 
+            app.UseCookiePolicy(new CookiePolicyOptions{ MinimumSameSitePolicy = SameSiteMode.None, Secure =  CookieSecurePolicy.None});
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
