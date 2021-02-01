@@ -90,6 +90,16 @@ jobs:
                                 "slotSetting": false
                               },
                               {
+                                "name": "keyvault:KeySasBlobUri",
+                                "value": "${{ secrets.KeySasBlobUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeyKeyvaultUri",
+                                "value": "${{ secrets.KeyKeyvaultUri }}",
+                                "slotSetting": false
+                              },
+                              {
                                 "name": "logging:ApplicationInsightsInstrumentationKey",
                                 "value": "${{ secrets.ApplicationInsightsInstrumentationKey }}",
                                 "slotSetting": false

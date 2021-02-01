@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
+using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -72,6 +73,9 @@ namespace CotacolApp
             var apiSettings = new CotacolApiSettings();
             configuration.GetSection("api").Bind(apiSettings);
 
+            var kvSettings = new KeyVaultSettings();
+            configuration.GetSection("keyvault").Bind(kvSettings);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -86,8 +90,14 @@ namespace CotacolApp
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            //services.AddDataProtection()
-            //        .PersistKeysToFileSystem(new DirectoryInfo(Configuration["KeyPersistenceLocation"]));
+            if (!string.IsNullOrEmpty(kvSettings?.KeySasBlobUri))
+            {
+                services.AddDataProtection()
+                    // .PersistKeysToFileSystem(new DirectoryInfo("/Users/samvanhoutte/Temp/bbb/ee"));
+                    .PersistKeysToAzureBlobStorage(new Uri($"{kvSettings.KeySasBlobUri}"))
+                    .ProtectKeysWithAzureKeyVault(new Uri(kvSettings.KeyKeyvaultUri), new DefaultAzureCredential());
+                //        .PersistKeysToFileSystem(new DirectoryInfo(Configuration["KeyPersistenceLocation"]));
+            }
 
             // Strava authentication
             services.AddAuthentication(options =>
@@ -96,11 +106,11 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie( options => options.Cookie.SameSite = SameSiteMode.None)
+                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.Lax)
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
-                        options.CorrelationCookie.SameSite = SameSiteMode.None;
+                        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
 
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
@@ -118,13 +128,6 @@ namespace CotacolApp
                         options.Scope.Add(
                             "read,read_all,activity:read_all,activity:read,activity:write,profile:write");
 
-                        // options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-                        // options.ClaimActions.MapJsonKey(ClaimTypes.Name, "username");
-                        // options.ClaimActions.MapJsonKey("FirstName", "firstname");
-                        // options.ClaimActions.MapJsonKey("LastName", "lastname");
-                        // options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "sex");
-                        // options.ClaimActions.MapJsonKey("ProfilePicture", "profile_medium");
-
                         options.Events = new OAuthEvents
                         {
                             OnRedirectToAuthorizationEndpoint = context =>
@@ -133,9 +136,10 @@ namespace CotacolApp
                                 {
                                     //https://www.strava.com/oauth/authorize?client_id=4987&scope=read,read_all,activity%3Aread_all,activity%3Aread,activity%3Awrite,profile%3Awrite&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fstravalogin&state=CfDJ8JoKNYGkoJRGiyjnLkJiaUUsy-Gdj3aacJxb_e1s6KOf3Afptjsi2QVvoszk3mZVi3x_8bgk0pKToWT7zkhgvcuFUgfRGN4-R8mENXrnj-R6p4RmNvj9z_svZfoUSPCPI7SJi2_Z34fh_IqiQr18KJ6nPJW6ZjInPhx9o-OyKamgn9gHxjhnVKgmDqelh38ARBpwYm_qLENo8caaBNpcfSKdfGT49uf7qlqxgmC5QYTMfqeFibaT2dR4B6aN-51baqmUnDd5MQrwEdypyusBzewTJS24WwmByB_CouErqXrOmVnQ3Llb8w06fq5PHhb6iA
                                     // Check to update redirect 
-                                    if(!string.IsNullOrEmpty( apiSettings.RedirectDomain))
+                                    if (!string.IsNullOrEmpty(apiSettings.RedirectDomain))
                                     {
-                                        _logger?.LogInformation($"Redirect domain configured to {apiSettings.RedirectDomain}");
+                                        _logger?.LogInformation(
+                                            $"Redirect domain configured to {apiSettings.RedirectDomain}");
                                         var oauthUrl = new UriBuilder(new Uri(context.RedirectUri));
                                         var queryCollection = HttpUtility.ParseQueryString(oauthUrl.Query);
                                         var redirectUrl = queryCollection["redirect_uri"];
@@ -153,12 +157,12 @@ namespace CotacolApp
                                             queryCollection["redirect_uri"] = redirect.Uri.ToString();
                                             oauthUrl.Query = queryCollection.ToString();
 
-                                            _logger?.LogInformation($"Will redirect user to login url {oauthUrl.Uri.ToString()}");
+                                            _logger?.LogInformation(
+                                                $"Will redirect user to login url {oauthUrl.Uri.ToString()}");
 
                                             context.Response.Redirect(oauthUrl.Uri.ToString());
                                         }
-                                    };
-
+                                    }
                                 }
 
                                 return Task.CompletedTask;
