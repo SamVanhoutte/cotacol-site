@@ -1,9 +1,129 @@
 @page "/achievements"
 @attribute [Authorize]
+
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using Serilog
+@using System.Globalization
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+
 <h1>Achievements</h1>
 <br/>
+@if (achievements == null)
+{
+    <p>
+        <em>We're retrieving your results , please be patient...</em>
+    </p>
+}
+else
+{
+    <h2>Score</h2>
+    <div>Total points: @achievements.TotalScore.ToString("#,###", new NumberFormatInfo{ NumberGroupSeparator = "."})</div>
+    <div>Unique cols: @achievements.UniqueCols.ToString("#,###", new NumberFormatInfo{ NumberGroupSeparator = "."})</div>
+    <AchievementChartComponent Achievements="@achievements" />
 
+    <h2>My most popular climbs</h2>
+    <ol>
+    @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
+    {
+        <li>@climb.CotacolName (@climb.Achievements.Count() attempts) </li>
+    }
+    </ol>
+    <h2>Badges</h2>
+    <div>West Flanders (@WflLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@WflResult"/>
+    <div>East Flanders (@EflLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@EflResult"/>
+    <div>Antwerp (@AntLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@AntResult"/>
+    <div>Limburg (@LimLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@LimResult"/>
+    <div>Flemish Brabant (@FbrLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@FbrResult"/>
+    <div>Brabant Walloon (@WbrLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@WbrResult"/>
+    <div>Hainaut (@HntLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@HntResult"/>
+    <div>Namur (@NamLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@NamResult"/>
+    <div>Liege (@LieLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@LieResult"/>
+    <div>Luxemburg (@LuxLabel)</div>
+    <MatProgressBar Indeterminate="false" Progress="@LuxResult"/>
+}
 
 @code {
+    private UserAchievements achievements;
+    private IEnumerable<UserClimb> climbs;
+
+    private double WflResult {set; get;}
+    private double EflResult {set; get;}
+    private double AntResult {set; get;}
+    private double LimResult {set; get;}
+    private double FbrResult {set; get;}
+    private double WbrResult {set; get;}
+    private double HntResult {set; get;}
+    private double NamResult {set; get;}
+    private double LieResult {set; get;}
+    private double LuxResult {set; get;}
+    private string WflLabel {set; get;}
+    private string EflLabel {set; get;}
+    private string AntLabel {set; get;}
+    private string LimLabel {set; get;}
+    private string FbrLabel {set; get;}
+    private string WbrLabel {set; get;}
+    private string HntLabel {set; get;}
+    private string NamLabel {set; get;}
+    private string LieLabel {set; get;}
+    private string LuxLabel {set; get;}
     
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            achievements = await CotacolUserClient.GetAchievementsAsync();
+            climbs = await CotacolUserClient.GetClimbDataAsync();
+
+            WflResult = GetProvinceProgress("West-Vl", out var wflLabel);
+            EflResult = GetProvinceProgress("Oost-Vl", out var eflLabel);
+            AntResult = GetProvinceProgress("Antwerpen", out var antLabel);
+            LimResult = GetProvinceProgress("Limburg", out var limLabel);
+            FbrResult = GetProvinceProgress("Vl-Br", out var fbrLabel);
+            WbrResult = GetProvinceProgress("Brabant Wallon", out var wbrLabel);
+            HntResult = GetProvinceProgress("Hainaut", out var hntLabel);
+            NamResult = GetProvinceProgress("Namur", out var namLabel);
+            LieResult = GetProvinceProgress("Liege", out var lieLabel);
+            LuxResult = GetProvinceProgress("Luxemburg", out var luxLabel);
+
+            WflLabel = wflLabel;
+            EflLabel = eflLabel;
+            AntLabel = antLabel;
+            LimLabel = limLabel;
+            FbrLabel = fbrLabel;
+            WbrLabel = wbrLabel;
+            HntLabel = hntLabel;
+            NamLabel = namLabel;
+            LieLabel = lieLabel;
+            LuxLabel = luxLabel;
+
+        }
+    }
+
+    private double GetProvinceProgress(string province, out string label)
+    {
+        label = "";
+        Logger.LogInformation($"Getting province stats for {province}");
+        if (climbs == null) return 0;
+
+        var provinceClimbs = climbs.Where(c => c.Province.Equals(province, StringComparison.InvariantCultureIgnoreCase));
+        var totalClimbs = (double) provinceClimbs.Count();
+        if (totalClimbs == 0) return 0;
+        var climbsDone = (double) provinceClimbs.Count(c => c.Done);
+        label = $"{climbsDone} / {totalClimbs}";
+        return climbsDone / totalClimbs;
+    }
+
 }
