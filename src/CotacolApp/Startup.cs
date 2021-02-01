@@ -99,11 +99,11 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.Lax)
+                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.None)
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
-                        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                        options.CorrelationCookie.SameSite = SameSiteMode.None;
 
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
@@ -175,18 +175,18 @@ namespace CotacolApp
                                 //context.RunClaimActions(user.RootElement);
                                 var userSettings = context.AddClaims(claimsJson);
                             },
-                            OnRemoteFailure = context =>
-                            {
-                                _logger?.LogError(context.Failure,
-                                    $"Error when authenticating against Strava: {context.Failure?.Message}");
-                                if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
-                                {
-                                    context.Response.Redirect("/AppName"); // redirect without trailing slash
-                                    context.HandleResponse();
-                                }
-
-                                return Task.CompletedTask;
-                            }
+                            // OnRemoteFailure = context =>
+                            // {
+                            //     _logger?.LogError(context.Failure,
+                            //         $"Error when authenticating against Strava: {context.Failure?.Message}");
+                            //     if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
+                            //     {
+                            //         context.Response.Redirect("/AppName"); // redirect without trailing slash
+                            //         context.HandleResponse();
+                            //     }
+                            //
+                            //     return Task.CompletedTask;
+                            // }
                         };
                         options.Validate();
                     });
