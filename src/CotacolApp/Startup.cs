@@ -99,11 +99,11 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.Lax)
+                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.None)
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
-                        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                        options.CorrelationCookie.SameSite = SameSiteMode.None;
 
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
