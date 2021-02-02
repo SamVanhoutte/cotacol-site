@@ -82,7 +82,7 @@ namespace CotacolApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor().AddHubOptions(config => config.MaximumReceiveMessageSize = 1048576);
             if (!string.IsNullOrEmpty(kvSettings?.KeySasBlobUri))
             {
                 services.AddDataProtection()

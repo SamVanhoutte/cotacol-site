@@ -1,0 +1,106 @@
+@page "/map"
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+@inject ILogger<Colmap> Logger 
+<h1>1000 Cotacols on a map</h1>
+
+
+<GoogleMap @ref="@map1" Id="map1" Options="@mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
+
+
+@code {
+    private GoogleMap map1;
+    private MapOptions mapOptions;
+    private MarkerClustering _markerClustering;
+
+    protected override async Task OnInitializedAsync()
+    {
+        mapOptions = new MapOptions()
+        {
+            Zoom = 9,
+            Center = new LatLngLiteral()
+            {
+                Lat = 50.84,
+                Lng = 4.376
+            },
+            MapTypeId = MapTypeId.Roadmap,
+            ZoomControl = true
+        };
+        await base.OnInitializedAsync();
+        
+    }
+    
+    private async Task OnAfterMapInit()
+    {
+        // await map1.InteropObject.AddListener<MouseEvent>("click", async (e) => await OnClick(e));
+        if (map1 != null)
+        {
+            Logger.LogWarning("Map is available");
+            var line = await Polyline.CreateAsync(map1.JsRuntime, new PolylineOptions()
+            {
+                StrokeColor = "red",
+                Clickable = true,
+                Draggable = false,
+                Editable = false,
+                Map = map1.InteropObject, Path = new List<LatLngLiteral>
+                {
+                    new(){Lat = 50.94, Lng = 4.476},
+                    new(){Lat = 51.01, Lng = 4.489},
+                    new(){Lat = 51.02, Lng = 4.376},
+                }
+            });
+            
+            var path = await line.GetPath();
+            // map1.InteropObject.FitBounds(path);
+            Logger.LogInformation($"Number of path segments : { path.Count()}");
+        }
+        else
+        {
+            Logger.LogWarning("Map is null");
+        }
+    }
+
+
+
+    private async Task RenderClimbs()
+    {
+        if (map1 != null)
+        {
+            var coordinates = new List<LatLngLiteral>
+            {
+                new(50.23, 4.23)
+            };
+
+            var markers = await GetMarkers(coordinates, map1.InteropObject);
+
+            _markerClustering = await MarkerClustering.CreateAsync(map1.JsRuntime, map1.InteropObject, markers);
+            await _markerClustering.FitMapToMarkers(1);
+        }
+    }
+
+    private async Task<IEnumerable<Marker>> GetMarkers(IEnumerable<LatLngLiteral> coords, Map map)
+    {
+        var result = new List<Marker>(coords.Count());
+        var index = 1;
+        foreach (var latLngLiteral in coords)
+        {
+            var marker = await Marker.CreateAsync(map1.JsRuntime, new MarkerOptions()
+            {
+                Position = latLngLiteral,
+                Map = map,
+                Label = $"Test {index++}",
+    //Icon = new Icon()
+    //{
+    //    Url = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+    //}
+    //Icon = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+            });
+
+            result.Add(marker);
+        }
+
+
+        return result;
+    }
+
+}
