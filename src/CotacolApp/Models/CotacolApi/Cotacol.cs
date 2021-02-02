@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace CotacolApp.Models.CotacolApi
 {
     public class Cotacol    {
@@ -5,5 +7,7 @@ namespace CotacolApp.Models.CotacolApi
         public string CotacolName { get; set; } 
         public int UniqueUsers { get; set; } 
         public int TotalAttempts { get; set; } 
+        public List<LocalLegend> LocalLegends { get; set; }
+        
     }
 }

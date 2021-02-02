@@ -25,11 +25,24 @@ else
     <div>Unique cols: @achievements.UniqueCols.ToString("#,###", new NumberFormatInfo{ NumberGroupSeparator = "."})</div>
     <AchievementChartComponent Achievements="@achievements" />
 
+    @if (achievements.LocalLegends?.Any()??false)
+    {
+        <h2>I am the local legend at the following climbs</h2>
+        <p><em>You are local legend if you did a col more than 5 times and no other user did more than you</em></p>
+        <ol>
+            @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
+            {
+                <div><span class="oi oi-star" aria-hidden="true"></span>@GetLegendString(legend.Key) </div>
+            }
+        </ol>
+
+    }
+
     <h2>My most popular climbs</h2>
     <ol>
     @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
     {
-        <li>@climb.CotacolName (@climb.Achievements.Count() attempts) </li>
+        <li>@climb.CotacolName (@climb.Achievements.Count() attempts) @if (achievements.LocalLegends.Any(leg=>leg.Key.Equals(climb.CotacolId))){<span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>} </li>
     }
     </ol>
     <h2>Badges</h2>
@@ -84,7 +97,7 @@ else
     {
         if (UserProfile.IsAuthenticated)
         {
-            achievements = await CotacolUserClient.GetAchievementsAsync();
+            achievements = await CotacolUserClient.GetAchievementsAsync(true);
             climbs = await CotacolUserClient.GetClimbDataAsync();
 
             WflResult = GetProvinceProgress("West-Vl", out var wflLabel);
@@ -126,4 +139,9 @@ else
         return climbsDone / totalClimbs;
     }
 
+    private string GetLegendString(string colId)
+    {
+        var col = achievements.ColResults.FirstOrDefault(cr => cr.CotacolId.Equals(colId));
+        return $"{col.CotacolId} {col.CotacolName} - {col.Achievements.Count} attempts";
+    }
 }

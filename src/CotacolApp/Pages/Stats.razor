@@ -63,7 +63,12 @@ else
                     <td>
                         <b>@context.CotacolName</b>
                     </td>
-                    <td>@context.UniqueUsers</td>
+                    <td>@context.UniqueUsers &nbsp;&nbsp;
+                        @if (ColHasLocalLegends(context.CotacolId))
+                        {
+                            <span class="oi oi-star" aria-hidden="true" title="@PrintLocalLegends(context.CotacolId)"></span>
+                        }
+                    </td>
                     <td>@context.TotalAttempts</td>
                 </MatTableRow>
             </MatTable>
@@ -209,6 +214,22 @@ else
                     break;
             }
         }
+    }
+
+    private bool ColHasLocalLegends(string colId)
+    {
+        var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
+        return legendcol?.LocalLegends?.Any() ?? false;
+    }
+
+    private string PrintLocalLegends(string colId)
+    {
+        var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
+        if (legendcol?.LocalLegends?.Any() ?? false)
+        {
+            return $"{string.Join(", ", legendcol.LocalLegends.Select(leg => leg.UserName))} ({legendcol.LocalLegends.First().Attempts})";
+        }
+        return "";
     }
 
 }

@@ -40,7 +40,7 @@ namespace CotacolApp.Services
                 (await _cotacolDataClient
                     .GetClimbDataAsync())
                 .Select(climb => new UserClimb(climb));
-            
+
             var stats =
                 (await _cotacolDataClient
                     .GetStatsAsync());
@@ -83,11 +83,23 @@ namespace CotacolApp.Services
             throw new System.NotImplementedException();
         }
 
-        public async Task<UserAchievements> GetAchievementsAsync()
+        public async Task<UserAchievements> GetAchievementsAsync(bool includeLocalLegends = false)
         {
             var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<UserAchievements>();
+
+            if (includeLocalLegends)
+            {
+                achievements.LocalLegends = new Dictionary<string, int>();
+                var stats = await _cotacolDataClient.GetStatsAsync();
+                foreach (var colStats in stats.Cotacols.Where(col =>
+                    col.LocalLegends != null && 
+                    col.LocalLegends.Any(leg => leg.UserId.Equals(userId))))
+                {
+                    achievements.LocalLegends.Add(colStats.CotacolId, colStats.LocalLegends.First().Attempts);
+                }
+            }
 
             return achievements;
         }

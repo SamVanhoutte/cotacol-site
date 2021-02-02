@@ -11,7 +11,7 @@ namespace CotacolApp.Interfaces
         Task<List<UserClimb>> GetClimbDataAsync();
 
         Task<List<CotacolActivity>> GetActivitiesAsync();
-        Task<UserAchievements> GetAchievementsAsync();
+        Task<UserAchievements> GetAchievementsAsync(bool includeLocalLegends = false);
         Task<UserProfile> GetProfileAsync();
         Task<SyncStatus> GetSyncStatus();
         Task<int> SynchronizeAsync( bool fullSync = false);
