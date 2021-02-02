@@ -11,5 +11,6 @@ namespace CotacolApp.Models.CotacolApi
         public int TotalAscent { get; set; } 
         public int TotalLength { get; set; } 
         public List<ColResult> ColResults { get; set; } 
+        public IDictionary<string, int> LocalLegends { get; set; }
     }
 }
