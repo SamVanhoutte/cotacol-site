@@ -7,7 +7,6 @@
 
 <div class="row">
 
-    <div class="col-md-6 col-md-offset-2">
         <section>
             <h4>Log in with Strava.</h4>
             <hr/>
@@ -23,6 +22,22 @@
                 }
                 else
                 {
+                    <div>
+                        When authenticating cotacol.eu, the following will happen:
+                        <ul>
+                            <li>Our cotacol backend will get access to your activities and will be notified on every new activity you complete on Strava</li>
+                            <li>When we sync, we will read all the activities and verify if you have completed any Cotacol segments</li>
+                        </ul>
+                        <p>The check boxes in the Strava authentication pop up indicate what we are allowed to do</p>
+                        <ul>
+                            <li>View data about your public profile (required)<br/><i>Read your user name</i></li>
+                            <li>View data about your activities (required)<br/><i>Read your public activities</i></li>
+                            <li>View your private non-activity data such as segments and routes<br/><i>Required if you want to include your non-public activities</i></li>
+                            <li>View data about your private activities (optional)<br/><i>Required if you want to include your non-public activities</i></li>
+                            <li>Upload your activities from Cotacol Hunting to Strava<br/><i>If you enable this, we can indicate which Cotacols were conquered in the activity description</i></li>
+                            <li>Edit certain data on your profile<br/><i>If you star a Cotacol, we can star the segment in your Strava profile</i></li>
+                        </ul>
+                    </div>
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
                             <p>
@@ -32,17 +47,9 @@
                             </p>
                         </div>
                     </form>
-                    <div>
-                        <p>
-                            <a href="http://www.strava.com/oauth/authorize?client_id=54778&response_type=code&redirect_uri=https://cotacol-hunting-workers-tst.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=ccwebapplocal&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">
-                                <button type="submit" class="btn" name="Strava" value="Strava" title="Log in using your Strava account">OAuth authentication</button>
-                            </a>
-                        </p>
-                    </div>
                 }
             }
         </section>
-    </div>
 </div>
 
 @section Scripts {
