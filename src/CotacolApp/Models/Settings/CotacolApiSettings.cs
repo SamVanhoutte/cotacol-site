@@ -7,6 +7,7 @@ namespace CotacolApp.Settings
         public string SharedKeyValue { get; set; }
         public string RedirectDomain { get; set; }
         public int RedirectPort { get; set; }
+        public string LoginUrl { get; set; }
     }
 }
 

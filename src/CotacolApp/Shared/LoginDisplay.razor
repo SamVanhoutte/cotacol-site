@@ -1,20 +1,45 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Http
+@using CotacolApp.Settings
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using Microsoft.AspNetCore.Mvc.Routing
+@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.Extensions.Options
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
+@inject IOptions<CotacolApiSettings> ApiSettings
+@inject IHttpContextAccessor HttpContextAccessor
 <AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage"><img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/></a>
+        <a href="Identity/Account/Manage">
+            <img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/>
+        </a>
         <form method="post" action="Identity/Account/LogOut">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
     </Authorized>
     <NotAuthorized>
         @* <a href="Identity/Account/Register">Register</a> *@
-        <a href="Identity/Account/Login">Log in</a>
+        <a href="@GetLoginLink()">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
+
+    private string GetLoginLink()
+    {
+        var redirectUrl = "Identity/Account/Login";
+        
+        if (!string.IsNullOrEmpty(ApiSettings?.Value?.RedirectDomain))
+        {
+            if (!HttpContextAccessor.HttpContext.Request.Host.Host
+                .Equals(ApiSettings.Value.RedirectDomain, StringComparison.InvariantCultureIgnoreCase))
+            {
+                redirectUrl = ApiSettings.Value.LoginUrl;
+            }
+        }
+        return redirectUrl;
+    }
 
 }

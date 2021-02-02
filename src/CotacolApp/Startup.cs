@@ -99,12 +99,10 @@ namespace CotacolApp
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.None)
+                .AddCookie()
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
-                        options.CorrelationCookie.SameSite = SameSiteMode.None;
-
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
                         options.CallbackPath = "/stravalogin"; //"/signin-strava";
@@ -123,43 +121,6 @@ namespace CotacolApp
 
                         options.Events = new OAuthEvents
                         {
-                            OnRedirectToAuthorizationEndpoint = context =>
-                            {
-                                if (!string.IsNullOrEmpty(apiSettings.RedirectDomain))
-                                {
-                                    //https://www.strava.com/oauth/authorize?client_id=4987&scope=read,read_all,activity%3Aread_all,activity%3Aread,activity%3Awrite,profile%3Awrite&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fstravalogin&state=CfDJ8JoKNYGkoJRGiyjnLkJiaUUsy-Gdj3aacJxb_e1s6KOf3Afptjsi2QVvoszk3mZVi3x_8bgk0pKToWT7zkhgvcuFUgfRGN4-R8mENXrnj-R6p4RmNvj9z_svZfoUSPCPI7SJi2_Z34fh_IqiQr18KJ6nPJW6ZjInPhx9o-OyKamgn9gHxjhnVKgmDqelh38ARBpwYm_qLENo8caaBNpcfSKdfGT49uf7qlqxgmC5QYTMfqeFibaT2dR4B6aN-51baqmUnDd5MQrwEdypyusBzewTJS24WwmByB_CouErqXrOmVnQ3Llb8w06fq5PHhb6iA
-                                    // Check to update redirect 
-                                    if (!string.IsNullOrEmpty(apiSettings.RedirectDomain))
-                                    {
-                                        _logger?.LogInformation(
-                                            $"Redirect domain configured to {apiSettings.RedirectDomain}");
-                                        var oauthUrl = new UriBuilder(new Uri(context.RedirectUri));
-                                        var queryCollection = HttpUtility.ParseQueryString(oauthUrl.Query);
-                                        var redirectUrl = queryCollection["redirect_uri"];
-                                        if (redirectUrl != null)
-                                        {
-                                            var redirect = new UriBuilder(new Uri(redirectUrl))
-                                            {
-                                                Host = apiSettings.RedirectDomain
-                                            };
-                                            if (apiSettings.RedirectPort > 0)
-                                            {
-                                                redirect.Port = apiSettings.RedirectPort;
-                                            }
-
-                                            queryCollection["redirect_uri"] = redirect.Uri.ToString();
-                                            oauthUrl.Query = queryCollection.ToString();
-
-                                            _logger?.LogInformation(
-                                                $"Will redirect user to login url {oauthUrl.Uri.ToString()}");
-
-                                            context.Response.Redirect(oauthUrl.Uri.ToString());
-                                        }
-                                    }
-                                }
-
-                                return Task.CompletedTask;
-                            },
                             OnCreatingTicket = async context =>
                             {
                                 var request = new HttpRequestMessage(HttpMethod.Get,
@@ -174,19 +135,7 @@ namespace CotacolApp
                                 var claimsJson = await response.Content.ReadAsStringAsync();
                                 //context.RunClaimActions(user.RootElement);
                                 var userSettings = context.AddClaims(claimsJson);
-                            },
-                            // OnRemoteFailure = context =>
-                            // {
-                            //     _logger?.LogError(context.Failure,
-                            //         $"Error when authenticating against Strava: {context.Failure?.Message}");
-                            //     if (context.Failure?.Message?.Contains("Correlation failed") ?? false)
-                            //     {
-                            //         context.Response.Redirect("/AppName"); // redirect without trailing slash
-                            //         context.HandleResponse();
-                            //     }
-                            //
-                            //     return Task.CompletedTask;
-                            // }
+                            }
                         };
                         options.Validate();
                     });

@@ -85,6 +85,11 @@ jobs:
                                 "slotSetting": true
                               },
                               {
+                                "name": "api:loginUrl",
+                                "value": "https://cotacol-hunting-app.azurewebsites.net/Identity/Account/Login",
+                                "slotSetting": true
+                              },
+                              {
                                 "name": "keyvault:keyvaultname",
                                 "value": "cotacol-hunting",
                                 "slotSetting": false
