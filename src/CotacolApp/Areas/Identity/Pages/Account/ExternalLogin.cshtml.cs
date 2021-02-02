@@ -59,6 +59,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required] public string UserName { get; set; }
             [Required] [EmailAddress] public string Email { get; set; }
         }
 
@@ -71,20 +72,6 @@ namespace CotacolApp.Areas.Identity.Pages.Account
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
-            // if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
-            // {
-            //     _logger.LogInformation($"Redirect domain configured with value '{_apiSettings?.RedirectDomain}'");
-            //     var fullUrl = Url.PageLink("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
-            //
-            //     // Remove trailing slash of domain
-            //     if (_apiSettings.RedirectDomain.EndsWith("/"))
-            //         _apiSettings.RedirectDomain =
-            //             _apiSettings.RedirectDomain.Remove(_apiSettings.RedirectDomain.Length - 1, 1);
-            //     // Ensure leading slash of relative url
-            //     if (!redirectUrl.StartsWith("/")) redirectUrl = "/" + redirectUrl;
-            //     // Stitch together
-            //     redirectUrl = _apiSettings.RedirectDomain + redirectUrl;
-            // }
             _logger.LogInformation($"OAuth login requested and configured URL {redirectUrl}");
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
@@ -126,12 +113,18 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 _logger.LogInformation($"New user tokens received {accessToken} - {refreshToken}");
 
                 ProviderDisplayName = info.ProviderDisplayName;
+                var userName = info.GetUserName();
+                if (string.IsNullOrEmpty(userName))
+                {
+                    userName = "Your strava user";
+                }
+                Input = new InputModel
+                {
+                    UserName = userName
+                };
                 if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                    Input.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 }
 
                 return Page();
@@ -149,8 +142,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             {
                 var user = new CotacolUser
                 {
-                    Id = info.GetUserId(), UserName = info.GetUserName(), Email = Input.Email,
-                    FirstName = info.Principal.GetClaim(IdentityExtensions.FirstNameClaim), LastName = info.Principal.GetClaim(IdentityExtensions.LastNameClaim),
+                    Id = info.GetUserId(), UserName = Input.UserName, Email = Input.Email,
+                    FirstName = info.Principal.GetClaim(IdentityExtensions.FirstNameClaim),
+                    LastName = info.Principal.GetClaim(IdentityExtensions.LastNameClaim),
                     ProfilePicture = info.Principal.GetClaim(IdentityExtensions.ProfilePictureClaim)
                 };
 
