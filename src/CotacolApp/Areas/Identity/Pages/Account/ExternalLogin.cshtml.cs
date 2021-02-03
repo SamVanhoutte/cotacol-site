@@ -6,6 +6,7 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services;
+using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
 using Flurl;
 using Microsoft.AspNetCore.Authentication;

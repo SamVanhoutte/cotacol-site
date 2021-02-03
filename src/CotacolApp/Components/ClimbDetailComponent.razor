@@ -32,7 +32,7 @@
 <div style="height: 80px">&nbsp;</div>
 <MatCard class="demo-mat-card" Style="width: 260px">
     <MatCardContent>
-        <MatCardMedia Wide="true" ImageUrl="images/climb-profile.png"></MatCardMedia>
+        @* <MatCardMedia Wide="true" ImageUrl="images/climb-profile.png"></MatCardMedia> *@
         <div class="demo-mat-card-content">
             <MatHeadline6 class="demo-mat-card-clean-margin">
                 @Cotacol?.Name
@@ -93,6 +93,7 @@
                         </td>
                     </tr>
                 </table>
+                <ClimbMapComponent Cotacol="@Cotacol"></ClimbMapComponent>
             }
         </MatBody2>
     </MatCardContent>

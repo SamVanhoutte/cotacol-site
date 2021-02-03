@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CotacolApp.Services
+namespace CotacolApp.Services.Extensions
 {
     public static class DictionaryExtensions
     {

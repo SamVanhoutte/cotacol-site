@@ -1,9 +1,6 @@
 @page "/achievements"
 @attribute [Authorize]
-
-@using MatBlazor
 @using CotacolApp.Models.CotacolApi
-@using Serilog
 @using System.Globalization
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
@@ -12,6 +9,7 @@
 
 <h1>Achievements</h1>
 <br/>
+
 @if (achievements == null)
 {
     <p>
