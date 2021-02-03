@@ -23,7 +23,7 @@ namespace CotacolApp.Services
             return new()
             {
                 Zoom = zoom,
-                Center = new LatLngLiteral(4.35, 50.85),
+                Center = new LatLngLiteral(4.52, 50.28),
                 MapTypeId = MapTypeId.Roadmap,
                 ZoomControl = !miniView,
                 Scrollwheel = true,
