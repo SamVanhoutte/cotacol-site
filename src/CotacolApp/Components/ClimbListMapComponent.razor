@@ -2,11 +2,11 @@
 @using GoogleMapsComponents.Maps
 @using CotacolApp.Services.Extensions
 @inject ILogger<ClimbListMapComponent> Logger
+@inject IJSRuntime JsRuntime
 
 @if (Climbs != null)
 {
-    <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions" OnAfterInit="OnAfterInitAsync" ></GoogleMap>
-    
+    <div @ref="@mapElementRef" id="map1" style="height: 450px"></div>
 }
 else
 {
@@ -17,13 +17,14 @@ else
 
 
 @code {
-
-    private GoogleMap map1;
     private MapOptions mapOptions;
     private MapService _mapService = new MapService();
 
     private IEnumerable<UserClimb> climbList;
-
+    private ElementReference mapElementRef;
+    private Map map1;
+    private int _currentzoom = 9;
+    private int polylineTreshold = 10;
 
     [Parameter]
     public IEnumerable<UserClimb> Climbs
@@ -33,7 +34,7 @@ else
         {
             if (value == null || (climbList?.Equals(value) ?? false)) return;
             Logger.LogInformation($"[Setter], number {value.Count()}");
-
+            map1 = null;
             climbList = value;
             ClimbsChanged.InvokeAsync(value);
         }
@@ -45,51 +46,67 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (climbList == null) Logger.LogWarning("[Initialize]");
+        if (climbList == null) Logger.LogWarning("[Initialize] climbList is null");
 
-        mapOptions = await _mapService.GetLayoutAsync(false);
+        mapOptions = await _mapService.GetLayoutAsync(false, _currentzoom);
         await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await ShowClimbsAsync();
-        Logger.LogInformation($"[Render]After show climbs");
-
+        if (map1 == null)
+        {
+            await InitializeMap();
+        }
+        var currentzoom = await map1.GetZoom();
+        if (firstRender ||
+            ((currentzoom < polylineTreshold) != (_currentzoom < polylineTreshold)))
+        {
+            Logger.LogInformation($"Plotting lines: {_currentzoom} < {polylineTreshold} && {currentzoom} != {_currentzoom}");
+            await ShowClimbsAsync(_currentzoom,
+                _currentzoom < polylineTreshold && currentzoom != _currentzoom);
+            Logger.LogInformation($"[Render]After show climbs");
+        }
+        _currentzoom = currentzoom;
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task ShowClimbsAsync()
+    private async Task InitializeMap()
     {
-        if (climbList == null) Logger.LogWarning("[ShowClimbs] Climb list is null");
-        if (map1 == null) Logger.LogWarning("[ShowClimbs] Map is null");
+        Logger.LogInformation($"[Render]Creating new map");
+        mapOptions = await _mapService.GetLayoutAsync(false, _currentzoom);
+        map1 = await Map.CreateAsync(JsRuntime, mapElementRef, mapOptions);
+        await map1.AddListener("zoom_changed", OnZoomChanged);
+    }
+
+    private async Task ShowClimbsAsync(int previousZoom, bool plotLines, bool centerMap = false)
+    {
+        Logger.LogInformation("Showing climbs");
         if (climbList != null && map1 != null)
         {
-            await _mapService.ClearClimbsAsync(map1);
+            await _mapService.ClearClimbsAsync();
             var tasks = new List<Task> {};
             tasks.AddRange(climbList.Select(
-                userClimb => _mapService.ShowClimbAsync(map1, userClimb, map1.get false)));
+                userClimb => _mapService.ShowClimbAsync(map1, JsRuntime, userClimb, plotLines, false)));
             await Task.WhenAll(tasks);
-            await _mapService.ClusterMarkersAsync(map1);
-            // await map1.CenterBelgiumAsync();
+            await _mapService.ClusterMarkersAsync(map1, JsRuntime, centerMap);
         }
     }
 
-    // private async Task OnAfterMapInit()
-    // {
-    //     if (climbList == null) Logger.LogWarning("[AfterMapInit] Climb list is null");
-    //     if (map1 == null) Logger.LogWarning("[AfterMapInit] Map is null");
-    //
-    //     await ShowClimbsAsync();
-    // }
-
     private async Task OnAfterInitAsync()
     {
-        await map1.InteropObject.AddListener("zoom_changed", OnZoomChanged);
+        if (map1 != null)
+        {
+            var zoom = await map1.GetZoom();
+            await map1.AddListener("zoom_changed", OnZoomChanged);
+            Logger.LogInformation("Enabled zoom change listener, current zoom {zoom}");
+        }
     }
 
     private void OnZoomChanged()
     {
+        Logger.LogInformation("Zoom");
         StateHasChanged();
     }
+
 }

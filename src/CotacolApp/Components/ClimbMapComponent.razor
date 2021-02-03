@@ -1,6 +1,7 @@
 @using GoogleMapsComponents
 @using GoogleMapsComponents.Maps
 @using CotacolApp.Services.Extensions
+@inject IJSRuntime JsRuntime
 
 @if (Cotacol != null) {
     <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
@@ -27,6 +28,6 @@ else
     
     private async Task OnAfterMapInit()
     {
-        await _mapService.ShowClimbAsync(map1, Cotacol, true);
+        await _mapService.ShowClimbAsync(map1.InteropObject, JsRuntime, Cotacol, true);
     }
 }

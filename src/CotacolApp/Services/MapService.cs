@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CotacolApp.Models;
 using GoogleMapsComponents;
 using GoogleMapsComponents.Maps;
+using Microsoft.JSInterop;
+using Serilog.Core;
 
 namespace CotacolApp.Services
 {
@@ -16,11 +18,11 @@ namespace CotacolApp.Services
         private List<Polyline> _lines = new();
         private MarkerClustering _markerClustering;
 
-        public async Task<MapOptions> GetLayoutAsync(bool miniView = false)
+        public async Task<MapOptions> GetLayoutAsync(bool miniView = false, int zoom = 9)
         {
             return new()
             {
-                Zoom = 9,
+                Zoom = zoom,
                 Center = new LatLngLiteral(4.35, 50.85),
                 MapTypeId = MapTypeId.Roadmap,
                 ZoomControl = !miniView,
@@ -48,40 +50,42 @@ namespace CotacolApp.Services
             return style.Build();
         }
 
-        public async Task ClusterMarkersAsync(GoogleMap map1)
+        public async Task ClusterMarkersAsync(Map map1, IJSRuntime jsRuntime, bool fitMarkers = false)
         {
-            _markerClustering = await MarkerClustering.CreateAsync(map1.JsRuntime, map1.InteropObject, _markers);
-            await _markerClustering.FitMapToMarkers(0);
+            _markerClustering = await MarkerClustering.CreateAsync(jsRuntime, map1, _markers);
+            if (fitMarkers) await _markerClustering.FitMapToMarkers(0);
         }
 
-        public async Task ShowClimbAsync(GoogleMap map1, UserClimb climb, bool plotTrack = true, bool singleClimb = false)
+        public async Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
+            bool plotTrack = true, bool singleClimb = false)
         {
+            
             if (!string.IsNullOrEmpty(climb.Polyline))
             {
                 var polyline = Columbae.Polyline.ParsePolyline(climb.Polyline);
-                await AddMarkerAsync(map1, climb, polyline, singleClimb);
-                if(plotTrack) await DrawPolylineAsync(map1, polyline);
+                await AddMarkerAsync(map1, jsRuntime, climb, polyline, singleClimb);
+                if (plotTrack) await DrawPolylineAsync(map1, jsRuntime, polyline);
                 if (singleClimb) await ZoomToClimbAsync(map1, polyline);
             }
         }
 
-        private async Task ZoomToClimbAsync(GoogleMap map1, Columbae.Polyline polyline)
+        private async Task ZoomToClimbAsync(Map map1, Columbae.Polyline polyline)
         {
             var box = polyline.BoundingBox;
             var bounds = new LatLngBoundsLiteral(
                 new LatLngLiteral(box.Vertices.First().Longitude, box.Vertices.First().Latitude),
                 new LatLngLiteral(box.Vertices[2].Longitude, box.Vertices[2].Latitude));
-            await map1.InteropObject.FitBounds(bounds);
+            await map1.FitBounds(bounds);
         }
 
-        private async Task AddMarkerAsync(GoogleMap map1, UserClimb climb, Columbae.Polyline polyline,
+        private async Task AddMarkerAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb, Columbae.Polyline polyline,
             bool singleClimb = false)
         {
             var start = polyline.Vertices.First();
-            var marker = await Marker.CreateAsync(map1.JsRuntime, new MarkerOptions()
+            var marker = await Marker.CreateAsync(jsRuntime, new MarkerOptions()
             {
                 Position = new LatLngLiteral(start.Longitude, start.Latitude),
-                Map = map1.InteropObject,
+                Map = map1,
                 Icon = new Icon {Url = "images/climb-icon-map-pink.png"}
             });
             if (singleClimb)
@@ -91,6 +95,9 @@ namespace CotacolApp.Services
             }
 
             var infoWindowContent = $@"<table class='table table-striped table-dark'><tbody>
+                        <tr>
+                        <td colspan=2>{climb.Name}</td>
+                        </tr>
                         <tr>
                         <td>Points</td>
                         <td>{climb.CotacolPoints}</td>
@@ -105,7 +112,7 @@ namespace CotacolApp.Services
                         </tr>
                         </tbody>
                         </table>";
-            var infoWindow = await InfoWindow.CreateAsync(map1.JsRuntime, new InfoWindowOptions()
+            var infoWindow = await InfoWindow.CreateAsync(jsRuntime, new InfoWindowOptions()
             {
                 Position = new LatLngLiteral(start.Longitude, start.Latitude)
             });
@@ -113,33 +120,33 @@ namespace CotacolApp.Services
             {
                 await infoWindow.SetContent(infoWindowContent);
                 await infoWindow.SetPosition(new LatLngLiteral(start.Longitude, start.Latitude));
-                await infoWindow.Open(map1.InteropObject);
+                await infoWindow.Open(map1);
             });
             _markers.Add(marker);
         }
 
 
-        private async Task DrawPolylineAsync(GoogleMap map1, Columbae.Polyline polyline)
+        private async Task DrawPolylineAsync(Map map1, IJSRuntime jsRuntime, Columbae.Polyline polyline)
         {
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
-            var line = await Polyline.CreateAsync(map1.JsRuntime, new PolylineOptions()
+            var line = await Polyline.CreateAsync(jsRuntime, new PolylineOptions()
             {
                 StrokeColor = "#FD7D7A",
                 Clickable = true,
                 Draggable = false,
                 Editable = false,
-                Map = map1.InteropObject, Path = path
+                Map = map1, Path = path
             });
             _lines.Add(line);
         }
 
-        public async Task ClearClimbsAsync(GoogleMap map1)
+        public async Task ClearClimbsAsync()
         {
             var tasks = new List<Task> { };
             tasks.AddRange(
                 _markers.Select(marker => marker.SetMap(null)));
             await Task.WhenAll(tasks);
-            
+
             tasks = new List<Task> { };
             tasks.AddRange(
                 _lines.Select(line => line.SetMap(null)));
@@ -149,6 +156,7 @@ namespace CotacolApp.Services
                 await _markerClustering.ClearMarkers();
                 await _markerClustering.SetMap(null);
             }
+
             _markers = new List<Marker>();
             _lines = new List<Polyline>();
         }
