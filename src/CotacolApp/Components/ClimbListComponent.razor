@@ -69,7 +69,7 @@ else
         {
             climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
         }
-        climbList = climbList.Shuffle().Take(400);
+        climbList = climbList.Shuffle().Take(1000);
         climbs = climbList;
     }
 
