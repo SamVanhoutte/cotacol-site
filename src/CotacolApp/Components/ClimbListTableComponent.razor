@@ -1,0 +1,154 @@
+@using MatBlazor
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<ClimbListTableComponent> Logger
+
+<div style="overflow-y: scroll; height:100vh;">
+    @if (Climbs.Count() < 1000)
+    {
+        <div>Showing @Climbs.Count() results.</div>
+    }
+    <MatDrawerContainer>
+        <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@ColSelected" Style="width: 270px">
+            <MatIconButton OnClick="CloseClimb">
+                <MatIcon>@MatIconNames.Close</MatIcon>
+            </MatIconButton>
+            <ClimbDetailComponent Cotacol="@SelectedClimb"/>
+        </MatDrawer>
+        <MatDrawerContent>
+            <MatTable FilterByColumnName="Name" Items="@Climbs" class="table" PageSize="2000"
+                      AllowSelection="true" SelectionChanged="SelectionChanged"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortClimbs">
+                        <MatSortHeader SortId="id">#</MatSortHeader>
+                        <MatSortHeader SortId="name">
+                            <span style="width:250px">Name</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="province">Province</MatSortHeader>
+                        <MatSortHeader SortId="surface">Surface</MatSortHeader>
+                        <MatSortHeader SortId="points">Points</MatSortHeader>
+                        <MatSortHeader SortId="length">Length</MatSortHeader>
+                        <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
+                        <MatSortHeader SortId="grade">Grade</MatSortHeader>
+                        <MatSortHeader>Link</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Id</td>
+                    @if (context.Done)
+                    {
+                        <td style="max-width: 200px">
+                            <b>@context.Name.ToUpper()</b>
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="max-width: 200px">@context.Name</td>
+                    }
+                    <td>@context.Province</td>
+                    <td>@context.Surface</td>
+                    <td>@context.CotacolPoints</td>
+                    <td>@context.Distance</td>
+                    <td>@context.ElevationDiff</td>
+                    <td>@context.AvgGrade %</td>
+                    <td>
+                        <a href="@context.Url" target="_blank">
+                            <img src="images/strava-logo-small.png" asp-append-version="true"/>
+                        </a>
+                    </td>
+                </MatTableRow>
+            </MatTable>
+        </MatDrawerContent>
+    </MatDrawerContainer>
+</div>
+
+@code {
+    private IEnumerable<UserClimb> climbList;
+    [Parameter]
+    public IEnumerable<UserClimb> Climbs { get=>climbList;
+        set
+        {
+            if (climbList!=null && climbList.Equals(value)) return;
+
+            climbList = value;
+            ClimbsChanged.InvokeAsync(value);
+        } }
+
+    private UserClimb SelectedClimb = null;
+    private bool ColSelected = false;
+    
+
+    [Parameter]
+    public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
+
+
+    private void SortClimbs(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && Climbs != null)
+        {
+            switch (sort.SortId)
+            {
+                case "id":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.Id) :
+                        Climbs.OrderByDescending(c => c.Id);
+                    break;
+                case "name":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.Name) :
+                        Climbs.OrderByDescending(c => c.Name);
+                    break;
+                case "province":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.Province) :
+                        Climbs.OrderByDescending(c => c.Province);
+                    break;
+                case "surface":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.Surface) :
+                        Climbs.OrderByDescending(c => c.Surface);
+                    break;
+                case "points":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.CotacolPoints) :
+                        Climbs.OrderByDescending(c => c.CotacolPoints);
+                    break;
+                case "length":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.Distance) :
+                        Climbs.OrderByDescending(c => c.Distance);
+                    break;
+                case "elevation":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.ElevationDiff) :
+                        Climbs.OrderByDescending(c => c.ElevationDiff);
+                    break;
+                case "grade":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderBy(c => c.AvgGrade) :
+                        Climbs.OrderByDescending(c => c.AvgGrade);
+                    break;
+            }
+        }
+    }
+
+    private void CloseClimb()
+    {
+        SelectedClimb = null;
+        ColSelected = false;
+        StateHasChanged();
+    }
+    
+    private void SelectionChanged(object col)
+    {
+        if (col is UserClimb climb)
+        {
+            SelectedClimb = climb;
+            Console.WriteLine(climb.Name);
+            StateHasChanged();
+        }
+        ColSelected = col != null;
+    }
+}

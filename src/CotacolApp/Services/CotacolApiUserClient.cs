@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CotacolApp.Interfaces;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
+using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
 using Flurl.Http;
 using GuardNet;

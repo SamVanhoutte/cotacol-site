@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 
-namespace CotacolApp.Services
+namespace CotacolApp.Services.Extensions
 {
     public static class IdentityExtensions
     {

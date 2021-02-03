@@ -1,0 +1,95 @@
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+@using CotacolApp.Services.Extensions
+@inject ILogger<ClimbListMapComponent> Logger
+
+@if (Climbs != null)
+{
+    <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions" OnAfterInit="OnAfterInitAsync" ></GoogleMap>
+    
+}
+else
+{
+    <span>
+        <em>Loading map...</em>
+    </span>
+}
+
+
+@code {
+
+    private GoogleMap map1;
+    private MapOptions mapOptions;
+    private MapService _mapService = new MapService();
+
+    private IEnumerable<UserClimb> climbList;
+
+
+    [Parameter]
+    public IEnumerable<UserClimb> Climbs
+    {
+        get => climbList;
+        set
+        {
+            if (value == null || (climbList?.Equals(value) ?? false)) return;
+            Logger.LogInformation($"[Setter], number {value.Count()}");
+
+            climbList = value;
+            ClimbsChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (climbList == null) Logger.LogWarning("[Initialize]");
+
+        mapOptions = await _mapService.GetLayoutAsync(false);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ShowClimbsAsync();
+        Logger.LogInformation($"[Render]After show climbs");
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task ShowClimbsAsync()
+    {
+        if (climbList == null) Logger.LogWarning("[ShowClimbs] Climb list is null");
+        if (map1 == null) Logger.LogWarning("[ShowClimbs] Map is null");
+        if (climbList != null && map1 != null)
+        {
+            await _mapService.ClearClimbsAsync(map1);
+            var tasks = new List<Task> {};
+            tasks.AddRange(climbList.Select(
+                userClimb => _mapService.ShowClimbAsync(map1, userClimb, map1.get false)));
+            await Task.WhenAll(tasks);
+            await _mapService.ClusterMarkersAsync(map1);
+            // await map1.CenterBelgiumAsync();
+        }
+    }
+
+    // private async Task OnAfterMapInit()
+    // {
+    //     if (climbList == null) Logger.LogWarning("[AfterMapInit] Climb list is null");
+    //     if (map1 == null) Logger.LogWarning("[AfterMapInit] Map is null");
+    //
+    //     await ShowClimbsAsync();
+    // }
+
+    private async Task OnAfterInitAsync()
+    {
+        await map1.InteropObject.AddListener("zoom_changed", OnZoomChanged);
+    }
+
+    private void OnZoomChanged()
+    {
+        StateHasChanged();
+    }
+}

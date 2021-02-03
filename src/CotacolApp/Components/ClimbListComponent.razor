@@ -1,0 +1,143 @@
+@using MatBlazor
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<ClimbListComponent> Logger
+
+@if (climbs == null)
+{
+    <p>
+        <em>We're getting the climbs , please be patient...</em>
+    </p>
+}
+else
+{
+    <MatChipSet Choice="true" SelectedChipChanged="ApplyFilter">
+        <MatChip Label="All" Id="NoFilter"></MatChip>
+        @if (UserProfile.IsAuthenticated)
+        {
+            <MatChip Label="Done" Id="DoneFilter"></MatChip>
+            <!--<MatChip Label="Planned" Id="PlannedFilter"></MatChip>-->
+            <MatChip Label="To do" Id="TodoFilter"></MatChip>
+        }
+        <MatChip Label="Top 50" Id="TopFilter"></MatChip>
+        <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
+        <MatChip Label="Highest" Id="HighFilter"></MatChip>
+        <MatChip Label="Longest" Id="LongFilter"></MatChip>
+        <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
+    </MatChipSet>
+    <MatChipSet Id="ProvinceFilter" Choice="false" Filter="true" SelectedChipChanged="ApplyProvinceFilter">
+        <MatChip Label="WFL" IsCheckable="true" Id="WestVlFilter"></MatChip>
+        <MatChip Label="EFL" IsCheckable="true" Id="OostVlFilter"></MatChip>
+        <MatChip Label="ANT" IsCheckable="true" Id="AntwerpenFilter"></MatChip>
+        <MatChip Label="LIM" IsCheckable="true" Id="LimburgFilter"></MatChip>
+        <MatChip Label="FLB" IsCheckable="true" Id="VlBrFilter"></MatChip>
+        <MatChip Label="WLB" IsCheckable="true" Id="BrabantWallonFilter"></MatChip>
+        <MatChip Label="HNT" IsCheckable="true" Id="HainautFilter"></MatChip>
+        <MatChip Label="NAM" IsCheckable="true" Id="NamurFilter"></MatChip>
+        <MatChip Label="LIE" IsCheckable="true" Id="LiegeFilter"></MatChip>
+        <MatChip Label="LUX" IsCheckable="true" Id="LuxemburgFilter"></MatChip>
+    </MatChipSet>
+    @if(Mode== ClimbViewMode.Table)
+    {
+        <ClimbListTableComponent @bind-Climbs="@climbs" />
+    }
+    else
+    {
+        <ClimbListMapComponent @bind-Climbs="@climbs" />
+    }
+}
+
+@code {
+
+    [Parameter]
+    public ClimbViewMode Mode  { get; set; }
+    
+    private string CurrentFilter = "nofilter";
+    private List<string> ProvinceFilters = null;
+    private IEnumerable<UserClimb> climbList;
+    private IEnumerable<UserClimb> climbs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            climbList = await CotacolUserClient.GetClimbDataAsync();
+        }
+        else
+        {
+            climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
+        }
+        climbs = climbList;
+    }
+
+    private void ApplyProvinceFilter(MatChip filter)
+    {
+        if (filter == null)
+        {
+            ProvinceFilters = null;
+        }
+        else
+        {
+            ProvinceFilters = filter.ChipSet.SelectedChips
+                .Select(chip => GetSystemName(chip.Id)).ToList();
+        }
+        FilterClimbs();
+    }
+
+    private void ApplyFilter(MatChip filter)
+    {
+        CurrentFilter = filter.Id;
+        FilterClimbs();
+    }
+
+    private string GetSystemName(string value)
+    {
+        return value.Replace("Filter", "")
+            .Replace(" ", "")
+            .Replace("-", "")
+            .ToLower();
+    }
+
+    private void FilterClimbs()
+    {
+        climbs = climbList;
+
+        // Filter on category
+        switch (CurrentFilter.ToLower())
+        {
+            case "nofilter":
+                break;
+            case "donefilter":
+                climbs = climbList.Where(c => c.Done);
+                break;
+            case "todofilter":
+                climbs = climbList.Where(c => !c.Done);
+                break;
+            case "topfilter":
+                climbs = climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
+                break;
+            case "easyfilter":
+                climbs = climbList.OrderBy(c => c.CotacolPoints).Take(50);
+                break;
+            case "highfilter":
+                climbs = climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
+                break;
+            case "longfilter":
+                climbs = climbList.OrderByDescending(c => c.Distance).Take(50);
+                break;
+            case "steepfilter":
+                climbs = climbList.OrderByDescending(c => c.AvgGrade).Take(50);
+                break;
+            default:
+                break;
+        }
+
+    // Filter on province
+        if (ProvinceFilters?.Any() ?? false)
+        {
+            climbs = climbs.Where(c =>
+                ProvinceFilters.Any(province => GetSystemName(province).Equals(GetSystemName(c.Province))));
+        }
+    }
+}

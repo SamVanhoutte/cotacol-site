@@ -57,5 +57,12 @@
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </EmbeddedResource>
     </ItemGroup>
-
+    <ItemGroup>
+        <Content Remove="StaticData\cotacolmapstyle.json" />
+        <EmbeddedResource Include="StaticData\cotacolmapstyle.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
 </Project>
