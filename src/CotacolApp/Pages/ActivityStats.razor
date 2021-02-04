@@ -1,4 +1,4 @@
-@page "/stats"
+@page "/activitystats"
 @using MatBlazor
 @using CotacolApp.Models.CotacolApi
 @inject ICotacolClient CotacolClient
@@ -21,28 +21,33 @@
 }
 else
 {
-
-    <h2>Leader board</h2>
-    <hr/>
-    <MatTable FilterByColumnName="UserName" Items="@stats.Users" class="table" PageSize="100"
+    <h2>Toughest activities</h2>
+    <MatTable Items="@stats.Activities" class="table" PageSize="100"
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
-            <MatSortHeaderRow SortChanged="SortLeaders">
-                <MatSortHeader SortId="position">#</MatSortHeader>
-                <MatSortHeader SortId="name">
-                    <span style="width:600px">Hunter</span>
-                </MatSortHeader>
+            <MatSortHeaderRow SortChanged="SortActivities">
+                <MatSortHeader SortId="name">Hunter</MatSortHeader>
+                <MatSortHeader SortId="date">Date</MatSortHeader>
+                <MatSortHeader SortId="cols">Cols</MatSortHeader>
                 <MatSortHeader SortId="points">Points</MatSortHeader>
-                <MatSortHeader SortId="climbs">Unique Climbs</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
         <MatTableRow>
-            <td>@context.Position</td>
-            <td>
+            <td style="min-width: 240px">
                 <b>@PrintName(context)</b>
             </td>
-            <td>@context.TotalPoints</td>
+            <td style="min-width: 240px">
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <a href="@context.ActivityUrl" target="_blank">@context.ActivityDate.ToString("D")</a>
+                }
+                else
+                {
+                    @context.ActivityDate.ToString("D")
+                }
+            </td>
             <td>@context.UniqueCols</td>
+            <td>@context.TotalPoints</td>
         </MatTableRow>
     </MatTable>
 }
@@ -83,27 +88,31 @@ else
         return "Anonymous";
     }
 
-    private string PrintName(UserStatistics user)
+    private string PrintName(Activity activity)
     {
-        return GetName(user.FullName, user.UserName);
+        return GetName(activity.FullName, activity.UserName);
     }
-    
 
-    private void SortLeaders(MatSortChangedEvent sort)
+   private void SortActivities(MatSortChangedEvent sort)
     {
         if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && stats != null)
         {
             switch (sort.SortId)
             {
-                case "points":
-                    stats.Users = sort.Direction == MatSortDirection.Asc ?
-                        stats.Users.OrderBy(c => c.TotalPoints).ToList() :
-                        stats.Users.OrderByDescending(c => c.TotalPoints).ToList();
+                case "date":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.ActivityDate).ToList() :
+                        stats.Activities.OrderByDescending(c => c.ActivityDate).ToList();
                     break;
-                case "climbs":
-                    stats.Users = sort.Direction == MatSortDirection.Asc ?
-                        stats.Users.OrderBy(c => c.UniqueCols).ToList() :
-                        stats.Users.OrderByDescending(c => c.UniqueCols).ToList();
+                case "cols":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.UniqueCols).ToList() :
+                        stats.Activities.OrderByDescending(c => c.UniqueCols).ToList();
+                    break;
+                case "points":
+                    stats.Activities = sort.Direction == MatSortDirection.Asc ?
+                        stats.Activities.OrderBy(c => c.TotalPoints).ToList() :
+                        stats.Activities.OrderByDescending(c => c.TotalPoints).ToList();
                     break;
             }
         }
