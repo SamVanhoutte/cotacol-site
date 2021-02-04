@@ -12,6 +12,13 @@
 @inject IHttpContextAccessor HttpContextAccessor
 <AuthorizeView>
     <Authorized>
+        @if(uniqueCols>=0)
+        {
+            <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>
+            <span class="cooper">@uniqueCols cols&nbsp;&nbsp;</span>
+            <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>
+            <span class="cooper">@totalPoints pts</span>
+        }
         <a href="Identity/Account/Manage">
             <img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/>
         </a>
@@ -26,7 +33,9 @@
 </AuthorizeView>
 
 @code {
-
+    private int uniqueCols = -1;
+    private int totalPoints = -1;
+    
     private string GetLoginLink()
     {
         var redirectUrl = "Identity/Account/Login";
@@ -40,6 +49,17 @@
             }
         }
         return redirectUrl;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (uniqueCols < 0)
+        {
+            var stats = await CotacolUserClient.GetAchievementsAsync();
+            uniqueCols = stats.UniqueCols;
+            totalPoints = stats.TotalScore;
+        }   
+        await base.OnInitializedAsync();
     }
 
 }

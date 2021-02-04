@@ -1,0 +1,96 @@
+@page "/colstats"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+
+<h1>Crunching numbers</h1>
+
+@if (!UserProfile.IsAuthenticated)
+{
+    <p>
+        <em>Since you are not a registered user, user names and activity details are hidden for user privacy.</em>
+    </p>
+}
+
+@if (stats == null)
+{
+    <p>
+        <em>Loading climbs...</em>
+    </p>
+}
+else
+{
+    <h2>Climb popularity</h2>
+    <MatTable FilterByColumnName="CotacolName" Items="@stats.Cotacols" class="table" PageSize="100"
+              ShowPaging="false" UseSortHeaderRow="true">
+        <MatTableHeader>
+            <MatSortHeaderRow SortChanged="SortClimbs">
+                <MatSortHeader SortId="name">
+                    <span style="width:600px">Name</span>
+                </MatSortHeader>
+                <MatSortHeader SortId="userCount">Users</MatSortHeader>
+                <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
+            </MatSortHeaderRow>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>
+                <b>@context.CotacolName</b>
+            </td>
+            <td>@context.UniqueUsers &nbsp;&nbsp;
+                @if (ColHasLocalLegends(context.CotacolId))
+                {
+                    <span class="oi oi-star" aria-hidden="true" title="@PrintLocalLegends(context.CotacolId)"></span>
+                }
+            </td>
+            <td>@context.TotalAttempts</td>
+        </MatTableRow>
+    </MatTable>
+}
+
+@code {
+    private SiteStats stats = null;
+    public int tabIndex = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stats = await CotacolClient.GetStatsAsync();
+    }
+    
+    private void SortClimbs(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && stats != null)
+        {
+            switch (sort.SortId)
+            {
+                case "userCount":
+                    stats.Cotacols = sort.Direction == MatSortDirection.Asc ?
+                        stats.Cotacols.OrderBy(c => c.UniqueUsers).ToList() :
+                        stats.Cotacols.OrderByDescending(c => c.UniqueUsers).ToList();
+                    break;
+                case "attemptCount":
+                    stats.Cotacols = sort.Direction == MatSortDirection.Asc ?
+                        stats.Cotacols.OrderBy(c => c.TotalAttempts).ToList() :
+                        stats.Cotacols.OrderByDescending(c => c.TotalAttempts).ToList();
+                    break;
+            }
+        }
+    }
+
+    private bool ColHasLocalLegends(string colId)
+    {
+        var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
+        return legendcol?.LocalLegends?.Any() ?? false;
+    }
+
+    private string PrintLocalLegends(string colId)
+    {
+        var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
+        if (legendcol?.LocalLegends?.Any() ?? false)
+        {
+            return $"{string.Join(", ", legendcol.LocalLegends.Select(leg => leg.UserName))} ({legendcol.LocalLegends.First().Attempts})";
+        }
+        return "";
+    }
+
+}

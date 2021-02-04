@@ -28,16 +28,35 @@
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="stats">
+            <NavLink class="nav-link" @onclick="ToggleStatsmenu">
                 <span class="oi oi-bar-chart" aria-hidden="true"></span> Statistics
             </NavLink>
         </li>
+        @if (expandStats)
+        {
+            <li class="nav-item px-5" @onclick="ToggleNavMenu">
+                <NavLink class="nav-link" href="stats">
+                    <span class="oi oi-people" aria-hidden="true"></span> Leader board
+                </NavLink>
+            </li>
+            <li class="nav-item px-5" @onclick="ToggleNavMenu">
+                <NavLink class="nav-link" href="colstats">
+                    <span class="oi oi-flag" aria-hidden="true"></span> Popular cols
+                </NavLink>
+            </li>
+            <li class="nav-item px-5" @onclick="ToggleNavMenu">
+                <NavLink class="nav-link" href="activitystats">
+                    <span class="oi oi-pulse" aria-hidden="true"></span> Activities
+                </NavLink>
+            </li>
+        }
     </ul>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
-
+    private bool expandStats = false;
+    
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
@@ -45,4 +64,8 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
+    private void ToggleStatsmenu()
+    {
+        expandStats = !expandStats;
+    }
 }
