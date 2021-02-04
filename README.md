@@ -1,5 +1,12 @@
 # Cotacol Web App
+
 An attempt to learn Blazor, by setting up a Cotacol web site
+
+This web site has been published to https://www.cotacol.eu and can be used to register and link your Strava profile against the Cotacol Hunting backend.  This web site shares the same backend as the iOS app (and the Android app that is coming)
+
+
+
+# Troubleshooting & links
 
 ## Identity login
 
