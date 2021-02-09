@@ -94,7 +94,14 @@ else
         var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
         if (legendcol?.LocalLegends?.Any() ?? false)
         {
-            return $"{string.Join(", ", legendcol.LocalLegends.Select(leg => leg.UserName))} ({legendcol.LocalLegends.First().Attempts})";
+            if (!UserProfile.IsAuthenticated)
+            {
+                return $"{legendcol.LocalLegends.Count} legend{(legendcol.LocalLegends.Count>1?"s":"")} ({legendcol.LocalLegends.First().Attempts} attempts)";
+            }
+            else
+            {
+                return $"{string.Join(", ", legendcol.LocalLegends.Select(leg => leg.UserName))} ({legendcol.LocalLegends.First().Attempts} attempts)";
+            }
         }
         return "";
     }
