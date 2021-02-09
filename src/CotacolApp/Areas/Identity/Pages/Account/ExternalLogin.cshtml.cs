@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
@@ -8,10 +7,8 @@ using Blazored.SessionStorage;
 using CotacolApp.Interfaces;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
-using CotacolApp.Services;
 using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
-using Flurl;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -106,7 +102,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
             }
 
-            var info = await GetLoginInfo(User);
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            //var info = await GetLoginInfo(User);
+
 
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
@@ -117,8 +115,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             {
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
                     info.LoginProvider);
-                await AddStravaClaims(info, info.GetUserId());
-                await _cotacolUserClient.SetUserPermissionsAsync(info.GetPermissions());
+                await PersistStravaClaimsAsync(info, info.GetUserId());
                 return LocalRedirect(returnUrl);
             }
 
@@ -161,15 +158,14 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
 
             // Get the information about the user from the external login provider
-            var info = await GetLoginInfo(User);
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            //var info = await GetLoginInfo(User);
 
             if (ModelState.IsValid)
             {
                 var user = await info.GetUser();
                 user.UserName = Input.UserName;
                 user.Email = Input.Email;
-
-                await user.CreateCotacolUser(info, _cotacolClient);
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -179,33 +175,13 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        
-                        //TODO : email verification
-                        // var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        // code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        // var callbackUrl = Url.Page(
-                        //     "/Account/ConfirmEmail",
-                        //     pageHandler: null,
-                        //     values: new {area = "Identity", userId = userId, code = code},
-                        //     protocol: Request.Scheme);
-                        //
-                        // await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                        //
-                        // // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        // if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        // {
-                        //     return RedirectToPage("./RegisterConfirmation", new {Email = Input.Email});
-                        // }
-                        // Include the access token in the properties
                         var props = new AuthenticationProperties();
                         props.StoreTokens(info.AuthenticationTokens);
                         props.IsPersistent = true;
                         
                         await _signInManager.SignInAsync(user, props);
                         
-                        await AddStravaClaims(info, user.Id);
+                        await CreateCotacolUserInBackendAsync(user, info);
 
                         _logger.LogInformation(
                             $"User {user.UserName} sign in result: {_signInManager.IsSignedIn(info.Principal)}");
@@ -249,14 +225,38 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             return info;
         }
 
-        private async Task AddStravaClaims(ExternalLoginInfo info, string userId)
+        private async Task CreateCotacolUserInBackendAsync( CotacolUser user, ExternalLoginInfo info)
         {
-            // TODO
+            var rights = await PersistStravaClaimsAsync(info, user.Id);
+
+            // register user here
+            if (_cotacolClient != null)
+            {
+                var request = new UserSetupRequest
+                {
+                    CotacolHunter = true,
+                    UserId = user.Id,
+                    StravaRefreshToken = rights.RefreshToken,
+                    UserName = user.UserName,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    EmailAddress = user.Email,
+                    PremiumUser = false,
+                    UpdateActivityDescription = rights.UpdateActivity
+                };
+
+                await _cotacolClient.SetupUserAsync(request);
+            }
+        }
+        
+        private async Task<StravaClaimSettings> PersistStravaClaimsAsync(ExternalLoginInfo info, string userId)
+        {
             var updateActivity = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ActivityWriteClaim))?.Value ?? "false";
             var updateProfile = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ProfileUpdateClaim))?.Value ?? "false";
-            await _profileManager.AddStravaClaims(updateActivity.Equals("true", StringComparison.InvariantCultureIgnoreCase), 
-                updateProfile.Equals("true", StringComparison.InvariantCultureIgnoreCase), userId);
+            var refreshToken = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals("refresh_token"))?.Value;
+            return await _profileManager.AddStravaClaims(updateActivity.Equals("true", StringComparison.InvariantCultureIgnoreCase), 
+                updateProfile.Equals("true", StringComparison.InvariantCultureIgnoreCase),refreshToken, userId);
         }
+
 
     }
 }

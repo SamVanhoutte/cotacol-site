@@ -1,5 +1,6 @@
 @using MatBlazor
 @using System.Globalization
+@using CotacolApp.Services.Extensions
 @inject IUserProfileManager UserProfile
 
 <style>
@@ -74,17 +75,17 @@
                     <tr>
                         <td>
                             <span class="iconify" data-icon="system-uicons:height" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.ElevationDiff.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."}))m</span>
+                            <span class="cooper">@(Cotacol?.ElevationDiff.Number())m</span>
                         </td>
                         <td>
                             <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.AvgGrade)%</span>
+                            <span class="cooper">@(Cotacol?.AvgGrade.Percentage())</span>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <span class="iconify" data-icon="mdi:map-marker-distance" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.Distance.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."}))m</span>
+                            <span class="cooper">@(Cotacol?.Distance.Number())m</span>
 
                         </td>
                         <td>

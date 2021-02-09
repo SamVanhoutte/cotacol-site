@@ -114,7 +114,6 @@ namespace CotacolApp
                         options.SaveTokens = true; // Save the auth/refresh token for later retrieval
 
                         options.SignInScheme = IdentityConstants.ExternalScheme;
-
                         options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
                         options.TokenEndpoint = stravaSettings.AccessTokenUrl;
                         options.UserInformationEndpoint = "https://www.strava.com/api/v3/athlete";

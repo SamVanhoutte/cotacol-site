@@ -1,20 +1,21 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CotacolApp.Models.Identity;
 
 namespace CotacolApp.Interfaces
 {
     public interface IUserProfileManager
     {
-        Task AddStravaClaims(bool canUpdateActivity, bool canUpdateProfile, string userId);
-
+        Task<StravaClaimSettings> AddStravaClaims(bool canUpdateActivity, bool canUpdateProfile, string refreshToken, string userId);
+        Task<string> GetRefreshTokenAsync();
         string ProfilePicture { get; }
         string Email { get; }
         string UserId { get; }
         string UserName { get; }
         string FullName { get; }
         bool IsAuthenticated { get; }
-        bool CanUpdateDescription { get; }
-        bool CanUpdateProfile{ get; }
-
+        Task<bool> CanUpdateDescriptionAsync();
+        Task<bool> CanUpdateProfileAsync();
     }
 }

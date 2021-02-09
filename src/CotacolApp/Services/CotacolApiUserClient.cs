@@ -86,28 +86,55 @@ namespace CotacolApp.Services
 
         public async Task<UserAchievements> GetAchievementsAsync(bool includeLocalLegends = false)
         {
-            var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
-                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .GetJsonAsync<UserAchievements>();
-
-            if (includeLocalLegends)
+            try
             {
-                achievements.LocalLegends = new Dictionary<string, int>();
-                var stats = await _cotacolDataClient.GetStatsAsync();
-                foreach (var colStats in stats.Cotacols.Where(col =>
-                    col.LocalLegends != null && 
-                    col.LocalLegends.Any(leg => leg.UserId.Equals(userId))))
+                var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
+                    .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                    .AllowAnyHttpStatus()
+                    .GetJsonAsync<UserAchievements>();
+            
+                if (includeLocalLegends)
                 {
-                    achievements.LocalLegends.Add(colStats.CotacolId, colStats.LocalLegends.First().Attempts);
+                    achievements.LocalLegends = new Dictionary<string, int>();
+                    var stats = await _cotacolDataClient.GetStatsAsync();
+                    foreach (var colStats in stats.Cotacols.Where(col =>
+                        col.LocalLegends != null &&
+                        col.LocalLegends.Any(leg => leg.UserId.Equals(userId))))
+                    {
+                        achievements.LocalLegends.Add(colStats.CotacolId, colStats.LocalLegends.First().Attempts);
+                    }
                 }
+
+                return achievements;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e,$"Achievement retrieval failed with error {e.Message}");
+                throw;
             }
 
-            return achievements;
         }
 
-        public Task<UserProfile> GetProfileAsync()
+        public async Task<UserProfile> GetProfileAsync()
         {
-            throw new System.NotImplementedException();
+            var profile = await $"{_settings.ApiUrl}/user/{userId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<UserProfile>();
+
+            return profile;
+        }
+
+        public async Task UpdateSettingsAsync(UserSettings settings)
+        {
+            //TODO : add private settings etc
+            await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
+            {
+                UserId = userId,
+                UpdateActivityDescription = settings.UpdateActivityDescription,
+                CotacolHunter = settings.CotacolHunter,
+                EnableBetaFeatures = settings.EnableBetaFeatures,
+                PrivateProfile = settings.PrivateProfile
+            });
         }
 
         public async Task<SyncStatus> GetSyncStatus()
@@ -129,16 +156,5 @@ namespace CotacolApp.Services
             return response.StatusCode;
         }
 
-        public async Task SetUserPermissionsAsync(string permissionScope)
-        {
-            if (!string.IsNullOrEmpty(permissionScope))
-            {
-                await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
-                {
-                    UserId = userId,
-                    UpdateActivityDescription = permissionScope.Contains("activity:write", StringComparison.InvariantCultureIgnoreCase),
-                });
-            }
-        }
     }
 }

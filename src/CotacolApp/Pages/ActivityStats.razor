@@ -1,6 +1,7 @@
 @page "/activitystats"
 @using MatBlazor
 @using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
 
@@ -34,7 +35,7 @@ else
         </MatTableHeader>
         <MatTableRow>
             <td style="min-width: 240px">
-                <b>@PrintName(context)</b>
+                @PrintName(context)
             </td>
             <td style="min-width: 240px">
                 @if (UserProfile.IsAuthenticated)
@@ -46,8 +47,8 @@ else
                     @context.ActivityDate.ToString("D")
                 }
             </td>
-            <td>@context.UniqueCols</td>
-            <td>@context.TotalPoints</td>
+            <td style="text-align: right">@context.UniqueCols</td>
+            <td style="text-align: right">@context.TotalPoints.Number()</td>
         </MatTableRow>
     </MatTable>
 }

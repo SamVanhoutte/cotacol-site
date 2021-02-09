@@ -6,28 +6,31 @@
 @using Microsoft.AspNetCore.Mvc.Routing
 @using Microsoft.Extensions.DependencyInjection
 @using Microsoft.Extensions.Options
+@using CotacolApp.Services.Extensions
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 @inject IOptions<CotacolApiSettings> ApiSettings
 @inject IHttpContextAccessor HttpContextAccessor
 <AuthorizeView>
     <Authorized>
-        @if(uniqueCols>=0)
+        @if(uniqueCols>0)
         {
             <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>
             <span class="cooper">@uniqueCols cols&nbsp;&nbsp;</span>
             <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>
-            <span class="cooper">@totalPoints pts</span>
+            <span class="cooper">@totalPoints.Number() pts</span>
         }
         <a href="Identity/Account/Manage">
             <img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/>
+        </a>
+        <a href="Identity/Account/Manage/Settings">
+            <span class="iconify" data-icon="whh:settingsandroid" data-inline="false" style="color:black" data-width="24px" data-height="24px"></span>
         </a>
         <form method="post" action="Identity/Account/LogOut">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
     </Authorized>
     <NotAuthorized>
-        @* <a href="Identity/Account/Register">Register</a> *@
         <a href="@GetLoginLink()">Log in</a>
     </NotAuthorized>
 </AuthorizeView>

@@ -10,6 +10,7 @@ using CotacolApp.Models.CotacolApi;
 using CotacolApp.Settings;
 using Flurl.Http;
 using GuardNet;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -18,13 +19,15 @@ namespace CotacolApp.Services
     public class CotacolApiClient : ICotacolClient
     {
         private CotacolApiSettings _settings;
+        private ILogger<CotacolApiClient> _logger;
 
-        public CotacolApiClient(IOptions<CotacolApiSettings> apiSettings)
+        public CotacolApiClient(IOptions<CotacolApiSettings> apiSettings, ILogger<CotacolApiClient> logger)
         {
             Guard.NotNull(apiSettings?.Value, nameof(apiSettings));
+            _logger = logger;
             _settings = apiSettings.Value;
         }
-        
+
         private async Task<List<ClimbData>> GetColsFromResource()
         {
             var assembly = Assembly.GetAssembly(typeof(CotacolApiClient));
@@ -35,11 +38,11 @@ namespace CotacolApp.Services
             var newClimbs = JsonConvert.DeserializeObject<List<ClimbData>>(result);
             return newClimbs;
         }
-        
+
         public async Task<List<ClimbData>> GetClimbDataAsync()
         {
             var fullData = await GetColsFromResource();
-            
+
             var segmentData = await $"{_settings.ApiUrl}/climbs"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<Climb>>();
@@ -63,6 +66,7 @@ namespace CotacolApp.Services
             {
                 statsUser.Position = idx++;
             }
+
             return stats;
         }
 
@@ -70,9 +74,11 @@ namespace CotacolApp.Services
         {
             // TODO : valdiation of required props
             var response = await $"{_settings.ApiUrl}/user/{userSettings.UserId}"
+                .AllowAnyHttpStatus()
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .PostJsonAsync(userSettings);
-
+            var bodyResponse = response.ResponseMessage.Content.ReadAsStringAsync();
+            _logger.LogInformation($"User setup result ({response.StatusCode}) with content {bodyResponse}");
             return response.ResponseMessage.IsSuccessStatusCode;
         }
     }

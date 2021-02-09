@@ -1,6 +1,7 @@
 @page "/stats"
 @using MatBlazor
 @using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
 
@@ -30,19 +31,19 @@ else
             <MatSortHeaderRow SortChanged="SortLeaders">
                 <MatSortHeader SortId="position">#</MatSortHeader>
                 <MatSortHeader SortId="name">
-                    <span style="width:600px">Hunter</span>
+                    <span style="width:200px">Hunter</span>
                 </MatSortHeader>
                 <MatSortHeader SortId="points">Points</MatSortHeader>
                 <MatSortHeader SortId="climbs">Unique Climbs</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
         <MatTableRow>
-            <td>@context.Position</td>
+            <td style="text-align: right">@context.Position</td>
             <td>
                 <b>@PrintName(context)</b>
             </td>
-            <td>@context.TotalPoints</td>
-            <td>@context.UniqueCols</td>
+            <td style="text-align: right">@context.TotalPoints.Number()</td>
+            <td style="text-align: right">@context.UniqueCols</td>
         </MatTableRow>
     </MatTable>
 }
