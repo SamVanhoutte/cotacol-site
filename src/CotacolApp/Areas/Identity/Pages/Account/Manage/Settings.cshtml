@@ -1,0 +1,36 @@
+@page
+@model SettingsModel
+@{
+    ViewData["Title"] = "Cotacol Settings";
+    ViewData["ActivePage"] = ManageNavPages.Settings;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.UpdateDescription"></label>
+                <input asp-for="Input.UpdateDescription" class="form-control" />
+                <span asp-validation-for="Input.UpdateDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.EnableBetaFeatures"></label>
+                <input asp-for="Input.EnableBetaFeatures" class="form-control" />
+                <span asp-validation-for="Input.EnableBetaFeatures" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.PrivateProfile"></label>
+                <input asp-for="Input.PrivateProfile" class="form-control" />
+                <span asp-validation-for="Input.PrivateProfile" class="text-danger"></span>
+            </div>
+            <button id="change-email-button" type="submit" asp-page-handler="UpdateProfile" class="btn btn-primary">Update profile</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

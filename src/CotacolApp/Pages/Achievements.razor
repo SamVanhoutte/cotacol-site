@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @using CotacolApp.Models.CotacolApi
 @using System.Globalization
+@using CotacolApp.Services.Extensions
 @using MatBlazor
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
@@ -20,8 +21,8 @@
 else
 {
     <h2>Score</h2>
-    <div>Total points: @achievements.TotalScore.ToString("#,###", new NumberFormatInfo{ NumberGroupSeparator = "."})</div>
-    <div>Unique cols: @achievements.UniqueCols.ToString("#,###", new NumberFormatInfo{ NumberGroupSeparator = "."})</div>
+    <div>Total points: @achievements.TotalScore.Number()</div>
+    <div>Unique cols: @achievements.UniqueCols.Number()</div>
     <AchievementChartComponent Achievements="@achievements" />
 
     @if (achievements.LocalLegends?.Any()??false)

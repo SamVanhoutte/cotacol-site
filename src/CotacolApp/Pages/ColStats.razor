@@ -26,10 +26,9 @@ else
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
-                <MatSortHeader SortId="name">
-                    <span style="width:600px">Name</span>
-                </MatSortHeader>
+                <MatSortHeader SortId="name">Name</MatSortHeader>
                 <MatSortHeader SortId="userCount">Users</MatSortHeader>
+                <MatSortHeader SortId="userCount">Legends</MatSortHeader>
                 <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
@@ -37,13 +36,20 @@ else
             <td>
                 <b>@context.CotacolName</b>
             </td>
-            <td>@context.UniqueUsers &nbsp;&nbsp;
-                @if (ColHasLocalLegends(context.CotacolId))
+            <td style="text-align: right">@context.UniqueUsers</td>
+            <td>@if (ColHasLocalLegends(context.CotacolId))
+                                {
+                                    <span 
+                                        data-text="@PrintLocalLegends(context.CotacolId)" 
+                                        class="cctooltip"
+                                    ><img src="images/climb-icon-map-pink.png" /></span>
+                                }
+                else
                 {
-                    <span class="oi oi-star" aria-hidden="true" title="@PrintLocalLegends(context.CotacolId)"></span>
+                    <span>&nbsp;</span>
                 }
-            </td>
-            <td>@context.TotalAttempts</td>
+                </td>
+            <td style="text-align: right">@context.TotalAttempts</td>
         </MatTableRow>
     </MatTable>
 }

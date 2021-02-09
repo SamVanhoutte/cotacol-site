@@ -1,4 +1,5 @@
 @using MatBlazor
+@using CotacolApp.Services.Extensions
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -32,7 +33,7 @@
                         <MatSortHeader SortId="length">Length</MatSortHeader>
                         <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
                         <MatSortHeader SortId="grade">Grade</MatSortHeader>
-                        <MatSortHeader>Link</MatSortHeader>
+                        <MatSortHeader>Segment</MatSortHeader>
                     </MatSortHeaderRow>
                 </MatTableHeader>
                 <MatTableRow>
@@ -49,10 +50,10 @@
                     }
                     <td>@context.Province</td>
                     <td>@context.Surface</td>
-                    <td>@context.CotacolPoints</td>
-                    <td>@context.Distance</td>
-                    <td>@context.ElevationDiff</td>
-                    <td>@context.AvgGrade %</td>
+                    <td style="text-align: right">@context.CotacolPoints</td>
+                    <td style="text-align: right">@context.Distance.Number() m</td>
+                    <td style="text-align: right">@context.ElevationDiff m</td>
+                    <td style="text-align: right">@context.AvgGrade.Percentage()</td>
                     <td>
                         <a href="@context.Url" target="_blank">
                             <img src="images/strava-logo-small.png" asp-append-version="true"/>

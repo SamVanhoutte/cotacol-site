@@ -5,6 +5,8 @@ namespace CotacolApp.Models.CotacolApi
         public bool UpdateActivityDescription { get; set; } 
         public bool PremiumUser { get; set; } 
         public bool CotacolHunter { get; set; } 
-        public bool EnableRouteMatching { get; set; } 
+        public bool EnableRouteMatching { get; set; }
+        public bool PrivateProfile { get; set; }
+        public bool EnableBetaFeatures { get; set; }
     }
 }
