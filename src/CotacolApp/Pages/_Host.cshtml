@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using CotacolApp.Settings
+@using Microsoft.Extensions.Options
 @namespace CotacolApp.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IOptions<MapSettings> MapSettings
 @{
     Layout = null;
 }
@@ -19,7 +22,7 @@
     <link href="CotacolApp.styles.css" rel="stylesheet"/>
     <script src="_content/MatBlazor/dist/matBlazor.js"></script>
     <link href="_content/MatBlazor/dist/matBlazor.css" rel="stylesheet" />
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7gmt8B-PSZU4Lzd3I_hKSuuoIkrjksbc&v=3"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@(MapSettings.Value.GoogleMapKey)&v=3"></script>
     <script src="_content/BlazorGoogleMaps/objectManager.js"></script>
     <script src="https://unpkg.com/@@googlemaps/markerclustererplus/dist/index.min.js"></script>
 </head>
