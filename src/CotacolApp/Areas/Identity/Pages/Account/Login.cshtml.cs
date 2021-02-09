@@ -34,6 +34,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public string ReturnUrl { get; set; }
+        public bool ForcePrompt { get; set; }
 
         [TempData]
         public string ErrorMessage { get; set; }

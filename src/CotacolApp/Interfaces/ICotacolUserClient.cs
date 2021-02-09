@@ -15,5 +15,6 @@ namespace CotacolApp.Interfaces
         Task<UserProfile> GetProfileAsync();
         Task<SyncStatus> GetSyncStatus();
         Task<int> SynchronizeAsync( bool fullSync = false);
+        Task SetUserPermissionsAsync(string permissionScope);
     }
 }

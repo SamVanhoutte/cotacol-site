@@ -128,5 +128,17 @@ namespace CotacolApp.Services
             _logger.LogInformation($"Sync requested for user {userId} with status {response.StatusCode}");
             return response.StatusCode;
         }
+
+        public async Task SetUserPermissionsAsync(string permissionScope)
+        {
+            if (!string.IsNullOrEmpty(permissionScope))
+            {
+                await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
+                {
+                    UserId = userId,
+                    UpdateActivityDescription = permissionScope.Contains("activity:write", StringComparison.InvariantCultureIgnoreCase),
+                });
+            }
+        }
     }
 }

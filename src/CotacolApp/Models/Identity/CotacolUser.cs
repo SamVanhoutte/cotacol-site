@@ -6,6 +6,8 @@ namespace CotacolApp.Models.Identity
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string ProfilePicture { get; set; }  
+        public string ProfilePicture { get; set; }
+        // public bool ActivityWritePermission { get; set; }
+        // public bool ProfileWritePermission { get; set; }
     }
 }

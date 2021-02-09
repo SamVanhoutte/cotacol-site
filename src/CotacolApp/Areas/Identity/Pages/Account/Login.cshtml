@@ -1,4 +1,5 @@
 @page
+@using CotacolApp.Models.Identity
 @model LoginModel
 
 @{
@@ -39,6 +40,11 @@
                         </ul>
                     </div>
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <span style="width:100px">&nbsp;</span>
+                        <span>
+                            <input asp-for="ForcePrompt" />
+                            <b>Review permissions at log on</b>
+                        </span>
                         <div>
                             <p>
                                 <button type="submit" class="btn" name="Strava" value="Strava" title="Log in using your Strava account">

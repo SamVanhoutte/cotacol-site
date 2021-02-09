@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using Azure.Identity;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -23,10 +24,12 @@ using CotacolApp.Services;
 using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
 using MatBlazor;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Rest;
 using Serilog;
 using Serilog.Events;
 using Serilog.Configuration;
@@ -136,6 +139,34 @@ namespace CotacolApp
                                 var claimsJson = await response.Content.ReadAsStringAsync();
                                 //context.RunClaimActions(user.RootElement);
                                 var userSettings = context.AddClaims(claimsJson);
+                                
+                                var tokens = context.Properties.GetTokens().ToList();
+                                tokens.AddRange(
+                                    userSettings.Select(userSetting => new AuthenticationToken() 
+                                        {Name = userSetting.Key, Value = userSetting.Value}));
+
+                                context.Properties.StoreTokens(tokens);
+
+                            },
+                            OnRedirectToAuthorizationEndpoint =  ctx =>
+                            {
+                                if (ctx.Properties.Items.ContainsKey(StravaAuthenticationProperties.ApprovalPrompt))
+                                {
+                                    ctx.HttpContext.Response.Redirect(ctx.RedirectUri + "&approval_prompt=force");
+                                }
+                                else
+                                {
+                                    ctx.HttpContext.Response.Redirect(ctx.RedirectUri);
+                                }
+                                return Task.FromResult(0);
+                            },
+                            OnTicketReceived = async context =>
+                            {
+                                if (context.Request.Query.TryGetValue("scope", out var scope))
+                                {
+                                    _logger.LogInformation($"Scope for login received: {scope.First()}");
+                                    context.Properties.Items.Add("Scope", scope);
+                                }
                             }
                         };
                         options.Validate();
@@ -148,6 +179,7 @@ namespace CotacolApp
                 .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<CotacolUser>
                 >();
             services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddBlazoredSessionStorage();
             services.AddOptions();
             services.AddLogging(loggingbuilder =>
             {

@@ -3,7 +3,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CotacolApp.Models.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 
@@ -17,7 +19,9 @@ namespace CotacolApp.Services.Extensions
         public const string EmailClaim = ClaimTypes.Email;
         public const string FirstNameClaim = "FirstName";
         public const string LastNameClaim = "LastName";
-        
+        public const string ActivityWriteClaim = "activity:write";
+        public const string ProfileUpdateClaim = "profile:write";
+
         public static string GetUserName(this ClaimsPrincipal user)
         {
             var userNameClaim = user?.Claims?.FirstOrDefault(claim => claim.Type.Equals(ClaimTypes.Name));
@@ -29,7 +33,7 @@ namespace CotacolApp.Services.Extensions
             var userNameClaim = user?.Claims?.FirstOrDefault(claim => claim.Type.Equals(ClaimTypes.NameIdentifier));
             return userNameClaim?.Value;
         }
-        
+
         public static string GetClaim(this ClaimsPrincipal user, string claimType)
         {
             var userNameClaim = user?.Claims?.FirstOrDefault(claim => claim.Type.Equals(claimType));
@@ -45,48 +49,43 @@ namespace CotacolApp.Services.Extensions
         {
             return loginInfo?.Principal?.GetUserId();
         }
+
         public static string GetClaim(this ExternalLoginInfo loginInfo, string claimType)
         {
             return loginInfo?.Principal?.GetClaim(claimType);
         }
-
-
-        public static async Task<ExternalLoginInfo> GetLoginInfo(this ClaimsPrincipal user,
-            SignInManager<CotacolUser> signInManager = null)
-        {
-            ExternalLoginInfo info = null;
-            if (signInManager != null)
-            {
-                info = await signInManager.GetExternalLoginInfoAsync();
-                if (info != null && !info.Principal.Claims.Any())
-                {
-                    info.Principal = user;
-                }
-            }
-
-
-            if (info == null)
-            {
-                info = new ExternalLoginInfo(user,
-                    "Strava", user.GetUserId(),
-                    "Strava") {Principal = user};
-            }
-
-            return info;
-        }
+        
 
         public static IDictionary<string, string> AddClaims(this OAuthCreatingTicketContext context, string claimsJson)
         {
             var data = JObject.Parse(claimsJson);
 
             var userSettings = new Dictionary<string, string>();
-            
+
             var userId = (string) data["id"];
             if (!string.IsNullOrEmpty(userId))
             {
                 userSettings.Add(UserIdClaim, userId);
                 context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String,
                     context.Options.ClaimsIssuer));
+            }
+
+
+            if (context.Request.Query.TryGetValue("scope", out var scopeValues))
+            {
+                var scope = scopeValues.FirstOrDefault();
+                if (!string.IsNullOrEmpty(scope))
+                {
+                    bool activityWritePermission = scope.Contains(ActivityWriteClaim);
+                    userSettings.Add(ActivityWriteClaim, activityWritePermission.ToString());
+                    context.Identity.AddClaim(new Claim(ActivityWriteClaim, activityWritePermission.ToString(),
+                        ClaimValueTypes.String, context.Options.ClaimsIssuer));
+
+                    bool profileWritePermission = scope.Contains(ProfileUpdateClaim);
+                    userSettings.Add(ProfileUpdateClaim, profileWritePermission.ToString());
+                    context.Identity.AddClaim(new Claim(ProfileUpdateClaim, profileWritePermission.ToString(),
+                        ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                }
             }
 
             var firstName = (string) data["firstname"];
