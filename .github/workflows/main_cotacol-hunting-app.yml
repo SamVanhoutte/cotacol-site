@@ -100,6 +100,16 @@ jobs:
                                 "slotSetting": false
                               },
                               {
+                                "name": "maps:googlemapkey",
+                                "value": "${{ secrets.GoogleMapsKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "admin:admins",
+                                "value": "${{ secrets.AdminUsers }}",
+                                "slotSetting": false
+                              },
+                              {
                                 "name": "keyvault:KeyKeyvaultUri",
                                 "value": "${{ secrets.KeyKeyvaultUri }}",
                                 "slotSetting": false

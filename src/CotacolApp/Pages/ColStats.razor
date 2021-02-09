@@ -37,12 +37,12 @@ else
                 <b>@context.CotacolName</b>
             </td>
             <td style="text-align: right">@context.UniqueUsers</td>
-            <td>@if (ColHasLocalLegends(context.CotacolId))
+            <td style="text-align: center">@if (ColHasLocalLegends(context.CotacolId))
                                 {
                                     <span 
                                         data-text="@PrintLocalLegends(context.CotacolId)" 
                                         class="cctooltip"
-                                    ><img src="images/climb-icon-map-pink.png" /></span>
+                                    ><img src="images/legend-icon-pink.png" /></span>
                                 }
                 else
                 {
