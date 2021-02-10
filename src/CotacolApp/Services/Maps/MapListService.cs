@@ -70,6 +70,12 @@ namespace CotacolApp.Services.Maps
                 // Showing the lines
                 await AddTracksAsync(map1, jsRuntime, mapLayout.ShowArrows, climbsToShow);
             }
+
+            if (climbs.Count.Equals(1))
+            {
+                var l = Columbae.Polyline.ParsePolyline(climbs.First().Polyline);
+                await ZoomToClimbAsync(map1, l);
+            }
         }
 
         private async Task AddTracksAsync(Map map1, IJSRuntime jsRuntime, bool showArrow, IEnumerable<UserClimb> climbs)
