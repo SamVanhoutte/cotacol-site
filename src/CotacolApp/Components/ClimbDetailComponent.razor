@@ -115,11 +115,7 @@
     [Parameter]
     public UserClimb Cotacol { get; set; }
 
-    private bool CotacolDone
-    {
-        get { return Cotacol?.Done ?? false; }
-        set { }
-    }
+    private bool CotacolDone { get => Cotacol?.Done ?? false; set{} }
 
     private string CotacolUrl => $"https://cotacol.cc/#/climbs/{Cotacol?.Id}/";
 

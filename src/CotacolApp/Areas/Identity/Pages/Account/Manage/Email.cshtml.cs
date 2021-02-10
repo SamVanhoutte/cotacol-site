@@ -11,19 +11,16 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace CotacolApp.Areas.Identity.Pages.Account.Manage
 {
-    public partial class EmailModel : PageModel
+    public  class EmailModel : PageModel
     {
         private readonly UserManager<CotacolUser> _userManager;
-        private readonly SignInManager<CotacolUser> _signInManager;
         private readonly IEmailSender _emailSender;
 
         public EmailModel(
             UserManager<CotacolUser> userManager,
-            SignInManager<CotacolUser> signInManager,
             IEmailSender emailSender)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _emailSender = emailSender;
         }
 
@@ -95,7 +92,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmailChange",
                     pageHandler: null,
-                    values: new { userId = userId, email = Input.NewEmail, code = code },
+                    values: new {userId, email = Input.NewEmail, code },
                     protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
@@ -131,7 +128,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { area = "Identity", userId = userId, code = code },
+                values: new { area = "Identity", userId, code },
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,

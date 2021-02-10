@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Blazored.SessionStorage;
 using CotacolApp.Interfaces;
 using CotacolApp.Models.Identity;
 using CotacolApp.Services.Extensions;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace CotacolApp.Services
 {

@@ -7,9 +7,9 @@
 <table class="table">
     <tbody>
     <tr>
-        <td>Synchronization status <em>(@syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
+        <td>Synchronization status <em>(@_syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
         <td>
-            @if (syncStatus == null)
+            @if (_syncStatus == null)
             {
                 <p>
                     <em>Loading...</em>
@@ -17,21 +17,21 @@
             }
             else
             {
-                <p>@syncStatus.Processed / @syncStatus.Total (@syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
+                <p>@_syncStatus.Processed / @_syncStatus.Total (@_syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
             }
         </td>
     </tr>
     <tr>
         <td>
             Full synchronization 
-            @if (syncRequestedTime != default)
+            @if (_syncRequestedTime != default)
             {
-                <em>(@syncRequestedTime.ToString("T"))</em>
+                <em>(@_syncRequestedTime.ToString("T"))</em>
             }
         </td>
         <td>
-            <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@syncRequested">Full sync</button><em>@syncMessage</em>
-            <MatSnackbar @bind-IsOpen="@syncRequested">
+            <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@_syncRequested">Full sync</button><em>@_syncMessage</em>
+            <MatSnackbar @bind-IsOpen="@_syncRequested">
                 <MatSnackbarContent>Synchronization requested.</MatSnackbarContent>
                 <MatSnackbarActions>
                     <MatButton Raised="true" OnClick="RefreshSyncStatusAsync">Refresh</MatButton>
@@ -44,11 +44,11 @@
 
 @code {
 
-    private SyncStatus syncStatus;
-    private DateTime syncStatusRefreshDate = DateTime.Now;
-    private DateTime syncRequestedTime = default;
-    private bool syncRequested = false;
-    private string syncMessage = "";
+    private SyncStatus _syncStatus;
+    private DateTime _syncStatusRefreshDate = DateTime.Now;
+    private DateTime _syncRequestedTime = default;
+    private bool _syncRequested = false;
+    private string _syncMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,31 +57,31 @@
 
     private async Task RefreshSyncStatusAsync()
     {
-        syncStatusRefreshDate = DateTime.Now;
-        syncStatus = await CotacolUserClient.GetSyncStatus();
-        syncRequested = false;
+        _syncStatusRefreshDate = DateTime.Now;
+        _syncStatus = await CotacolUserClient.GetSyncStatus();
+        _syncRequested = false;
     }
 
     private async Task TriggerFullSyncAsync()
     {
-        var result = await MatDialogService.AskAsync("Synchronization takes long, are you sure you want this?", new string[] {"Yes", "Cancel"});
+        var result = await MatDialogService.AskAsync("Synchronization takes long, are you sure you want this?", new[] {"Yes", "Cancel"});
         if (result.Equals("Yes", StringComparison.InvariantCultureIgnoreCase))
         {
             Console.WriteLine("Trigger sync");
-            syncRequested = true;
+            _syncRequested = true;
             try
             {
                 var httpStatus = await CotacolUserClient.SynchronizeAsync();
-                syncRequestedTime = DateTime.Now;
+                _syncRequestedTime = DateTime.Now;
                 if (httpStatus <= 200 && httpStatus >= 300)
                 {
-                    syncRequested = false;
-                    syncMessage = $"❌ (HTTP error {httpStatus}";
+                    _syncRequested = false;
+                    _syncMessage = $"❌ (HTTP error {httpStatus}";
                 }
             }
             catch (Exception e)
             {
-                syncMessage = e.Message;
+                _syncMessage = e.Message;
             }
         }
     }

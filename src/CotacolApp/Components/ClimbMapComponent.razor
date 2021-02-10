@@ -1,33 +1,44 @@
 @using GoogleMapsComponents
 @using GoogleMapsComponents.Maps
 @using CotacolApp.Services.Extensions
+@using CotacolApp.Services.Maps
 @inject IJSRuntime JsRuntime
+@inject IMapService MapService
 
-@if (Cotacol != null) {
-    <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
+@if (Cotacol != null)
+{
+    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
 }
 else
 {
-    <span><em>Loading map...</em></span>
+    <span>
+        <em>Loading map...</em>
+    </span>
 }
 
 
 @code {
+
     [Parameter]
     public UserClimb Cotacol { get; set; }
 
-    private GoogleMap map1;
-    private MapOptions mapOptions;
-    private MapService _mapService = new MapService();
+    private GoogleMap _googleMap;
+    private MapOptions _mapOptions;
 
     protected override async Task OnInitializedAsync()
     {
-        mapOptions = await _mapService.GetLayoutAsync(true);
+        _mapOptions = await MapService.GetLayoutAsync(true);
         await base.OnInitializedAsync();
     }
-    
+
     private async Task OnAfterMapInit()
     {
-        await _mapService.ShowClimbAsync(map1.InteropObject, JsRuntime, Cotacol, true, true, true);
+        await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, Cotacol, new MapLayout
+        {
+            CenterMap = true, RedrawNeeded = true, 
+            ShowArrows = true, ShowPolylines = true, 
+            SingleClimb = true
+        }); //true, true, true);
     }
+
 }

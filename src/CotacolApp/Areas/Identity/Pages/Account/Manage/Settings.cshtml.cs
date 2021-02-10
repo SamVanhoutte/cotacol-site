@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CotacolApp.Areas.Identity.Pages.Account.Manage
 {
-    public partial class SettingsModel : PageModel
+    public class SettingsModel : PageModel
     {
         private readonly UserManager<CotacolUser> _userManager;
         private readonly ICotacolUserClient _cotacolClient;
@@ -43,7 +43,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
             public bool PrivateProfile { get; set; }
         }
 
-        private async Task LoadAsync(CotacolUser user)
+        private async Task LoadAsync()
         {
             var userSettings = await _cotacolClient.GetProfileAsync();
 
@@ -63,7 +63,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            await LoadAsync();
             return Page();
         }
 
@@ -81,10 +81,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
                 return RedirectToPage();
             }
 
-            var i = User;
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
+                await LoadAsync();
                 return Page();
             }
 

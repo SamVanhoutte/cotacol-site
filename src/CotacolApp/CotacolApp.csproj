@@ -66,4 +66,7 @@
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </EmbeddedResource>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\BlazorGoogleMaps\GoogleMapsComponents\GoogleMapsComponents.csproj" />
+    </ItemGroup>
 </Project>

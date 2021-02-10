@@ -1,12 +1,13 @@
 @using GoogleMapsComponents
 @using GoogleMapsComponents.Maps
 @using CotacolApp.Services.Extensions
+@using CotacolApp.Services.Maps
 @inject ILogger<ClimbListMapComponent> Logger
 @inject IJSRuntime JsRuntime
-
+@inject IMapService MapService
 @if (Climbs != null)
 {
-    <div @ref="@mapElementRef" id="map1" style="height: 100vh;"></div>
+    <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
 }
 else
 {
@@ -17,29 +18,27 @@ else
 
 
 @code {
-    private MapOptions mapOptions;
-    private MapService _mapService = new MapService();
+    private MapOptions _mapOptions;
 
-    private IEnumerable<UserClimb> climbList;
-    private ElementReference mapElementRef;
-    private Map map1;
+    private IEnumerable<UserClimb> _climbList;
+    private ElementReference _mapElementRef;
+    private Map _map1;
     private MapLayout _previousLayout = new MapLayout();
     private int _previousZoom = 9;
-    private int polylineTreshold = 12;
-    private int arrowTreshold = 14;
-    private bool dataChanged = false;
+    private int _polylineTreshold = 12;
+    private int _arrowTreshold = 14;
+    private bool _dataChanged = false;
 
     [Parameter]
     public IEnumerable<UserClimb> Climbs
     {
-        get => climbList;
+        get => _climbList;
         set
         {
-            if (value == null || (climbList?.Equals(value) ?? false)) return;
-            Logger.LogInformation($"[Setter], number {value.Count()}");
-            map1 = null;
-            dataChanged = true;
-            climbList = value;
+            if (value == null || (_climbList?.Equals(value) ?? false)) return;
+            _map1 = null;
+            _dataChanged = true;
+            _climbList = value;
             ClimbsChanged.InvokeAsync(value);
         }
     }
@@ -50,86 +49,66 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (climbList == null) Logger.LogWarning("[Initialize] climbList is null");
+        if (_climbList == null) Logger.LogWarning("[Initialize] climbList is null");
 
-        mapOptions = await _mapService.GetLayoutAsync(false, _previousZoom);
+        _mapOptions = await MapService.GetLayoutAsync(false, _previousZoom);
         await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (map1 == null)
+        if (_map1 == null)
         {
             await InitializeMap();
         }
-        var currentzoom = await map1.GetZoom();
+        var currentzoom = await _map1.GetZoom();
         var layout = CheckMapRequirements(firstRender, currentzoom);
         if (layout.RedrawNeeded)
         {
-            dataChanged = false;
-            await ShowClimbsAsync(layout);
+            _dataChanged = false;
+            if (_climbList != null && _map1 != null)
+            {
+                await MapService.ShowClimbsAsync(_map1, JsRuntime, _climbList.ToList(), layout);
+            }
         }
         _previousZoom = currentzoom;
         _previousLayout = layout;
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private struct MapLayout
-    {
-        public bool ShowPolylines { get; set; }
-        public bool ShowArrows { get; set; }
-        public bool RedrawNeeded { get; set; }
-        public bool CenterMap { get; set; }
-    }
 
     private MapLayout CheckMapRequirements(bool firstRender, int currentzoom)
     {
         var layout = new MapLayout();
-    // Redraw map, on first render, when map1 was reset or when data was changed
-        if (firstRender || map1 == null || dataChanged) layout.RedrawNeeded = true;
-        layout.ShowArrows = currentzoom > arrowTreshold;
-        layout.ShowPolylines = currentzoom > polylineTreshold;
+        // Redraw map, on first render, when map1 was reset or when data was changed
+        layout.ShowArrows = currentzoom > _arrowTreshold;
+        layout.ShowPolylines = currentzoom >= _polylineTreshold;
+        layout.ShowMarkers = currentzoom < _polylineTreshold;
 
+        if (firstRender || _map1 == null || _dataChanged) layout.RedrawNeeded = true;
         if (layout.ShowArrows != _previousLayout.ShowArrows) layout.RedrawNeeded = true;
         if (layout.ShowPolylines != _previousLayout.ShowPolylines) layout.RedrawNeeded = true;
-        
-        Logger.LogInformation($"Map zoom input: current {currentzoom} - previous {_previousZoom} - Data changed: {dataChanged} - Map empty: {map1 == null}");
+        if (layout.ShowMarkers != _previousLayout.ShowMarkers) layout.RedrawNeeded = true;
+
+        Logger.LogInformation($"Map zoom input: current {currentzoom} - previous {_previousZoom} - Data changed: {_dataChanged} - Map empty: {_map1 == null}");
         Logger.LogInformation($"Map settings: redraw: {layout.RedrawNeeded} - lines: {layout.ShowPolylines} - arrows: {layout.ShowArrows}");
+
         return layout;
     }
 
     private async Task InitializeMap()
     {
-        mapOptions = await _mapService.GetLayoutAsync(false, _previousZoom);
-        map1 = await Map.CreateAsync(JsRuntime, mapElementRef, mapOptions);
-        await map1.AddListener("zoom_changed", OnZoomChanged);
+        _mapOptions = await MapService.GetLayoutAsync(false, _previousZoom);
+        _map1 = await Map.CreateAsync(JsRuntime, _mapElementRef, _mapOptions);
+        await _map1.AddListener("zoom_changed", OnZoomChanged);
     }
 
-    //private async Task ShowClimbsAsync(int previousZoom, bool plotLines, bool showArrows, bool centerMap = false)
-    private async Task ShowClimbsAsync(MapLayout mapLayout)
-    {
-        Logger.LogInformation("Showing climbs");
-        if (climbList != null && map1 != null)
-        {
-            await _mapService.ClearClimbsAsync();
-            var tasks = new List<Task> {};
-            tasks.AddRange(climbList.Select(
-                userClimb => _mapService.ShowClimbAsync(map1, JsRuntime, userClimb, mapLayout.ShowPolylines, false, mapLayout.ShowArrows)));
-            await Task.WhenAll(tasks);
-            if (!mapLayout.ShowPolylines)
-            {
-                await _mapService.ClusterMarkersAsync(map1, JsRuntime, mapLayout.CenterMap);
-            }
-        }
-    }
 
     private async Task OnAfterInitAsync()
     {
-        if (map1 != null)
+        if (_map1 != null)
         {
-            var zoom = await map1.GetZoom();
-            await map1.AddListener("zoom_changed", OnZoomChanged);
-            Logger.LogInformation("Enabled zoom change listener, current zoom {zoom}");
+            await _map1.AddListener("zoom_changed", OnZoomChanged);
         }
     }
 

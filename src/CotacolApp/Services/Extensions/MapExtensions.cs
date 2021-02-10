@@ -1,8 +1,5 @@
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using CotacolApp.Pages;
 using GoogleMapsComponents;
 using GoogleMapsComponents.Maps;
 

@@ -5,7 +5,7 @@
 @inject IUserProfileManager UserProfile
 @inject ILogger<ClimbListComponent> Logger
 
-@if (climbs == null)
+@if (_climbs == null)
 {
     <p>
         <em>We're getting the climbs , please be patient...</em>
@@ -41,11 +41,11 @@ else
     </MatChipSet>
     @if(Mode== ClimbViewMode.Table)
     {
-        <ClimbListTableComponent @bind-Climbs="@climbs" />
+        <ClimbListTableComponent @bind-Climbs="@_climbs" />
     }
     else
     {
-        <ClimbListMapComponent @bind-Climbs="@climbs" />
+        <ClimbListMapComponent @bind-Climbs="@_climbs" />
     }
 }
 
@@ -54,33 +54,33 @@ else
     [Parameter]
     public ClimbViewMode Mode  { get; set; }
     
-    private string CurrentFilter = "nofilter";
-    private List<string> ProvinceFilters = null;
-    private IEnumerable<UserClimb> climbList;
-    private IEnumerable<UserClimb> climbs;
+    private string _currentFilter = "nofilter";
+    private List<string> _provinceFilters = null;
+    private IEnumerable<UserClimb> _climbList;
+    private IEnumerable<UserClimb> _climbs;
 
     protected override async Task OnInitializedAsync()
     {
         if (UserProfile.IsAuthenticated)
         {
-            climbList = await CotacolUserClient.GetClimbDataAsync();
+            _climbList = await CotacolUserClient.GetClimbDataAsync();
         }
         else
         {
-            climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
+            _climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
         }
-        climbs = climbList;
+        _climbs = _climbList;
     }
 
     private void ApplyProvinceFilter(MatChip filter)
     {
         if (filter == null)
         {
-            ProvinceFilters = null;
+            _provinceFilters = null;
         }
         else
         {
-            ProvinceFilters = filter.ChipSet.SelectedChips
+            _provinceFilters = filter.ChipSet.SelectedChips
                 .Select(chip => GetSystemName(chip.Id)).ToList();
         }
         FilterClimbs();
@@ -88,7 +88,7 @@ else
 
     private void ApplyFilter(MatChip filter)
     {
-        CurrentFilter = filter.Id;
+        _currentFilter = filter.Id;
         FilterClimbs();
     }
 
@@ -102,43 +102,41 @@ else
 
     private void FilterClimbs()
     {
-        climbs = climbList;
+        _climbs = _climbList;
 
         // Filter on category
-        switch (CurrentFilter.ToLower())
+        switch (_currentFilter.ToLower())
         {
             case "nofilter":
                 break;
             case "donefilter":
-                climbs = climbList.Where(c => c.Done);
+                _climbs = _climbList.Where(c => c.Done);
                 break;
             case "todofilter":
-                climbs = climbList.Where(c => !c.Done);
+                _climbs = _climbList.Where(c => !c.Done);
                 break;
             case "topfilter":
-                climbs = climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
+                _climbs = _climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
                 break;
             case "easyfilter":
-                climbs = climbList.OrderBy(c => c.CotacolPoints).Take(50);
+                _climbs = _climbList.OrderBy(c => c.CotacolPoints).Take(50);
                 break;
             case "highfilter":
-                climbs = climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
+                _climbs = _climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
                 break;
             case "longfilter":
-                climbs = climbList.OrderByDescending(c => c.Distance).Take(50);
+                _climbs = _climbList.OrderByDescending(c => c.Distance).Take(50);
                 break;
             case "steepfilter":
-                climbs = climbList.OrderByDescending(c => c.AvgGrade).Take(50);
-                break;
-            default:
+                _climbs = _climbList.OrderByDescending(c => c.AvgGrade).Take(50);
                 break;
         }
 
     // Filter on province
-        if (ProvinceFilters?.Any() ?? false)
+        if (_provinceFilters?.Any() ?? false)
         {
-            climbs = climbs.Where(c =>
-                ProvinceFilters.Any(province => GetSystemName(province).Equals(GetSystemName(c.Province))));
+            _climbs = _climbs.Where(c =>
+                _provinceFilters.Any(province => GetSystemName(province).Equals(GetSystemName(c.Province))));
         }
     }
 }

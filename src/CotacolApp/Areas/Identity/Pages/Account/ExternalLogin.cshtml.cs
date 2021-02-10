@@ -26,14 +26,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<CotacolUser> _signInManager;
         private readonly UserManager<CotacolUser> _userManager;
-        private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
-        private IHttpContextAccessor _contextAccessor;
         private ICotacolClient _cotacolClient;
-        private CotacolApiSettings _apiSettings;
         private IUserProfileManager _profileManager;
-        private ICotacolUserClient _cotacolUserClient;
-        private ISessionStorageService _sessionStorage;
 
         public ExternalLoginModel(
             SignInManager<CotacolUser> signInManager,
@@ -47,16 +42,11 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             ISessionStorageService sessionStorage,
             IEmailSender emailSender)
         {
-            _contextAccessor = contextAccessor;
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
-            _emailSender = emailSender;
             _cotacolClient = cotacolClient;
-            _cotacolUserClient = cotacolUserClient;
-            _apiSettings = apiSettings.Value;
             _profileManager = profileManager;
-            _sessionStorage = sessionStorage;
         }
 
         [BindProperty] public InputModel Input { get; set; }
@@ -200,31 +190,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             return Page();
         }
         
-        private async Task<ExternalLoginInfo> GetLoginInfo(ClaimsPrincipal user)
-        {
-            return await _signInManager.GetExternalLoginInfoAsync();
-
-            ExternalLoginInfo info = null;
-            if (_signInManager != null)
-            {
-                info = await _signInManager.GetExternalLoginInfoAsync();
-                if (info != null && !info.Principal.Claims.Any())
-                {
-                    info.Principal = user;
-                }
-            }
-
-
-            if (info == null)
-            {
-                info = new ExternalLoginInfo(user,
-                    "Strava", user.GetUserId(),
-                    "Strava") {Principal = user};
-            }
-
-            return info;
-        }
-
+        
         private async Task CreateCotacolUserInBackendAsync( CotacolUser user, ExternalLoginInfo info)
         {
             var rights = await PersistStravaClaimsAsync(info, user.Id);
