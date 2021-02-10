@@ -1,7 +1,4 @@
-using System.Linq;
 using System.Threading.Tasks;
-using CotacolApp.Interfaces;
-using CotacolApp.Models.CotacolApi;
 using CotacolApp.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 

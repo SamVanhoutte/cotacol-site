@@ -11,11 +11,11 @@
         <div>Showing @Climbs.Count() results.</div>
     }
     <MatDrawerContainer>
-        <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@ColSelected" Style="width: 270px">
+        <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@_colSelected" Style="width: 270px">
             <MatIconButton OnClick="CloseClimb">
                 <MatIcon>@MatIconNames.Close</MatIcon>
             </MatIconButton>
-            <ClimbDetailComponent Cotacol="@SelectedClimb"/>
+            <ClimbDetailComponent Cotacol="@_selectedClimb"/>
         </MatDrawer>
         <MatDrawerContent>
             <MatTable FilterByColumnName="Name" Items="@Climbs" class="table" PageSize="2000"
@@ -66,19 +66,19 @@
 </div>
 
 @code {
-    private IEnumerable<UserClimb> climbList;
+    private IEnumerable<UserClimb> _climbList;
     [Parameter]
-    public IEnumerable<UserClimb> Climbs { get=>climbList;
+    public IEnumerable<UserClimb> Climbs { get=>_climbList;
         set
         {
-            if (climbList!=null && climbList.Equals(value)) return;
+            if (_climbList!=null && _climbList.Equals(value)) return;
 
-            climbList = value;
+            _climbList = value;
             ClimbsChanged.InvokeAsync(value);
         } }
 
-    private UserClimb SelectedClimb = null;
-    private bool ColSelected = false;
+    private UserClimb _selectedClimb = null;
+    private bool _colSelected = false;
     
 
     [Parameter]
@@ -137,8 +137,8 @@
 
     private void CloseClimb()
     {
-        SelectedClimb = null;
-        ColSelected = false;
+        _selectedClimb = null;
+        _colSelected = false;
         StateHasChanged();
     }
     
@@ -146,10 +146,10 @@
     {
         if (col is UserClimb climb)
         {
-            SelectedClimb = climb;
+            _selectedClimb = climb;
             Console.WriteLine(climb.Name);
             StateHasChanged();
         }
-        ColSelected = col != null;
+        _colSelected = col != null;
     }
 }
