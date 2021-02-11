@@ -5,19 +5,20 @@
 @inject IUserProfileManager UserProfile
 @inject ILogger<ClimbListTableComponent> Logger
 
-<div style="overflow-y: scroll; height:100vh;">
-    @if (Climbs.Count() < 1000)
-    {
-        <div>Showing @Climbs.Count() results.</div>
-    }
-    <MatDrawerContainer>
-        <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@_colSelected" Style="width: 270px">
-            <MatIconButton OnClick="CloseClimb">
-                <MatIcon>@MatIconNames.Close</MatIcon>
-            </MatIconButton>
-            <ClimbDetailComponent Cotacol="@_selectedClimb"/>
-        </MatDrawer>
-        <MatDrawerContent>
+@if (Climbs.Count() < 1000)
+{
+    <div>Showing @Climbs.Count() results.</div>
+}
+<MatDrawerContainer>
+    <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@_colSelected" Style="width: 270px">
+        <MatIconButton OnClick="CloseClimb">
+            <MatIcon>@MatIconNames.Close</MatIcon>
+        </MatIconButton>
+        <ClimbDetailComponent Cotacol="@_selectedClimb"/>
+    </MatDrawer>
+    <MatDrawerContent>
+        <div style="overflow-y: scroll; height:100vh;">
+
             <MatTable FilterByColumnName="Name" Items="@Climbs" class="table" PageSize="2000"
                       AllowSelection="true" SelectionChanged="SelectionChanged"
                       ShowPaging="false" UseSortHeaderRow="true">
@@ -61,25 +62,29 @@
                     </td>
                 </MatTableRow>
             </MatTable>
-        </MatDrawerContent>
-    </MatDrawerContainer>
-</div>
+        </div>
+    </MatDrawerContent>
+</MatDrawerContainer>
 
 @code {
     private IEnumerable<UserClimb> _climbList;
+
     [Parameter]
-    public IEnumerable<UserClimb> Climbs { get=>_climbList;
+    public IEnumerable<UserClimb> Climbs
+    {
+        get => _climbList;
         set
         {
-            if (_climbList!=null && _climbList.Equals(value)) return;
+            if (_climbList != null && _climbList.Equals(value)) return;
 
             _climbList = value;
             ClimbsChanged.InvokeAsync(value);
-        } }
+        }
+    }
 
     private UserClimb _selectedClimb = null;
     private bool _colSelected = false;
-    
+
 
     [Parameter]
     public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
@@ -141,7 +146,7 @@
         _colSelected = false;
         StateHasChanged();
     }
-    
+
     private void SelectionChanged(object col)
     {
         if (col is UserClimb climb)
@@ -152,4 +157,5 @@
         }
         _colSelected = col != null;
     }
+
 }

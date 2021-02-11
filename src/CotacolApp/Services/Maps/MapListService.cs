@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CotacolApp.Models;
+using CotacolApp.Pages;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
 using Microsoft.Extensions.Logging;
@@ -27,13 +29,18 @@ namespace CotacolApp.Services.Maps
 
         public async Task ClearClimbsAsync()
         {
+
+        }
+
+        private async Task ClearClusterAsync()
+        {
             if (MarkerCluster != null)
             {
                 await MarkerCluster.ClearMarkers();
                 await MarkerCluster.SetMap(null);
             }
         }
-
+        
         public async Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout)
         {
@@ -41,34 +48,36 @@ namespace CotacolApp.Services.Maps
         }
 
         public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbs,
-            MapLayout mapLayout)
+            MapLayout mapLayout, Action<MouseEvent, string> handleClick = null)
         {
             _logger.LogInformation($"Showing multiple climbs {climbs.Count()}");
 
             var climbsToShow = climbs.Where(c => !string.IsNullOrEmpty(c.Polyline));
-            if (mapLayout.ShowPolylines == false)
-            {
-                // Removing the polylines
-                await RemoveLinesAsync();
-            }
+            
+            if (mapLayout.ShowPolylines == false) await RemoveLinesAsync();
 
             if (mapLayout.ShowMarkers == false)
             {
-                // Removing the markers
                 await RemoveMarkersAsync();
             }
 
             if (mapLayout.ShowMarkers)
             {
-                // Showing the actual lines
                 await AddMarkersAsync(map1, jsRuntime, climbsToShow);
-                //await ClusterMarkersAsync(map1, jsRuntime);
+                if (handleClick != null)
+                {
+                    await _markerList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
+                }
             }
 
             if (mapLayout.ShowPolylines)
             {
-                // Showing the lines
-                await AddTracksAsync(map1, jsRuntime, mapLayout.ShowArrows, climbsToShow);
+                await AddTracksAsync(map1, jsRuntime, mapLayout.ShowStartFinish, climbsToShow);
+                if (handleClick != null)
+                {
+                    await _lineList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
+                }
+
             }
 
             if (climbs.Count.Equals(1))
@@ -80,25 +89,31 @@ namespace CotacolApp.Services.Maps
 
         private async Task AddTracksAsync(Map map1, IJSRuntime jsRuntime, bool showArrow, IEnumerable<UserClimb> climbs)
         {
-            if (climbs.Any())
-                _logger.LogInformation("****ADDING LINES NOW");
-
             if (_lineList == null)
             {
-                _lineList = await PolylineList.CreateAsync(
-                    jsRuntime, climbs
-                        .ToDictionary(s => s.Id, c => GetClimbLine(c, showArrow, map1))
-                );
+                _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
             }
-            else
-            {
-                await _lineList.AddMultipleAsync(
-                    climbs.ToDictionary(
-                        s => s.Id, c => GetClimbLine(c, showArrow, map1)));
 
-                //await RemoveLinesAsync(climbs);
-            }
+            await _lineList.SetMultipleAsync(
+                climbs.ToDictionary(
+                    s => s.Id, c => GetClimbLine(c, showArrow, map1)));
         }
+
+        private async Task AddMarkersAsync(Map map1, IJSRuntime jsRuntime, IEnumerable<UserClimb> climbs)
+        {
+            if (_markerList == null)
+            {
+                _markerList = await MarkerList.CreateAsync(
+                    jsRuntime, new Dictionary<string, MarkerOptions>());
+            }
+
+            await _markerList.SetMultipleAsync(
+                climbs.ToDictionary(
+                    s => s.Id, c => GetClimbMarker(c, map1)));
+            await ClusterMarkersAsync(map1, jsRuntime);
+
+        }
+
 
         private PolylineOptions GetClimbLine(UserClimb climb, bool showArrow, Map map1)
         {
@@ -126,110 +141,40 @@ namespace CotacolApp.Services.Maps
                         Icon = new Symbol {Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red"},
                         Offset = "100%"
                     },
-                    // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "80%"},
-                    // new IconSequence
-                    // {
-                    //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
-                    //     Offset = "50%"
-                    // },
-                    // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "40%"},
-                    // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "20%"},
+                    new IconSequence
+                    {
+                        Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
+                        Offset = "50%"
+                    },
                 };
             }
 
             return options;
         }
 
-        private async Task AddMarkersAsync(Map map1, IJSRuntime jsRuntime, IEnumerable<UserClimb> climbs)
-        {
-            _logger.LogInformation("****ADDING MARKERS NOW");
-            if (_markerList == null)
-            {
-                _markerList = await MarkerList.CreateAsync(
-                    jsRuntime, climbs
-                        .ToDictionary(s => s.Id, c => GetClimbMarker(c, map1))
-                );
-            }
-            else
-            {
-                await _markerList.SetMultipleAsync(
-                    climbs.ToDictionary(
-                        s => s.Id, c => GetClimbMarker(c, map1)));
-
-                //await RemoveMarkersAsync(climbs);
-            }
-        }
 
         private async Task RemoveMarkersAsync()
         {
             if (_markerList != null)
             {
-                _logger.LogInformation($"****** CLEARING MARKERS *********");
-                var markerIds = new List<string> { };
-                foreach (var mrk in _markerList.Markers)
-                {
-                    markerIds.Add(mrk.Key);
-                    await mrk.Value.SetMap(null);
-                }
-
-                await _markerList.RemoveMultipleAsync(markerIds);
+                var tasks = new List<Task>();
+                tasks.AddRange(_markerList.Markers.Select(marker => marker.Value.SetMap(null)));
+                await Task.WhenAll(tasks);
+                await _markerList.RemoveAllAsync();
             }
+            await ClearClusterAsync();
         }
 
         private async Task RemoveLinesAsync()
         {
             if (_lineList != null)
             {
-                _logger.LogInformation($"****** CLEARING LINES *********");
-
-                var lineIds = new List<string> { };
-                foreach (var line in _lineList.Polylines)
-                {
-                    lineIds.Add(line.Key);
-                    await line.Value.SetMap(null);
-                }
-
-                await _lineList.RemoveMultipleAsync(lineIds);
+                var tasks = new List<Task>();
+                tasks.AddRange(_lineList.Polylines.Select(line => line.Value.SetMap(null)));
+                await Task.WhenAll(tasks);
+                await _lineList.RemoveAllAsync();
             }
         }
 
-        private async Task RemoveUnneededMarkersAsync(IEnumerable<UserClimb> climbs)
-        {
-            if (climbs.Count() < 1000)
-            {
-                await _markerList.RemoveMultipleAsync();
-                var keysToRemove = Enumerable.Range(1, 1000)
-                    .Where(colId => climbs.Select(c => c.Id).Contains(colId.ToString()) == false)
-                    .Select(colId => colId.ToString())
-                    .ToList();
-                foreach (var markerId in keysToRemove.Where(
-                    markerId => _markerList.Markers.ContainsKey(markerId)))
-                {
-                    await _markerList.Markers[markerId].SetMap(null);
-                }
-
-                await _markerList.RemoveMultipleAsync(keysToRemove);
-            }
-        }
-
-
-        private async Task RemoveUnneededLinesAsync(IEnumerable<UserClimb> climbs)
-        {
-            if (climbs.Count() < 1000)
-            {
-                // Remove keys from marker list that should not be shown
-                var keysToRemove = Enumerable.Range(1, 1000)
-                    .Where(colId => climbs.Select(c => c.Id).Contains(colId.ToString()) == false)
-                    .Select(colId => colId.ToString())
-                    .ToList();
-                foreach (var lineId in keysToRemove.Where(
-                    markerId => _lineList.Polylines.ContainsKey(markerId)))
-                {
-                    await _lineList.Polylines[lineId].SetMap(null);
-                }
-
-                await _lineList.RemoveMultipleAsync(keysToRemove);
-            }
-        }
     }
 }
