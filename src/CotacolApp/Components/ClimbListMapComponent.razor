@@ -81,17 +81,17 @@ else
     {
         var layout = new MapLayout();
         // Redraw map, on first render, when map1 was reset or when data was changed
-        layout.ShowArrows = currentzoom > _arrowTreshold;
+        layout.ShowStartFinish = currentzoom > _arrowTreshold;
         layout.ShowPolylines = currentzoom >= _polylineTreshold;
-        layout.ShowMarkers = currentzoom < _polylineTreshold;
+        layout.ShowMarkers = currentzoom <= _polylineTreshold;
 
         if (firstRender || _map1 == null || _dataChanged) layout.RedrawNeeded = true;
-        if (layout.ShowArrows != _previousLayout.ShowArrows) layout.RedrawNeeded = true;
+        if (layout.ShowStartFinish != _previousLayout.ShowStartFinish) layout.RedrawNeeded = true;
         if (layout.ShowPolylines != _previousLayout.ShowPolylines) layout.RedrawNeeded = true;
         if (layout.ShowMarkers != _previousLayout.ShowMarkers) layout.RedrawNeeded = true;
 
         Logger.LogInformation($"Map zoom input: current {currentzoom} - previous {_previousZoom} - Data changed: {_dataChanged} - Map empty: {_map1 == null}");
-        Logger.LogInformation($"Map settings: redraw: {layout.RedrawNeeded} - lines: {layout.ShowPolylines} - arrows: {layout.ShowArrows}");
+        Logger.LogInformation($"Map settings: redraw: {layout.RedrawNeeded} - lines: {layout.ShowPolylines} - arrows: {layout.ShowStartFinish}");
 
         return layout;
     }
