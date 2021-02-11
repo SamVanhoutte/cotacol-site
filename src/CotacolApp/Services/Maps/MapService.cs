@@ -55,11 +55,10 @@ namespace CotacolApp.Services.Maps
         }
 
 
-
         protected MarkerOptions GetClimbMarker(UserClimb climb, Map map)
         {
             var start = Columbae.Polyline.ParsePolyline(climb.Polyline).Vertices.First();
-            return new MarkerOptions()
+            var options = new MarkerOptions()
             {
                 Position = new LatLngLiteral(start.Longitude, start.Latitude),
                 Map = map,
@@ -68,22 +67,32 @@ namespace CotacolApp.Services.Maps
                 Title = climb.Name,
                 Visible = true
             };
+
+            return options;
         }
 
 
         protected async Task ZoomToClimbAsync(Map map1, Columbae.Polyline polyline)
         {
-            var box = polyline.BoundingBox;
-            var bounds = new LatLngBoundsLiteral(
-                new LatLngLiteral(box.Vertices.First().Longitude, box.Vertices.First().Latitude),
-                new LatLngLiteral(box.Vertices[2].Longitude, box.Vertices[2].Latitude));
-            await map1.FitBounds(bounds);
+            if (map1 != null)
+            {
+                var box = polyline.BoundingBox;
+                var bounds = new LatLngBoundsLiteral(
+                    new LatLngLiteral(box.Vertices.First().Longitude, box.Vertices.First().Latitude),
+                    new LatLngLiteral(box.Vertices[2].Longitude, box.Vertices[2].Latitude));
+                await map1.FitBounds(bounds);
+            }
         }
 
 
-        protected async Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime,
-            Polypoint position)
+        public async Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime,
+            Polypoint position = null)
         {
+            if (position == null)
+            {
+                position = Columbae.Polyline.ParsePolyline(climb.Polyline).Vertices.First();
+            }
+
             var infoWindowContent = $@"<table class='table table-striped table-dark'><tbody>
                         <tr>
                         <td colspan=2>{climb.Name}</td>
@@ -107,7 +116,7 @@ namespace CotacolApp.Services.Maps
                 Position = new LatLngLiteral(position.Longitude, position.Latitude)
             });
             await infoWindow.SetContent(infoWindowContent);
-            await infoWindow.SetPosition(new LatLngLiteral(position.Longitude, position.Latitude));
+            //await infoWindow.SetPosition(new LatLngLiteral(position.Longitude, position.Latitude));
             return infoWindow;
         }
     }

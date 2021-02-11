@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CotacolApp.Models;
+using CotacolApp.Pages;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
 using Microsoft.Extensions.Logging;
@@ -46,7 +48,7 @@ namespace CotacolApp.Services.Maps
         }
 
         public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbs,
-            MapLayout mapLayout)
+            MapLayout mapLayout, Action<MouseEvent, string> handleClick = null)
         {
             _logger.LogInformation($"Showing multiple climbs {climbs.Count()}");
 
@@ -62,9 +64,21 @@ namespace CotacolApp.Services.Maps
             if (mapLayout.ShowMarkers)
             {
                 await AddMarkersAsync(map1, jsRuntime, climbsToShow);
+                if (handleClick != null)
+                {
+                    await _markerList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
+                }
             }
 
-            if (mapLayout.ShowPolylines) await AddTracksAsync(map1, jsRuntime, mapLayout.ShowStartFinish, climbsToShow);
+            if (mapLayout.ShowPolylines)
+            {
+                await AddTracksAsync(map1, jsRuntime, mapLayout.ShowStartFinish, climbsToShow);
+                if (handleClick != null)
+                {
+                    await _lineList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
+                }
+
+            }
 
             if (climbs.Count.Equals(1))
             {
@@ -75,9 +89,6 @@ namespace CotacolApp.Services.Maps
 
         private async Task AddTracksAsync(Map map1, IJSRuntime jsRuntime, bool showArrow, IEnumerable<UserClimb> climbs)
         {
-            if (climbs.Any())
-                _logger.LogInformation("****ADDING LINES NOW");
-
             if (_lineList == null)
             {
                 _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
@@ -90,7 +101,6 @@ namespace CotacolApp.Services.Maps
 
         private async Task AddMarkersAsync(Map map1, IJSRuntime jsRuntime, IEnumerable<UserClimb> climbs)
         {
-            _logger.LogInformation("****ADDING MARKERS NOW");
             if (_markerList == null)
             {
                 _markerList = await MarkerList.CreateAsync(
@@ -103,6 +113,7 @@ namespace CotacolApp.Services.Maps
             await ClusterMarkersAsync(map1, jsRuntime);
 
         }
+
 
         private PolylineOptions GetClimbLine(UserClimb climb, bool showArrow, Map map1)
         {

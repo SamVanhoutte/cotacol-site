@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,8 @@ namespace CotacolApp.Services.Maps
             }
         }
         
-        public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbList, MapLayout mapLayout)
+        public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbList,
+            MapLayout mapLayout, Action<MouseEvent, string> handleClick)
         {
             if (climbList != null && map1 != null)
             {

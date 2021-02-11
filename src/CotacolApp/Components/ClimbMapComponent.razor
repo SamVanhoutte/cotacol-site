@@ -5,7 +5,7 @@
 @inject IJSRuntime JsRuntime
 @inject IMapService MapService
 
-@if (Cotacol != null)
+@if (_cotacol != null)
 {
     <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
 }
@@ -18,12 +18,29 @@ else
 
 
 @code {
-
-    [Parameter]
-    public UserClimb Cotacol { get; set; }
+    private UserClimb _cotacol { get; set; }
 
     private GoogleMap _googleMap;
     private MapOptions _mapOptions;
+    private bool _dataChanged = false;
+
+    [Parameter]
+    public UserClimb Cotacol
+    {
+        get => _cotacol;
+        set
+        {
+            if (value == null || (_cotacol?.Equals(value) ?? false)) return;
+    // _map1 = null;
+            _dataChanged = true;
+            _cotacol = value;
+            CotacolChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<UserClimb> CotacolChanged { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,14 +48,32 @@ else
         await base.OnInitializedAsync();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_googleMap != null && _cotacol!=null && JsRuntime!=null)
+        {
+            await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     private async Task OnAfterMapInit()
     {
-        await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, Cotacol, new MapLayout
+        if (_googleMap != null)
         {
-            CenterMap = true, RedrawNeeded = true, 
-            ShowStartFinish = true, ShowPolylines = true, 
-            SingleClimb = true
-        }); //true, true, true);
+
+            await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
     }
 
 }

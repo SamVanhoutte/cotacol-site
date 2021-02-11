@@ -19,7 +19,7 @@ else
 
 @code {
     private MapOptions _mapOptions;
-
+    private InfoWindow _existingWindow = null;
     private IEnumerable<UserClimb> _climbList;
     private ElementReference _mapElementRef;
     private Map _map1;
@@ -57,18 +57,27 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+
         if (_map1 == null)
         {
             await InitializeMap();
         }
+
         var currentzoom = await _map1.GetZoom();
         var layout = CheckMapRequirements(firstRender, currentzoom);
         if (layout.RedrawNeeded)
         {
-            _dataChanged = false;
-            if (_climbList != null && _map1 != null)
+            try
             {
-                await MapService.ShowClimbsAsync(_map1, JsRuntime, _climbList.ToList(), layout);
+                _dataChanged = false;
+                if (_climbList != null && _map1 != null)
+                {
+                    await MapService.ShowClimbsAsync(_map1, JsRuntime, _climbList.ToList(), layout, HandleMarkerClick);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"An error occurred while rendering the map: {e.Message}");
             }
         }
         _previousZoom = currentzoom;
@@ -76,7 +85,16 @@ else
         await base.OnAfterRenderAsync(firstRender);
     }
 
-
+    private async void HandleMarkerClick<MouseEvent>(MouseEvent e, string colId)
+    {
+        if (_existingWindow != null)
+        {
+            await _existingWindow.Close();
+        }
+        _existingWindow = await MapService.CreateInfoWindowAsync(Climbs.First(c => c.Id.Equals(colId)), JsRuntime);
+        await _existingWindow.Open(_map1);
+    }
+    
     private MapLayout CheckMapRequirements(bool firstRender, int currentzoom)
     {
         var layout = new MapLayout();
