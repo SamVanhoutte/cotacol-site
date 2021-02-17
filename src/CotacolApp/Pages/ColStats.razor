@@ -32,15 +32,15 @@ else
                 <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
-        <MatTableRow>
+        <MatTableRow Context="climb">
             <td>
-                <b>@context.CotacolName</b>
+                <b>@climb.CotacolName</b>
             </td>
-            <td style="text-align: right">@context.UniqueUsers</td>
-            <td style="text-align: center">@if (ColHasLocalLegends(context.CotacolId))
+            <td style="text-align: right">@climb.UniqueUsers</td>
+            <td style="text-align: center">@if (ColHasLocalLegends(climb.CotacolId))
                                 {
                                     <span 
-                                        data-text="@PrintLocalLegends(context.CotacolId)" 
+                                        data-text="" 
                                         class="cctooltip"
                                     ><img src="images/legend-icon-pink.png" /></span>
                                 }
@@ -49,7 +49,7 @@ else
                     <span>&nbsp;</span>
                 }
                 </td>
-            <td style="text-align: right">@context.TotalAttempts</td>
+            <td style="text-align: right">@climb.TotalAttempts</td>
         </MatTableRow>
     </MatTable>
 }
