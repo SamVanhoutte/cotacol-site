@@ -18,13 +18,13 @@
     }
     
     .cooper-card-clean-margin {
-        font-family: 'Cooper Black', serif;
+        font-family: 'Cooper', serif;
         margin: 0px;
         color: #000000;
     }
     
-    .cooper {
-        font-family: 'Cooper Black', serif;
+    .lekton {
+        font-family: 'Cooper', serif;
         color: #000000;
         margin-top: 0px;
         margin-bottom: 1px;
@@ -51,15 +51,15 @@
                 {
                     <div>
                         <span class="iconify" data-icon="clarity:date-solid-alerted" data-inline="false"></span>&nbsp;
-                        <span class="cooper">@(Cotacol.FirstAchievement.ToString("dd MMM, yyyy"))</span>
+                        <span class="lektonic">@(Cotacol.FirstAchievement.ToString("dd MMM, yyyy"))</span>
                     </div>
                     <div>
                         <span class="iconify" data-icon="grommet-icons:achievement" data-inline="false"></span>&nbsp;
-                        <span class="cooper">@(TimeSpan.FromSeconds(Cotacol.Duration).ToString("g"))</span>
+                        <span class="lektonic">@(TimeSpan.FromSeconds(Cotacol.Duration).ToString("g"))</span>
                     </div>
                     <div>
                         <span class="iconify" data-icon="fluent:text-word-count-20-filled" data-inline="false"></span>&nbsp;
-                        <span class="cooper">@(Cotacol.Attempts) attempts</span>
+                        <span class="lektonic">@(Cotacol.Attempts) attempts</span>
                     </div>                    
                 }
             }
@@ -68,28 +68,28 @@
                 <hr/>
                 <div>
                     <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
-                    <span class="cooper">@(Cotacol?.CotacolPoints) pts</span>
+                    <span class="lektonic">@(Cotacol?.CotacolPoints) pts</span>
                 </div>
                 <table style="width:100%;">
                     <tr>
                         <td>
                             <span class="iconify" data-icon="system-uicons:height" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.ElevationDiff.Number())m</span>
+                            <span class="lektonic">@(Cotacol?.ElevationDiff.Number())m</span>
                         </td>
                         <td>
                             <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.AvgGrade.Percentage())</span>
+                            <span class="lektonic">@(Cotacol?.AvgGrade.Percentage())</span>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <span class="iconify" data-icon="mdi:map-marker-distance" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.Distance.Number())m</span>
+                            <span class="lektonic">@(Cotacol?.Distance.Number())m</span>
 
                         </td>
                         <td>
                             <span class="iconify" data-icon="mdi:road-variant" data-inline="false"></span>&nbsp;
-                            <span class="cooper">@(Cotacol?.Surface)</span>
+                            <span class="lektonic">@(Cotacol?.Surface)</span>
                         </td>
                     </tr>
                 </table>

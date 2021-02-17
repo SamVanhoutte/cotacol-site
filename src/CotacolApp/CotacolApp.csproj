@@ -66,4 +66,7 @@
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </EmbeddedResource>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="wwwroot\fonts" />
+    </ItemGroup>
 </Project>

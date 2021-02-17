@@ -1,28 +1,47 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+@font-face {
+    font-family: Cooper;
+    src: url(../fonts/cooper_light_bt-webfont.ttf);
+}
+
+@font-face {
+    font-family: Lekton;
+    src: url(../fonts/lekton-regular.ttf);
+}
+
+@font-face {
+    font-family: Merkury;
+    src: url(../fonts/merkury_bold.otf);
+}
+
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 h1 {
-    font-family: 'Cooper Black', serif;
+    font-family: 'Merkury', serif;
     color: #FD7D7A;
-    margin-top: 0px;
-    margin-bottom: 1px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 h2 {
-    font-family: 'Cooper Black', serif;
+    font-family: 'Merkury', serif;
     color: #999999;
-    margin-top: 0px;
-    margin-bottom: 1px;
+    margin-top: 6px;
+    margin-bottom: 3px;
 }
 h3 {
-    font-family: 'Cooper Black', serif;
+    font-family: 'Merkury', serif;
     color: #FD7D7A;
-    margin-top: 0px;
-    margin-bottom: 1px;
+    margin-top: 6px;
+    margin-bottom: 3px;
 }
 
 a, .btn-link {
+    font-family: 'Lekton', sans-serif;
+    font-size: medium;
     color: #0366d6;
 }
 
