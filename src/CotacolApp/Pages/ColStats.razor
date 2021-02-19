@@ -22,7 +22,7 @@
 else
 {
     <h2>Climb popularity</h2>
-    <MatTable FilterByColumnName="CotacolName" Items="@stats.Cotacols" class="table" PageSize="100"
+    <MatTable FilterByColumnName="CotacolName" Items="@stats.Cotacols" class="lektonic" PageSize="100"
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
@@ -30,6 +30,7 @@ else
                 <MatSortHeader SortId="userCount">Users</MatSortHeader>
                 <MatSortHeader SortId="userCount">Legends</MatSortHeader>
                 <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
+                <MatSortHeader SortId="attemptCount">&nbsp;</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
         <MatTableRow Context="climb">
@@ -50,6 +51,7 @@ else
                 }
                 </td>
             <td style="text-align: right">@climb.TotalAttempts</td>
+            <td>&nbsp;</td>
         </MatTableRow>
     </MatTable>
 }

@@ -44,6 +44,15 @@ a, .btn-link {
     font-size: medium;
     color: #0366d6;
 }
+.lektonic {
+    font-family: 'Lekton', serif;
+    color: #000000;
+}
+
+.lektonicgrey {
+    font-family: 'Lekton', serif;
+    color: #666666;
+}
 
 .btn-primary {
     color: #fff;

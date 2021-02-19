@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 
 namespace CotacolApp.Services.Extensions
@@ -26,5 +27,10 @@ namespace CotacolApp.Services.Extensions
         {
             return $"{value:#.0}%";
         }
+        
+        public static string WholeNumber(this double value)
+        {
+            return Math.Round(value, 0).ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+        }    
     }
 }
