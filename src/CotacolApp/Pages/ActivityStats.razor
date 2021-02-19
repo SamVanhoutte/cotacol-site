@@ -9,7 +9,7 @@
 
 @if (!UserProfile.IsAuthenticated)
 {
-    <p>
+    <p class="lektonic">
         <em>Since you are not a registered user, user names and activity details are hidden for user privacy.</em>
     </p>
 }
@@ -23,7 +23,7 @@
 else
 {
     <h2>Toughest activities</h2>
-    <MatTable Items="@stats.Activities" class="table" PageSize="100"
+    <MatTable Items="@stats.Activities" class="lektonic" PageSize="100"
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortActivities">
@@ -31,6 +31,7 @@ else
                 <MatSortHeader SortId="date">Date</MatSortHeader>
                 <MatSortHeader SortId="cols">Cols</MatSortHeader>
                 <MatSortHeader SortId="points">Points</MatSortHeader>
+                <MatSortHeader SortId="points"></MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
         <MatTableRow>
@@ -49,6 +50,7 @@ else
             </td>
             <td style="text-align: right">@context.UniqueCols</td>
             <td style="text-align: right">@context.TotalPoints.Number()</td>
+            <td>&nbsp;</td>
         </MatTableRow>
     </MatTable>
 }

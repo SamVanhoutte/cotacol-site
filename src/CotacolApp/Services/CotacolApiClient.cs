@@ -72,7 +72,7 @@ namespace CotacolApp.Services
 
         public async Task<bool> SetupUserAsync(UserSetupRequest userSettings)
         {
-            // TODO : valdiation of required props
+            // TODO : validation of required props
             var response = await $"{_settings.ApiUrl}/user/{userSettings.UserId}"
                 .AllowAnyHttpStatus()
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
@@ -80,6 +80,15 @@ namespace CotacolApp.Services
             var bodyResponse = response.ResponseMessage.Content.ReadAsStringAsync();
             _logger.LogInformation($"User setup result ({response.StatusCode}) with content {bodyResponse}");
             return response.ResponseMessage.IsSuccessStatusCode;
+        }
+
+        public async Task<HomeStats> GetHomeStatsAsync()
+        {
+            var stats = await $"{_settings.ApiUrl}/home/stats"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<HomeStats>();
+
+            return stats;
         }
     }
 }

@@ -7,29 +7,29 @@
 <table class="table">
     <tbody>
     <tr>
-        <td>Synchronization status <em>(@_syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
+        <td class="lektonic">Synchronization status <em>(@_syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
         <td>
             @if (_syncStatus == null)
             {
-                <p>
+                <p class="lektonic">
                     <em>Loading...</em>
                 </p>
             }
             else
             {
-                <p>@_syncStatus.Processed / @_syncStatus.Total (@_syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
+                <p class="lektonic">@_syncStatus.Processed / @_syncStatus.Total (@_syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
             }
         </td>
     </tr>
     <tr>
-        <td>
+        <td class="lektonic">
             Full synchronization 
             @if (_syncRequestedTime != default)
             {
                 <em>(@_syncRequestedTime.ToString("T"))</em>
             }
         </td>
-        <td>
+        <td class="lektonic">
             <button @onclick="@(async () => await TriggerFullSyncAsync())" class="btn btn-primary" name="StravaSync" disabled="@_syncRequested">Full sync</button><em>@_syncMessage</em>
             <MatSnackbar @bind-IsOpen="@_syncRequested">
                 <MatSnackbarContent>Synchronization requested.</MatSnackbarContent>

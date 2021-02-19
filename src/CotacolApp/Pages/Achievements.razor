@@ -19,18 +19,18 @@
 else
 {
     <h2>Score</h2>
-    <div>Total points: @achievements.TotalScore.Number()</div>
-    <div>Unique cols: @achievements.UniqueCols.Number()</div>
+    <div class="lektonic">Total points: @achievements.TotalScore.Number()</div>
+    <div class="lektonic">Unique cols: @achievements.UniqueCols.Number()</div>
     <AchievementChartComponent Achievements="@achievements" />
 
     @if (achievements.LocalLegends?.Any()??false)
     {
         <h2>I am the local legend at the following climbs</h2>
-        <p><em>You are local legend if you did a col more than 5 times and no other user did more than you</em></p>
+        <p><em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em></p>
         <ol>
             @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
             {
-                <div><span class="oi oi-star" aria-hidden="true"></span>@GetLegendString(legend.Key) </div>
+                <div class="lektonic"><span class="oi oi-star" aria-hidden="true"></span>@GetLegendString(legend.Key) </div>
             }
         </ol>
 
@@ -40,29 +40,29 @@ else
     <ol>
     @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
     {
-        <li>@climb.CotacolName (@climb.Achievements.Count() attempts) @if (achievements.LocalLegends.Any(leg=>leg.Key.Equals(climb.CotacolId))){<span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>} </li>
+        <li class="lektonic">@climb.CotacolName (@climb.Achievements.Count() attempts) @if (achievements.LocalLegends.Any(leg=>leg.Key.Equals(climb.CotacolId))){<span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>} </li>
     }
     </ol>
     <h2>Badges</h2>
-    <div>West Flanders (@WflLabel)</div>
+    <div class="lektonic">West Flanders (@WflLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@WflResult"/>
-    <div>East Flanders (@EflLabel)</div>
+    <div class="lektonic">East Flanders (@EflLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@EflResult"/>
-    <div>Antwerp (@AntLabel)</div>
+    <div class="lektonic">Antwerp (@AntLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@AntResult"/>
-    <div>Limburg (@LimLabel)</div>
+    <div class="lektonic">Limburg (@LimLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@LimResult"/>
-    <div>Flemish Brabant (@FbrLabel)</div>
+    <div class="lektonic">Flemish Brabant (@FbrLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@FbrResult"/>
-    <div>Brabant Walloon (@WbrLabel)</div>
+    <div class="lektonic">Brabant Walloon (@WbrLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@WbrResult"/>
-    <div>Hainaut (@HntLabel)</div>
+    <div class="lektonic">Hainaut (@HntLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@HntResult"/>
-    <div>Namur (@NamLabel)</div>
+    <div class="lektonic">Namur (@NamLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@NamResult"/>
-    <div>Liege (@LieLabel)</div>
+    <div class="lektonic">Liege (@LieLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@LieResult"/>
-    <div>Luxemburg (@LuxLabel)</div>
+    <div class="lektonic">Luxemburg (@LuxLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@LuxResult"/>
 }
 

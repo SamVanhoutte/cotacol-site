@@ -1,0 +1,75 @@
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@inject ICotacolClient CotacolClient
+@inject ILogger<HomeStatsComponent> Logger
+
+<h2>Combined achievements</h2>
+
+@if (Stats != null)
+{
+    <div>
+        <span class="iconify" data-icon="carbon:user-multiple" data-inline="false"></span>&nbsp;
+        <span class="lektonic">@(Stats?.Users) registered users</span>
+    </div>
+    <div>
+        <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
+        <span class="lektonic">conquered @(Stats?.UniqueCols) of 1000 climbs</span>
+    </div>
+    <div>
+        <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
+        <span class="lektonic">and collected @(Stats?.TotalPoints.Number()) points</span>
+    </div>
+    <ul>
+        @foreach (var recent in Stats.RecentActivities.Take(15))
+        {
+            <li class="lektonicgrey">@(recent.FullName.Split(" ").FirstOrDefault()) did @(recent.CotacolName) @(PrintTime(recent.ActivityDate))</li>
+        }
+    </ul>
+
+}
+else
+{
+    <span>
+        <em>Loading recent activities...</em>
+    </span>
+}
+
+@code {
+    private HomeStats Stats;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Stats ??= await CotacolClient.GetHomeStatsAsync();
+
+        await base.OnInitializedAsync();
+    }
+
+    private string PrintTime(DateTime recentActivityDate)
+    {
+        var timeSpan = DateTime.UtcNow - recentActivityDate;
+        if (timeSpan < TimeSpan.FromHours(1))
+        {
+            // return minutes
+            return $"{timeSpan.TotalMinutes.WholeNumber()} minutes ago";
+        }
+        if (timeSpan < TimeSpan.FromHours(10))
+        {
+            // return hours
+            return $"{timeSpan.TotalHours.WholeNumber()} hours ago";
+        }
+        if (recentActivityDate.DayOfYear == DateTime.UtcNow.DayOfYear)
+        {
+            // return today
+            return "today";
+        }
+        if (recentActivityDate.DayOfYear + 1 == DateTime.UtcNow.DayOfYear)
+        {
+            // return yesterday
+            return "yesterday";
+        }
+        // return days
+        return $"{timeSpan.TotalDays.WholeNumber()} days ago";
+
+    }
+
+}

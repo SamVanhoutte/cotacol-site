@@ -57,6 +57,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </EmbeddedResource>
+      <Content Update="Components\ClimbDetailComponent.razor.css">
+        <DependentUpon>ClimbDetailComponent.razor</DependentUpon>
+      </Content>
     </ItemGroup>
     <ItemGroup>
         <Content Remove="StaticData\cotacolmapstyle.json" />

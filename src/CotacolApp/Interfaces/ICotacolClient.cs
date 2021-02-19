@@ -10,5 +10,6 @@ namespace CotacolApp.Interfaces
         Task<List<ClimbData>> GetClimbDataAsync();
         Task<SiteStats> GetStatsAsync();
         Task<bool> SetupUserAsync(UserSetupRequest userSettings);
+        Task<HomeStats> GetHomeStatsAsync();
     }
 }   

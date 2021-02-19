@@ -1,21 +1,41 @@
 ﻿@page "/"
+@using MatBlazor
 @inject IUserProfileManager UserProfile
 
 <h1>Your Cotacol Bucket list</h1>
 
 @if (UserProfile.IsAuthenticated)
 {
-    <CotacolSyncComponent />    
+    <CotacolSyncComponent/>
 }
 else
 {
-    <a class="nav-link text-dark" href="Identity/Account/Login">Enable strava integration for the full experience</a>
+    <a class="nav-link text-dark" href="Identity/Account/Login">Enable strava integration for the full experience !</a>
 }
 
-<h2>A bit of history</h2>
-
-<p>The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.</p> 
-<p>Each climb is described by several facts: name, a short description, height, grade, length, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.</p>  
-<p>The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396 meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book.  Each hill has a so-called COTACOL score. This score is determined using several parameters: grade, length, road surface. A higher score means a tougher climb.</p>
-<p>More than 30 years later, some cycling &amp; tech enthousiast virtually got together and built apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer as much Cotacols as possible and automatically flag them when integrating with Strava.</p>
-
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-align-top mat-layout-grid-cell-span-4">
+            <h2>A bit of history</h2>
+            <p class="lektonic">The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.</p>
+            <p class="lektonic">Each climb is described by several facts: name, a short description, height, grade, length, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.</p>
+            <p class="lektonic">The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396 meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book. Each hill has a so-called COTACOL score. This score is determined using several parameters: grade, length, road surface. A higher score means a tougher climb.</p>
+            <p class="lektonic">More than 30 years later, some cycling &amp; tech enthousiast virtually got together and built apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer as much Cotacols as possible and automatically flag them when integrating with Strava.</p>
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-align-top mat-layout-grid-cell-span-4">
+            <HomeStatsComponent/>
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-align-top mat-layout-grid-cell-span-2">
+            <h2>Apps</h2>
+            <div style="align-items: center">
+                <a href="https://apps.apple.com/be/app/cotacol/id1526464862" target="_blank">
+                    <img src="images/apple-store.jpg" style="width: 80px; align-items: center"/>
+                </a>
+                <p class="lektonic">Install iOS App</p>
+            </div>
+            <p/>
+            <img src="images/google-play.png" style="width: 80px; align-items: center"/>
+            <p class="lektonic">Android app in active development</p>
+        </div>
+    </div>
+</div>
