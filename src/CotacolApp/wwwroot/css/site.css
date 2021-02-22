@@ -17,17 +17,20 @@
 
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Gill Sans', Helvetica, Arial, sans-serif;
+    color: #100C08;
+    background-color: #F9F1E6;
 }
 
 h1 {
     font-family: 'Merkury', serif;
-    color: #FD7D7A;
+    text-transform: uppercase;
     margin-top: 6px;
+    font-weight: bold;
     margin-bottom: 6px;
 }
 h2 {
-    font-family: 'Merkury', serif;
+    font-family: 'Cooper', serif;
     color: #999999;
     margin-top: 6px;
     margin-bottom: 3px;
