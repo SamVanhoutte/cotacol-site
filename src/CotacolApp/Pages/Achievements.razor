@@ -1,5 +1,7 @@
 @page "/achievements"
 @attribute [Authorize]
+@using MatBlazor
+@using MatBlazor.Components
 @using CotacolApp.Models.CotacolApi
 @using CotacolApp.Services.Extensions
 @inject ICotacolClient CotacolClient
@@ -59,7 +61,6 @@ else
     <div class="lektonic">Hainaut (@HntLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@HntResult"/>
     <div class="lektonic">Namur (@NamLabel)</div>
-    
     <MatProgressBar Indeterminate="false" Progress="@NamResult"/>
     <div class="lektonic">Liege (@LieLabel)</div>
     <MatProgressBar Indeterminate="false" Progress="@LieResult"/>
