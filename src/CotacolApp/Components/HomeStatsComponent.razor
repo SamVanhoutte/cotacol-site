@@ -1,5 +1,6 @@
 @using CotacolApp.Models.CotacolApi
 @using CotacolApp.Services.Extensions
+@using System.Xml
 @inject ICotacolClient CotacolClient
 @inject ILogger<HomeStatsComponent> Logger
 
@@ -46,17 +47,18 @@ else
 
     private string PrintTime(DateTime recentActivityDate)
     {
+        Console.WriteLine(recentActivityDate);
         var timeSpan = DateTime.UtcNow - recentActivityDate;
-        if (timeSpan < TimeSpan.FromHours(1))
-        {
-            // return minutes
-            return $"{timeSpan.TotalMinutes.WholeNumber()} minutes ago";
-        }
-        if (timeSpan < TimeSpan.FromHours(10))
-        {
-            // return hours
-            return $"{timeSpan.TotalHours.WholeNumber()} hours ago";
-        }
+        // if (timeSpan < TimeSpan.FromHours(1))
+        // {
+        //     // return minutes
+        //     return $"{timeSpan.TotalMinutes.WholeNumber()} minutes ago";
+        // }
+        // if (timeSpan < TimeSpan.FromHours(10))
+        // {
+        //     // return hours
+        //     return $"{timeSpan.TotalHours.WholeNumber()} hours ago";
+        // }
         if (recentActivityDate.DayOfYear == DateTime.UtcNow.DayOfYear)
         {
             // return today
@@ -68,7 +70,7 @@ else
             return "yesterday";
         }
         // return days
-        return $"{timeSpan.TotalDays.WholeNumber()} days ago";
+        return $"{timeSpan.Days} days ago";
 
     }
 
