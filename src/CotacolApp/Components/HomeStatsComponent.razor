@@ -40,7 +40,13 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        Stats ??= await CotacolClient.GetHomeStatsAsync();
+        try
+        {
+            Stats ??= await CotacolClient.GetHomeStatsAsync();
+        }
+        catch (Exception e)
+        {
+        }
 
         await base.OnInitializedAsync();
     }

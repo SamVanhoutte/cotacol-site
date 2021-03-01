@@ -58,9 +58,16 @@
     {
         if (uniqueCols < 0)
         {
-            var stats = await CotacolUserClient.GetAchievementsAsync();
-            uniqueCols = stats.UniqueCols;
-            totalPoints = stats.TotalScore;
+            try
+            {
+                var stats = await CotacolUserClient.GetAchievementsAsync();
+                uniqueCols = stats.UniqueCols;
+                totalPoints = stats.TotalScore;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }   
         await base.OnInitializedAsync();
     }

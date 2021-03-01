@@ -1,0 +1,99 @@
+@using MatBlazor
+@page "/support"
+@inject ICotacolUserClient CotacolClient
+<h1>Support</h1>
+
+
+<h2>Strava integration</h2>
+
+<MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Missing Cotacol?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>I believe I conquered a Cotacol that does not show.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the actual Strava Segment (that you can find in the col list) has been ridden.</p>
+            <p>We have chosen to stick true to the actual descriptions and routes of the original book, which means that the popular track of a col is not always the exact matching one</p>
+            <p>If you feel there is indeed an activity that has not been matched well by the backend, please leave your details here, so we can follow up</p>
+            <MatStringField Label="Activity ID" @bind-value="@MissingActivityId" HelperText="The strava activity id is part of the url of your strava activity page"></MatStringField>
+            <MatStringField Label="Cotacol Number" @bind-value="@MissingCotacolId"></MatStringField>
+            <MatIconButton Icon="send" OnClick="@(async () => await SubmitMissingColAsync())"></MatIconButton><em>@_missingDataMessage</em>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Multiple efforts per activity?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>Multiple efforts of the same col in 1 activity only count for one.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>This is because of the current implementation in the synchronization backend. It is planned to update this soon, but this will require a resync for those activities, normally. Please follow this article for the latest news.</p>
+            <p>When implemented, this will finally turn your Everesting activities into become a Cotacol Local Legend</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Update Strava activity descriptions?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>How can I show the cols in my strava ride descriptions.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>We can update the activity description of an activity on strava, to show and indicate the different cotacols you conquored.</p>
+            <p>This is not only nice to show off your exploring &nbsp; climbing skills, but it also can drive other users to our community.</p>
+            <p>In order to achieve this, two things are needed:</p>
+            <ol>
+                <li>
+                    Strava needs your permission to update the activity descriptions. For that, it is important that you enable the checkbox <b>Upload your activities from Cotacol Hunting to Strava</b> when logging on to Strava
+                    <img src="images/support/strava-permissions.png" style="width: 200px"/>
+                </li>
+                <li>If you want to review or update your Strava permissions, you can navigate to our <a href="/Identity/Account/Login">login page</a> and enable the checkbox <b>Review permissions at log on</b> before logging on to Strava</li>
+                <li>After that, it's also important to enable this feature, named <b>Add cotacols to Activity description</b> in your <a href="/Identity/Account/Manage/Settings">profile page</a>.</li>
+            </ol>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+</MatAccordion>
+<hr />
+<h2>Data and privacy</h2>
+<MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>No public profile?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>I don't want to show up in public pages.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>When joining Cotacol.eu, you automatically will be joined to the Cotacol leader boards, where your Full Name will be visible.</p>
+            <p>Your name will only be visible for users that are registered and logged in. For anonymous users, only the initials will be shown in leader boards</p>
+            <p>A new feature is coming, where you can opt out of leader boards and stats. There is already a check box in your profile where you can indicate you don't want to be part of the leader boards. For that, you can navigate to your <a href="/Identity/Account/Manage/Settings">profile page</a> and check the <b>Private profile</b> checkbox</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+</MatAccordion>
+
+@code {
+    private string MissingActivityId;
+    private string MissingCotacolId;
+    private bool _dataSubmitted = false;
+    private string _missingDataMessage = "";
+
+    private async Task SubmitMissingColAsync()
+    {
+        Console.WriteLine($"{MissingActivityId} - {MissingCotacolId}");
+        try
+        {
+            var httpStatus = await CotacolClient.SubmitMissingSegmentAsync(MissingActivityId, MissingCotacolId);
+            if (httpStatus < 200 || httpStatus >= 300)
+            {
+                _dataSubmitted = false;
+                _missingDataMessage = $"❌ (HTTP error {httpStatus})";
+            }
+            else
+            {
+                _missingDataMessage = "Submitted";
+            }
+        }
+        catch (Exception e)
+        {
+            _missingDataMessage = e.Message;
+        }
+
+    }
+
+}
