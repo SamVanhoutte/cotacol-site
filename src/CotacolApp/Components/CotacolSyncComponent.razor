@@ -58,7 +58,14 @@
     private async Task RefreshSyncStatusAsync()
     {
         _syncStatusRefreshDate = DateTime.Now;
-        _syncStatus = await CotacolUserClient.GetSyncStatus();
+        try
+        {
+            _syncStatus = await CotacolUserClient.GetSyncStatus();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
         _syncRequested = false;
     }
 
@@ -73,7 +80,7 @@
             {
                 var httpStatus = await CotacolUserClient.SynchronizeAsync();
                 _syncRequestedTime = DateTime.Now;
-                if (httpStatus <= 200 && httpStatus >= 300)
+                if (httpStatus <= 200 || httpStatus >= 300)
                 {
                     _syncRequested = false;
                     _syncMessage = $"❌ (HTTP error {httpStatus}";

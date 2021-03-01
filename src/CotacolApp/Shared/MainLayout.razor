@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@using MatBlazor
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -9,6 +9,7 @@
         <div class="top-row px-4 auth">
             <LoginDisplay/>
             <a href="about" >About</a>
+            <MatIconButton Link="/support" Icon="contact_support"></MatIconButton>
         </div>
 
         <div class="content px-4">

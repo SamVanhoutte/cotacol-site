@@ -156,5 +156,21 @@ namespace CotacolApp.Services
             return response.StatusCode;
         }
 
+        public async Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId, string remark = "")
+        {
+            _logger.LogInformation($"Add missing segment for user {userId}: col : {missingCotacolId} : activity : {missingActivityId}");
+            var response = await $"{_settings.ApiUrl}/data/missing"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .AllowAnyHttpStatus()
+                .PostJsonAsync(new MissingDataRequest
+                {
+                    UserId = userId,
+                    ActivityId = missingActivityId,
+                    CotacolId = missingCotacolId,
+                    Remark = remark
+                });
+            _logger.LogInformation($"Missing col published for user {userId} with status {response.StatusCode}");
+            return response.StatusCode;
+        }
     }
 }
