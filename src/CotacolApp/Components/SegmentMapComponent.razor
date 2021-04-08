@@ -1,0 +1,293 @@
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+@using CotacolApp.Services.Extensions
+@using CotacolApp.Services.Maps
+@using CotacolApp.Models.CotacolApi
+@using GoogleMapsComponents.Maps.Extension
+@using Serilog
+@using MatBlazor
+@using ILogger = Microsoft.Extensions.Logging.ILogger
+@inject IJSRuntime JsRuntime
+@inject IMapService MapService
+@inject ICotacolClient CotacolClient
+
+@if (_cotacol != null)
+{
+    <MatTextField TValue="string" ValueChanged="@(async (val) => await VerifyNewSegment(val))" HelperText="Enter the url or segment Id" Label="New segment" HelperTextPersistent="true"></MatTextField>
+    <MatTable Items="@_cotacol.Segments" class="lektonic" PageSize="10"
+              AllowSelection="true" SelectionChanged="SelectionChanged"
+              ShowPaging="false" UseSortHeaderRow="true">
+        <MatTableHeader>
+            <MatSortHeaderRow SortChanged="SortSegments">
+                <MatSortHeader SortId="id">#</MatSortHeader>
+                <MatSortHeader SortId="name">
+                    <span style="width:250px">Name</span>
+                </MatSortHeader>
+                <MatSortHeader SortId="valid">
+                    <span style="width:120px">Valid until</span>
+                </MatSortHeader>
+                <MatSortHeader SortId="surface">Distance</MatSortHeader>
+                <MatSortHeader SortId="surface">Confidence</MatSortHeader>
+                <MatSortHeader SortId="remark"><span style="width:250px">Remark</span></MatSortHeader>
+                <MatSortHeader>Segment</MatSortHeader>
+            </MatSortHeaderRow>
+        </MatTableHeader>
+        <MatTableRow>
+            <td style="background-color: @PickColor(context)">@context.Segmentid</td>
+            <td style="max-width: 200px">@context.Name</td>
+            <td>@PrintDate(context.Validto)</td>
+            <td>@context.Distance.Number() m</td>
+            <td>
+                @if (context.Confidence.Equals("new"))
+                {
+                    <MatIconButton OnClick="@(async (val) => await ConfirmSegmentAsync(context.Segmentid))">
+                        <MatIcon>@MatIconNames.Check_circle</MatIcon>
+                    </MatIconButton>
+                }
+                else
+                {
+                    @context.Confidence
+                }
+            </td>
+            <td>@context.Remark</td>
+            <td>
+                <a href="https://www.strava.com/segments/@context.Segmentid" target="_blank">
+                    <img src="images/strava-logo-small.png" asp-append-version="true"/>
+                </a>
+            </td>
+        </MatTableRow>
+    </MatTable>
+    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
+    <MatDialog @bind-IsOpen="@dialogIsOpen">
+        <MatDialogTitle>#@_cotacol.Id @_cotacol.Name</MatDialogTitle>
+        <MatDialogContent>
+            <p>Verify details before updating the segment on the backend</p>
+            <MatSelect TValue="string" Label="Confidence" @bind-Value="@confidence">
+                <MatOptionString Value="official">Official</MatOptionString>
+                <MatOptionString Value="goodenough">Good enough</MatOptionString>
+            </MatSelect>
+            <MatTextField @bind-Value="@remark"></MatTextField>
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@(async () => await UpdateSegmentAsync())">OK</MatButton>
+            <MatButton OnClick="@(e => { dialogIsOpen = false; })">No Thanks</MatButton>
+        </MatDialogActions>
+    </MatDialog>
+}
+else
+{
+    <span>
+        <em>Loading map...</em>
+    </span>
+}
+
+
+@code {
+    private ClimbDetail _cotacol { get; set; }
+    private bool dialogIsOpen = false;
+    private string remark;
+    private string confidence;
+    private List<string> _colors = new List<string> {"#E49969", "#B2C891",  "#AD85BA", "#95A1C3", "#74A18E", "#81SFB5", "#C88691"};
+    private GoogleMap _googleMap;
+    private MapOptions _mapOptions;
+    private bool _dataChanged = false;
+    private PolylineList _lineList;
+    public string NewSegmentId { get; set; }
+    public string ErrorMessage { get; set; }
+    private StravaSegment NewSegmentDetail { get; set; }
+
+    [Parameter]
+    public ClimbDetail Cotacol
+    {
+        get => _cotacol;
+        set
+        {
+            if (value == null || (_cotacol?.Equals(value) ?? false)) return;
+    // _map1 = null;
+            _dataChanged = true;
+            _cotacol = value;
+            CotacolChanged.InvokeAsync(value);
+        }
+    }
+
+
+    [Parameter]
+    public EventCallback<ClimbDetail> CotacolChanged { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _mapOptions = await MapService.GetLayoutAsync(true);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_googleMap != null && _cotacol != null && JsRuntime != null)
+        {
+            await ShowSegmentsAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task OnAfterMapInit()
+    {
+        if (_googleMap != null)
+        {
+            await ShowSegmentsAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
+    }
+
+    private async Task ShowSegmentsAsync(Map map1, IJSRuntime jsRuntime, ClimbDetail climbDetail,
+        MapLayout mapLayout, Action<MouseEvent, string> handleClick = null)
+    {
+        if (_lineList == null)
+        {
+            _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
+        }
+
+        var lines = new Dictionary<string, PolylineOptions>();
+        lines.Add(climbDetail.Id, DrawMainLine(map1, climbDetail.Polyline, "#FD7D7A"));
+        var index = 0;
+        foreach (var climbDetailSegment in climbDetail.Segments)
+        {
+            if (!string.IsNullOrEmpty(climbDetailSegment?.Polyline))
+            {
+                lines.Add(climbDetailSegment.Segmentid, DrawSegment(map1, climbDetailSegment.Polyline, _colors[index]));
+                index++;
+            }
+        }
+        await _lineList.SetMultipleAsync(lines);
+        var polyline = Columbae.Polyline.ParsePolyline(climbDetail.Polyline);
+        var box = polyline.BoundingBox;
+        var bounds = new LatLngBoundsLiteral(
+            new LatLngLiteral(box.Vertices.First().Longitude, box.Vertices.First().Latitude),
+            new LatLngLiteral(box.Vertices[2].Longitude, box.Vertices[2].Latitude));
+        if (bounds != null && map1 != null)
+            await map1.FitBounds(bounds);
+    }
+
+    private PolylineOptions DrawMainLine(Map map1, string polyLine, string color)
+    {
+        var polyline = Columbae.Polyline.ParsePolyline(polyLine);
+        var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
+        var options = new PolylineOptions()
+        {
+            StrokeColor = color,
+            StrokeOpacity = 1f,
+            Draggable = false,
+            Editable = false,
+            Map = map1, Path = path
+        };
+        return options;
+    }
+
+    private PolylineOptions DrawSegment(Map map1, string polyLine, string color)
+    {
+        var polyline = Columbae.Polyline.ParsePolyline(polyLine);
+        var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
+        var options = new PolylineOptions()
+        {
+    // StrokeColor = color,
+            StrokeOpacity = 0f,
+            Clickable = true,
+            Icons = new[]
+            {
+                new IconSequence
+                {
+                    Icon = new Symbol {Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f, FillColor = color},
+                    Offset = "0%", Repeat = "10px"
+                }
+            },
+            Draggable = false,
+            Editable = false,
+            Map = map1, Path = path
+        };
+        return options;
+    }
+
+
+    private string PrintDate(DateTimeOffset? dateTime)
+    {
+        return dateTime == null ? "-" : dateTime.Value.ToString("d");
+    }
+
+    private void SortSegments(MatSortChangedEvent sort)
+    {
+    }
+
+    private void SelectionChanged(object segment)
+    {
+        if (segment is SegmentDetail segmentDetail)
+        {
+            var o = _lineList.Polylines[segmentDetail.Segmentid];
+            o.SetOptions(new PolylineOptions {StrokeColor = "#000000"});
+        }
+    }
+
+    private async Task VerifyNewSegment(string segmentId)
+    {
+        Console.WriteLine(segmentId);
+        var segmentResponse = await CotacolClient.FetchStravaSegmentAsync(segmentId);
+        if (segmentResponse.Succeeded)
+        {
+            NewSegmentDetail = segmentResponse.Segment;
+            Console.WriteLine("succeeded");
+        }
+        else
+        {
+            ErrorMessage = segmentResponse.ErrorMessage;
+            Console.WriteLine(ErrorMessage);
+        }
+        _cotacol.Segments.Add(new Models.CotacolApi.SegmentDetail
+        {
+            Confidence = "new",
+            Distance = NewSegmentDetail.Distance, Name = NewSegmentDetail.Name, Polyline = NewSegmentDetail.Polyline, Segmentid = NewSegmentDetail.Id.ToString()
+        });
+        StateHasChanged();
+    }
+
+    private string PickColor(SegmentDetail context)
+    {
+        var index = _cotacol.Segments.FindIndex(s => s.Segmentid.Equals(context.Segmentid));
+        return _colors[index];
+    }
+
+    private async Task ConfirmSegmentAsync(string? contextSegmentid)
+    {
+        dialogIsOpen = true;
+        NewSegmentId = contextSegmentid;
+    }
+
+    private async Task UpdateSegmentAsync()
+    {
+        try
+        {
+            Console.WriteLine($"Will update {NewSegmentId}");
+            var stravaSegment = _cotacol.Segments.First(s => s.Segmentid.Equals(NewSegmentId));
+            var updateRequest = new UpdateSegmentRequest
+            {
+                Remark = remark, SegmentConfidence = confidence, UserId = "", 
+                Distance = stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
+                StravaSegmentId = stravaSegment.Segmentid
+            };
+            await CotacolClient.UpdateSegmentAsync(_cotacol.Id, updateRequest);
+            dialogIsOpen = false;
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.Message;
+        }
+    }
+
+}

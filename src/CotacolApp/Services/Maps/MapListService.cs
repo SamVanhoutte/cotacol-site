@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CotacolApp.Models;
+using CotacolApp.Models.CotacolApi;
 using CotacolApp.Pages;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
@@ -26,7 +27,8 @@ namespace CotacolApp.Services.Maps
         {
             return Task.FromResult(_markerList.Markers.Values.ToList());
         }
-
+        
+        
         public async Task ClearClimbsAsync()
         {
 

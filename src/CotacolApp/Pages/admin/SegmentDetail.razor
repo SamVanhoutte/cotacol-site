@@ -1,0 +1,58 @@
+@page "/admin/segments/{CotacolId}"
+@using CotacolApp.Models.CotacolApi
+@using Microsoft.ApplicationInsights
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+<h1>Segment integration</h1>
+<h2>Admin page</h2>
+
+<br/>
+@if (UserProfile.IsAdmin)
+{
+    @if (climbDetail == null)
+    {
+        <p>
+            <em>Loading the details from Strava &nbsp;Cotacol API...</em>
+        </p>
+    }
+    else
+    {
+        <h3>#@CotacolId: @climbDetail.Name</h3>
+        <ul>
+            <li>
+                <b>Points:</b> @climbDetail.Cotacolpoints
+            </li>
+            <li>
+                <b>Province:</b> @climbDetail.Province
+            </li>
+            <li>
+                <b>Surface:</b> @climbDetail.Surface
+            </li>
+        </ul>
+        <h3>Segments</h3>
+
+        <SegmentMapComponent Cotacol="climbDetail"/>
+    }
+}
+else
+{
+    <p>
+        <em>Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</em>
+    </p>
+}
+
+@code {
+
+    [Parameter]
+    public string CotacolId { get; set; }
+
+    private ClimbDetail climbDetail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId);
+    }
+
+
+}

@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace CotacolApp.Settings
+namespace CotacolApp.Models.Settings
 {
     public class AdminSettings
     {

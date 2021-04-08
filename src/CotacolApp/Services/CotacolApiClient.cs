@@ -90,5 +90,37 @@ namespace CotacolApp.Services
 
             return stats;
         }
+
+        public async Task<ClimbDetail> GetClimbDetailAsync(string cotacolId)
+        {
+            var fullData = await GetColsFromResource();
+
+            var segmentData = await $"{_settings.ApiUrl}/climbs/{cotacolId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<ClimbDetail>();
+
+            return segmentData;
+        }
+
+        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId)
+        {
+            if (stravaSegmentId.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+            {
+                stravaSegmentId = stravaSegmentId.Split('/').Last();
+            }
+            var segmentResponse = await $"{_settings.ApiUrl}/climbs/segment/{stravaSegmentId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<StravaSegmentResponse>();
+
+            return segmentResponse;
+        }
+        
+        public async Task UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update)
+        {
+            await $"{_settings.ApiUrl}/climbs/{cotacolId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .PostJsonAsync(update);
+
+        }
     }
 }

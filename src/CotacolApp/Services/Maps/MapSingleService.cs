@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CotacolApp.Models;
+using CotacolApp.Models.CotacolApi;
 using GoogleMapsComponents.Maps;
 using Microsoft.JSInterop;
 
@@ -17,7 +18,7 @@ namespace CotacolApp.Services.Maps
         {
             return Task.FromResult(_markers);
         }
-        
+
         public async Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout)
         {
@@ -25,12 +26,18 @@ namespace CotacolApp.Services.Maps
             {
                 var polyline = Columbae.Polyline.ParsePolyline(climb.Polyline);
 
-                if (!mapLayout.ShowPolylines) await AddMarkerAsync(map1, jsRuntime, climb, polyline, mapLayout.SingleClimb);
+                if (!mapLayout.ShowPolylines)
+                    await AddMarkerAsync(map1, jsRuntime, climb, polyline, mapLayout.SingleClimb);
                 if (mapLayout.ShowPolylines) await DrawPolylineAsync(map1, jsRuntime, climb, polyline, true);
                 if (mapLayout.SingleClimb) await ZoomToClimbAsync(map1, polyline);
             }
         }
-        
+
+        public async Task ShowSegmentsAsync(Map map1, IJSRuntime jsRuntime, ClimbDetail climb, MapLayout mapLayout)
+        {
+            throw new NotImplementedException();    
+        }
+
         public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbList,
             MapLayout mapLayout, Action<MouseEvent, string> handleClick)
         {
@@ -49,7 +56,7 @@ namespace CotacolApp.Services.Maps
                 }
             }
         }
-        
+
         public async Task ClearClimbsAsync()
         {
             if (_markers != null)
@@ -77,7 +84,7 @@ namespace CotacolApp.Services.Maps
             _markers = new List<Marker>();
             _lines = new List<Polyline>();
         }
-        
+
         private async Task AddMarkerAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb, Columbae.Polyline polyline,
             bool singleClimb = false)
         {
@@ -94,11 +101,15 @@ namespace CotacolApp.Services.Maps
                 await marker.SetAnimation(Animation.Drop);
             }
 
-            var infoWindow = await CreateInfoWindowAsync(climb, jsRuntime, start);
-            await marker.AddListener("click", async () => { await infoWindow.Open(map1); });
+            if (climb != null)
+            {
+                var infoWindow = await CreateInfoWindowAsync(climb, jsRuntime, start);
+                await marker.AddListener("click", async () => { await infoWindow.Open(map1); });
+            }
+
             _markers.Add(marker);
         }
-        
+
         private async Task DrawPolylineAsync(Map map1, IJSRuntime jsRuntime, ClimbData climb,
             Columbae.Polyline polyline,
             bool showArrow = false)
@@ -128,18 +139,13 @@ namespace CotacolApp.Services.Maps
                             Icon = new Symbol {Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red"},
                             Offset = "100%"
                         },
-                        // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "80%"},
-                        // new IconSequence
-                        // {
-                        //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
-                        //     Offset = "50%"
-                        // },
-                        // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "40%"},
-                        // new IconSequence {Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW}, Offset = "20%"},
                     }
                 });
-                var infoWindow = await CreateInfoWindowAsync(climb, jsRuntime, polyline.Vertices.First());
-                await line.AddListener("click", async () => { await infoWindow.Open(map1); });
+                if (climb != null)
+                {
+                    var infoWindow = await CreateInfoWindowAsync(climb, jsRuntime, polyline.Vertices.First());
+                    await line.AddListener("click", async () => { await infoWindow.Open(map1); });
+                }
             }
 
             _lines.Add(line);
