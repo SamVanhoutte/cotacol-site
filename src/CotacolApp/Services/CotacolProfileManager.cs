@@ -7,6 +7,8 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
 using CotacolApp.Services.Extensions;
+using CotacolApp.Settings;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -19,14 +21,20 @@ namespace CotacolApp.Services
         private IHttpContextAccessor _contextAccessor;
         private SignInManager<CotacolUser> _signInManager;
         private AdminSettings _adminSettings;
+        private CotacolApiSettings _apiSettings;
+        private IHttpContextAccessor _httpContextAccessor;
+
 
         public CotacolProfileManager(IHttpContextAccessor contextAccessor, IOptions<AdminSettings> adminSettings,
-            UserManager<CotacolUser> userManager, SignInManager<CotacolUser> signInManager)
+            UserManager<CotacolUser> userManager, SignInManager<CotacolUser> signInManager, 
+            IHttpContextAccessor httpContextAccessor, IOptions<CotacolApiSettings> apiSettings)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;
             _signInManager = signInManager;
             _adminSettings = adminSettings.Value;
+            _apiSettings = apiSettings.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private CotacolUser CurrentUser => _userManager.GetUserAsync(_contextAccessor.HttpContext.User).Result;
@@ -106,6 +114,22 @@ namespace CotacolApp.Services
             return claims.Any(c =>
                 c.Type.Equals(IdentityExtensions.ProfileUpdateClaim, StringComparison.InvariantCultureIgnoreCase) &&
                 c.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public string GetLoginLink()
+        {
+            var redirectUrl = "Identity/Account/Login";
+        
+            if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Host.Host
+                    .Equals(_apiSettings.RedirectDomain, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    redirectUrl = _apiSettings.LoginUrl;
+                }
+            }
+
+            return redirectUrl;
         }
     }
 }

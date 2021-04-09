@@ -99,11 +99,13 @@ else
             switch (sort.SortId)
             {
                 case "points":
+                    stats.SortUsers(true);
                     stats.Users = sort.Direction == MatSortDirection.Asc ?
                         stats.Users.OrderBy(c => c.TotalPoints).ToList() :
                         stats.Users.OrderByDescending(c => c.TotalPoints).ToList();
                     break;
                 case "climbs":
+                    stats.SortUsers(false);
                     stats.Users = sort.Direction == MatSortDirection.Asc ?
                         stats.Users.OrderBy(c => c.UniqueCols).ToList() :
                         stats.Users.OrderByDescending(c => c.UniqueCols).ToList();

@@ -1,5 +1,4 @@
 @page "/achievements"
-@attribute [Authorize]
 @using MatBlazor
 @using MatBlazor.Components
 @using CotacolApp.Models.CotacolApi
@@ -8,91 +7,121 @@
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 @inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <h1>Achievements</h1>
+        <br/>
 
-<h1>Achievements</h1>
-<br/>
+        @if (achievements == null)
+        {
+            <p>
+                <em>We're retrieving your results , please be patient...</em>
+            </p>
+        }
+        else
+        {
+            <h2>Score</h2>
+            <div class="lektonic">Total points: @achievements.TotalScore.Number()</div>
+            <div class="lektonic">Unique cols: @achievements.UniqueCols.Number()</div>
+            <AchievementChartComponent Achievements="@achievements"/>
 
-@if (achievements == null)
-{
-    <p>
-        <em>We're retrieving your results , please be patient...</em>
-    </p>
-}
-else
-{
-    <h2>Score</h2>
-    <div class="lektonic">Total points: @achievements.TotalScore.Number()</div>
-    <div class="lektonic">Unique cols: @achievements.UniqueCols.Number()</div>
-    <AchievementChartComponent Achievements="@achievements" />
-
-    @if (achievements.LocalLegends?.Any()??false)
-    {
-        <h2>I am the local legend at the following climbs</h2>
-        <p><em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em></p>
-        <ol>
-            @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
+            @if (achievements.LocalLegends?.Any() ?? false)
             {
-                <div class="lektonic"><span class="oi oi-star" aria-hidden="true"></span>@GetLegendString(legend.Key) </div>
+                <h2>I am the local legend at the following climbs</h2>
+                <p>
+                    <em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em>
+                </p>
+                <ol>
+                    @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
+                    {
+                        <div class="lektonic">
+                            <span class="oi oi-star" aria-hidden="true"></span>@GetLegendString(legend.Key)
+                        </div>
+                    }
+                </ol>
             }
-        </ol>
 
-    }
+            <h2>My most popular climbs</h2>
+            <p>
+                <em class="lektonic">These climbs are the climbs you ride the most, the stars indicate you're local legend.</em>
+            </p>
+            <ol>
+                @if (achievements?.ColResults != null)
+                {
+                    @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
+                    {
+                        <li class="lektonic">
+                            @climb.CotacolName (@climb.Achievements.Count() attempts)
+                            @if (achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
+                            {
+                                <span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>
+                            }
+                        </li>
+                    }
+                }
+            </ol>
+            <h2>Badges</h2>
+            <div class="lektonic">West Flanders (@WflLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@WflResult"/>
+            <div class="lektonic">East Flanders (@EflLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@EflResult"/>
+            <div class="lektonic">Antwerp (@AntLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@AntResult"/>
+            <div class="lektonic">Limburg (@LimLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@LimResult"/>
+            <div class="lektonic">Brussels (@BruLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@BruResult"/>
+            <div class="lektonic">Flemish Brabant (@FbrLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@FbrResult"/>
+            <div class="lektonic">Brabant Walloon (@WbrLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@WbrResult"/>
+            <div class="lektonic">Hainaut (@HntLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@HntResult"/>
+            <div class="lektonic">Namur (@NamLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@NamResult"/>
+            <div class="lektonic">Liege (@LieLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@LieResult"/>
+            <div class="lektonic">Luxemburg (@LuxLabel)</div>
+            <MatProgressBar Indeterminate="false" Progress="@LuxResult"/>
+        }
 
-    <h2>My most popular climbs</h2>
-    <ol>
-    @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
-    {
-        <li class="lektonic">@climb.CotacolName (@climb.Achievements.Count() attempts) @if (achievements.LocalLegends.Any(leg=>leg.Key.Equals(climb.CotacolId))){<span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>} </li>
-    }
-    </ol>
-    <h2>Badges</h2>
-    <div class="lektonic">West Flanders (@WflLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@WflResult"/>
-    <div class="lektonic">East Flanders (@EflLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@EflResult"/>
-    <div class="lektonic">Antwerp (@AntLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@AntResult"/>
-    <div class="lektonic">Limburg (@LimLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@LimResult"/>
-    <div class="lektonic">Flemish Brabant (@FbrLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@FbrResult"/>
-    <div class="lektonic">Brabant Walloon (@WbrLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@WbrResult"/>
-    <div class="lektonic">Hainaut (@HntLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@HntResult"/>
-    <div class="lektonic">Namur (@NamLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@NamResult"/>
-    <div class="lektonic">Liege (@LieLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@LieResult"/>
-    <div class="lektonic">Luxemburg (@LuxLabel)</div>
-    <MatProgressBar Indeterminate="false" Progress="@LuxResult"/>
-}
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private UserAchievements achievements;
     private IEnumerable<UserClimb> climbs;
 
-    private double WflResult {set; get;}
-    private double EflResult {set; get;}
-    private double AntResult {set; get;}
-    private double LimResult {set; get;}
-    private double FbrResult {set; get;}
-    private double WbrResult {set; get;}
-    private double HntResult {set; get;}
-    private double NamResult {set; get;}
-    private double LieResult {set; get;}
-    private double LuxResult {set; get;}
-    private string WflLabel {set; get;}
-    private string EflLabel {set; get;}
-    private string AntLabel {set; get;}
-    private string LimLabel {set; get;}
-    private string FbrLabel {set; get;}
-    private string WbrLabel {set; get;}
-    private string HntLabel {set; get;}
-    private string NamLabel {set; get;}
-    private string LieLabel {set; get;}
-    private string LuxLabel {set; get;}
-    
+    private double WflResult { set; get; }
+    private double EflResult { set; get; }
+    private double AntResult { set; get; }
+    private double LimResult { set; get; }
+    private double BruResult { set; get; }
+    private double FbrResult { set; get; }
+    private double WbrResult { set; get; }
+    private double HntResult { set; get; }
+    private double NamResult { set; get; }
+    private double LieResult { set; get; }
+    private double LuxResult { set; get; }
+    private string WflLabel { set; get; }
+    private string EflLabel { set; get; }
+    private string AntLabel { set; get; }
+    private string LimLabel { set; get; }
+    private string BruLabel { set; get; }
+    private string FbrLabel { set; get; }
+    private string WbrLabel { set; get; }
+    private string HntLabel { set; get; }
+    private string NamLabel { set; get; }
+    private string LieLabel { set; get; }
+    private string LuxLabel { set; get; }
+
     protected override async Task OnInitializedAsync()
     {
         if (UserProfile.IsAuthenticated)
@@ -104,6 +133,7 @@ else
             EflResult = GetProvinceProgress("Oost-Vl", out var eflLabel);
             AntResult = GetProvinceProgress("Antwerpen", out var antLabel);
             LimResult = GetProvinceProgress("Limburg", out var limLabel);
+            BruResult = GetProvinceProgress("Brussels", out var bruLabel);
             FbrResult = GetProvinceProgress("Vl-Br", out var fbrLabel);
             WbrResult = GetProvinceProgress("Brabant Wallon", out var wbrLabel);
             HntResult = GetProvinceProgress("Hainaut", out var hntLabel);
@@ -115,13 +145,13 @@ else
             EflLabel = eflLabel;
             AntLabel = antLabel;
             LimLabel = limLabel;
+            BruLabel = bruLabel;
             FbrLabel = fbrLabel;
             WbrLabel = wbrLabel;
             HntLabel = hntLabel;
             NamLabel = namLabel;
             LieLabel = lieLabel;
             LuxLabel = luxLabel;
-
         }
     }
 
@@ -144,4 +174,5 @@ else
         var col = achievements.ColResults.FirstOrDefault(cr => cr.CotacolId.Equals(colId));
         return $"{col.CotacolId} {col.CotacolName} - {col.Achievements.Count} attempts";
     }
+
 }

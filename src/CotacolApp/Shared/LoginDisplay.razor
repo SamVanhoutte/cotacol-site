@@ -31,7 +31,7 @@
         </form>
     </Authorized>
     <NotAuthorized>
-        <a href="@GetLoginLink()">Log in</a>
+        <a href="@UserProfile.GetLoginLink()">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -39,20 +39,7 @@
     private int uniqueCols = -1;
     private int totalPoints = -1;
     
-    private string GetLoginLink()
-    {
-        var redirectUrl = "Identity/Account/Login";
-        
-        if (!string.IsNullOrEmpty(ApiSettings?.Value?.RedirectDomain))
-        {
-            if (!HttpContextAccessor.HttpContext.Request.Host.Host
-                .Equals(ApiSettings.Value.RedirectDomain, StringComparison.InvariantCultureIgnoreCase))
-            {
-                redirectUrl = ApiSettings.Value.LoginUrl;
-            }
-        }
-        return redirectUrl;
-    }
+
 
     protected override async Task OnInitializedAsync()
     {
