@@ -4399,7 +4399,7 @@
   {
     "name": "Rue du Mystere",
     "city": "Forest",
-    "province": "Brussel",
+    "province": "Brussels",
     "cotacol_points": 75,
     "distance": 275,
     "elevation_diff": 33,
@@ -9004,7 +9004,7 @@
   {
     "name": "Trassersweg",
     "city": "Neder-over-heembeek",
-    "province": "Brussel",
+    "province": "Brussels",
     "cotacol_points": 47,
     "distance": 1000,
     "elevation_diff": 44,
@@ -13369,7 +13369,7 @@
   {
     "name": "Côte de l'observatoire",
     "city": "Uccle",
-    "province": "Brussel",
+    "province": "Brussels",
     "cotacol_points": 59,
     "distance": 850,
     "elevation_diff": 59,

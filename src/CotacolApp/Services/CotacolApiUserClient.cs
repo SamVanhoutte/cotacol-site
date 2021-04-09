@@ -41,29 +41,33 @@ namespace CotacolApp.Services
                 (await _cotacolDataClient
                     .GetClimbDataAsync())
                 .Select(climb => new UserClimb(climb));
-
-            var stats =
-                (await _cotacolDataClient
-                    .GetStatsAsync());
-
-            _logger.LogInformation($"User {userId} has {achievements.ColResults.Count()} conquered climbs");
             var result = new List<UserClimb>();
-            foreach (var climb in allClimbs)
+            _logger.LogInformation($"Climbs = null? {allClimbs == null}");
+            if (achievements?.ColResults != null && allClimbs!=null)
             {
-                // First check users results for the climb
-                var achievement = achievements.ColResults.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
-                climb.Done = achievement != null;
-                if (achievement != null)
-                {
-                    climb.FirstAchievement = achievement.Achievements.OrderBy(a => a.AchievementDate).FirstOrDefault()
-                        ?.AchievementDate ?? default;
-                    climb.Attempts = achievement.Achievements.Count;
-                    climb.Duration = achievement.Achievements.Min(a => TimeSpan.Parse(a.Duration).TotalSeconds);
-                }
+                // var stats =
+                //     (await _cotacolDataClient
+                //         .GetStatsAsync());
 
-                // Now update with the stats
-                // TODO
-                result.Add(climb);
+                _logger.LogInformation($"User {userId} has {achievements?.ColResults?.Count() ?? 0} conquered climbs");
+                foreach (var climb in allClimbs)
+                {
+                    // First check users results for the climb
+                    var achievement = achievements.ColResults.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
+                    climb.Done = achievement != null;
+                    if (achievement != null)
+                    {
+                        climb.FirstAchievement = achievement.Achievements.OrderBy(a => a.AchievementDate)
+                            .FirstOrDefault()
+                            ?.AchievementDate ?? default;
+                        climb.Attempts = achievement.Achievements.Count;
+                        climb.Duration = achievement.Achievements.Min(a => TimeSpan.Parse(a.Duration).TotalSeconds);
+                    }
+
+                    // Now update with the stats
+                    // TODO
+                    result.Add(climb);
+                }
             }
 
             _logger.LogInformation($"Returned cotacols with {result.Count(c => c.Done)} marked climbs");
@@ -92,7 +96,7 @@ namespace CotacolApp.Services
                     .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                     .AllowAnyHttpStatus()
                     .GetJsonAsync<UserAchievements>();
-            
+
                 if (includeLocalLegends)
                 {
                     achievements.LocalLegends = new Dictionary<string, int>();
@@ -109,10 +113,9 @@ namespace CotacolApp.Services
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e,$"Achievement retrieval failed with error {e.Message}");
+                _logger.LogWarning(e, $"Achievement retrieval failed with error {e.Message}");
                 throw;
             }
-
         }
 
         public async Task<UserProfile> GetProfileAsync()
@@ -156,9 +159,11 @@ namespace CotacolApp.Services
             return response.StatusCode;
         }
 
-        public async Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId, string remark = "")
+        public async Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId,
+            string remark = "")
         {
-            _logger.LogInformation($"Add missing segment for user {userId}: col : {missingCotacolId} : activity : {missingActivityId}");
+            _logger.LogInformation(
+                $"Add missing segment for user {userId}: col : {missingCotacolId} : activity : {missingActivityId}");
             var response = await $"{_settings.ApiUrl}/data/missing"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .AllowAnyHttpStatus()
