@@ -86,7 +86,7 @@ jobs:
                               },
                               {
                                 "name": "api:loginUrl",
-                                "value": "https://cotacol-hunting-app.azurewebsites.net/Identity/Account/Login",
+                                "value": "https://cotacol-hunting-app.azurewebsites.net/achievements",
                                 "slotSetting": true
                               },
                               {

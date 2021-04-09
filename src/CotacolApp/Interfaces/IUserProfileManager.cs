@@ -15,5 +15,6 @@ namespace CotacolApp.Interfaces
         bool IsAuthenticated { get; }
         Task<bool> CanUpdateDescriptionAsync();
         Task<bool> CanUpdateProfileAsync();
+        string GetLoginLink();
     }
 }
