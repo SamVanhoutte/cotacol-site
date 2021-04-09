@@ -126,26 +126,31 @@ namespace CotacolApp
                         {
                             OnCreatingTicket = async context =>
                             {
-                                var request = new HttpRequestMessage(HttpMethod.Get,
-                                    context.Options.UserInformationEndpoint);
-                                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                                request.Headers.Authorization =
-                                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                                try
+                                {
+                                    var request = new HttpRequestMessage(HttpMethod.Get,
+                                        context.Options.UserInformationEndpoint);
+                                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                    request.Headers.Authorization =
+                                        new AuthenticationHeaderValue("Bearer", context.AccessToken);
 
-                                var response = await context.Backchannel.SendAsync(request,
-                                    HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
-                                response.EnsureSuccessStatusCode();
-                                var claimsJson = await response.Content.ReadAsStringAsync();
-                                //context.RunClaimActions(user.RootElement);
-                                var userSettings = context.AddClaims(claimsJson);
+                                    var response = await context.Backchannel.SendAsync(request,
+                                        HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                                    response.EnsureSuccessStatusCode();
+                                    var claimsJson = await response.Content.ReadAsStringAsync();
+                                    //context.RunClaimActions(user.RootElement);
+                                    var userSettings = context.AddClaims(claimsJson);
                                 
-                                var tokens = context.Properties.GetTokens().ToList();
-                                tokens.AddRange(
-                                    userSettings.Select(userSetting => new AuthenticationToken() 
-                                        {Name = userSetting.Key, Value = userSetting.Value}));
+                                    var tokens = context.Properties.GetTokens().ToList();
+                                    tokens.AddRange(
+                                        userSettings.Select(userSetting => new AuthenticationToken() 
+                                            {Name = userSetting.Key, Value = userSetting.Value}));
 
-                                context.Properties.StoreTokens(tokens);
-
+                                    context.Properties.StoreTokens(tokens);
+                                }
+                                catch (Exception e)
+                                {
+                                }
                             },
                             OnRedirectToAuthorizationEndpoint =  ctx =>
                             {
