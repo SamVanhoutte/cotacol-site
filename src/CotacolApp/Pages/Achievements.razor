@@ -12,7 +12,7 @@
     <NotAuthorized>
         @if (true)
         {
-            NavManager.NavigateTo("Identity/Account/Login", true);
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
         }
     </NotAuthorized>
     <Authorized>
