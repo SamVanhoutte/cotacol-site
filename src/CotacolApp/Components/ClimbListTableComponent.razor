@@ -59,6 +59,10 @@
                         <a href="@context.StravaSegment" target="_blank">
                             <img src="images/strava-logo-small.png" asp-append-version="true"/>
                         </a>
+                        @if(UserProfile.IsAdmin)
+                        {
+                            <a href="/admin/segments/@context.Id">Edit</a>
+                        }
                     </td>
                 </MatTableRow>
             </MatTable>
