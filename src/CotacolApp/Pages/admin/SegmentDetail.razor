@@ -18,6 +18,26 @@
     }
     else
     {
+        <MatAccordion Multi="true">
+        <MatExpansionPanel>
+            <MatExpansionPanelSummary Class="lektonic">
+                <MatExpansionPanelHeader>How to edit segments?</MatExpansionPanelHeader>
+                <MatExpansionPanelSubHeader></MatExpansionPanelSubHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                <ul>
+                    <li>When setting a new segment, the old segment will be made invalid after one week.</li>
+                    <li>Old segments will still be valid and matched for activities that happened, while the segment was active</li>
+                    <li>Create or search the right segment on strava and keep the SegmentId (part of the url)</li>
+                    <li>Enter the SegmentId in the 'New Segment' text box and press enter</li>
+                    <li>Shortly after that, the new segment will be shown on the map, and in the table</li>
+                    <li>At this point, nothing has been changed yet, as we need you to validate the segment</li>
+                    <li>If the segment looks right, press the 'Check' icon and enter the details in the popup window</li>
+                </ul>
+                <p>It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the actual Strava Segment (that you can find in the col list) has been ridden.</p>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+        </MatAccordion>
         <h3>#@CotacolId: @climbDetail.Name</h3>
         <ul>
             <li>
