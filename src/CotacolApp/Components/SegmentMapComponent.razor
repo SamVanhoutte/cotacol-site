@@ -28,7 +28,9 @@
                 </MatSortHeader>
                 <MatSortHeader SortId="surface">Distance</MatSortHeader>
                 <MatSortHeader SortId="surface">Confidence</MatSortHeader>
-                <MatSortHeader SortId="remark"><span style="width:250px">Remark</span></MatSortHeader>
+                <MatSortHeader SortId="remark">
+                    <span style="width:250px">Remark</span>
+                </MatSortHeader>
                 <MatSortHeader>Segment</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
@@ -87,7 +89,7 @@ else
     private bool dialogIsOpen = false;
     private string remark;
     private string confidence;
-    private List<string> _colors = new List<string> {"#E49969", "#B2C891",  "#AD85BA", "#95A1C3", "#74A18E", "#81SFB5", "#C88691"};
+    private List<string> _colors = new List<string> {"#E49969", "#B2C891", "#AD85BA", "#95A1C3", "#74A18E", "#81SFB5", "#C88691"};
     private GoogleMap _googleMap;
     private MapOptions _mapOptions;
     private bool _dataChanged = false;
@@ -277,7 +279,7 @@ else
             var stravaSegment = _cotacol.Segments.First(s => s.Segmentid.Equals(NewSegmentId));
             var updateRequest = new UpdateSegmentRequest
             {
-                Remark = remark, SegmentConfidence = confidence, UserId = "", 
+                Remark = remark, SegmentConfidence = confidence, UserId = "",
                 Distance = stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
                 StravaSegmentId = stravaSegment.Segmentid
             };

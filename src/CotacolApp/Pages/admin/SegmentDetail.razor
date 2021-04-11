@@ -1,4 +1,5 @@
 @page "/admin/segments/{CotacolId}"
+@using MatBlazor
 @using CotacolApp.Models.CotacolApi
 @using Microsoft.ApplicationInsights
 @inject ICotacolClient CotacolClient
@@ -10,6 +11,26 @@
 <br/>
 @if (UserProfile.IsAdmin)
 {
+    <MatAccordion Multi="true">
+        <MatExpansionPanel>
+            <MatExpansionPanelSummary Class="lektonic">
+                <MatExpansionPanelHeader>User guidance for segment editing</MatExpansionPanelHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                <ul>
+                    <li>When setting a new segment, the old segment will be made invalid after one week.</li>
+                    <li>Old segments will still be valid and matched for activities that happened, while the segment was active</li>
+                    <li>Create or search the right segment on strava and keep the SegmentId (part of the url)</li>
+                    <li>Enter the SegmentId in the 'New Segment' text box and press enter</li>
+                    <li>Shortly after that, the new segment will be shown on the map, and in the table</li>
+                    <li>At this point, nothing has been changed yet, as we need you to validate the segment</li>
+                    <li>If the segment looks right, press the 'Check' icon and enter the details in the popup window</li>
+                </ul>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    </MatAccordion>
+    <br/>
+    <hr />
     @if (climbDetail == null)
     {
         <p>
