@@ -10,6 +10,7 @@ namespace CotacolApp.Interfaces
         string ProfilePicture { get; }
         string Email { get; }
         string UserId { get; }
+        bool IsAdmin { get; }
         string UserName { get; }
         string FullName { get; }
         bool IsAuthenticated { get; }

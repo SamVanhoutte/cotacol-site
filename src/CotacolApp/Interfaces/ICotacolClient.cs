@@ -11,5 +11,9 @@ namespace CotacolApp.Interfaces
         Task<SiteStats> GetStatsAsync();
         Task<bool> SetupUserAsync(UserSetupRequest userSettings);
         Task<HomeStats> GetHomeStatsAsync();
+        Task<ClimbDetail> GetClimbDetailAsync(string cotacolId);
+        Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId);
+        Task UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update);
+
     }
 }   

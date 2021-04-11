@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Columbae;
 using CotacolApp.Models;
+using CotacolApp.Models.CotacolApi;
 using CotacolApp.Services.Maps;
 using GoogleMapsComponents.Maps;
 using Microsoft.JSInterop;
@@ -16,7 +17,7 @@ namespace CotacolApp.Services
 
         Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout);
-
+        
         Task ClearClimbsAsync();
         Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime, Polypoint position=null);
         Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> toList, MapLayout layout, Action<MouseEvent, string> handleClick = null);

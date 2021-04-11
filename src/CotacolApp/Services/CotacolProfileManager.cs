@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CotacolApp.Interfaces;
 using CotacolApp.Models.Identity;
+using CotacolApp.Models.Settings;
 using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
 using Microsoft.AspNetCore.Components;
@@ -19,16 +20,19 @@ namespace CotacolApp.Services
         private UserManager<CotacolUser> _userManager;
         private IHttpContextAccessor _contextAccessor;
         private SignInManager<CotacolUser> _signInManager;
+        private AdminSettings _adminSettings;
         private CotacolApiSettings _apiSettings;
         private IHttpContextAccessor _httpContextAccessor;
 
-        public CotacolProfileManager(IHttpContextAccessor contextAccessor, 
+
+        public CotacolProfileManager(IHttpContextAccessor contextAccessor, IOptions<AdminSettings> adminSettings,
             UserManager<CotacolUser> userManager, SignInManager<CotacolUser> signInManager, 
             IHttpContextAccessor httpContextAccessor, IOptions<CotacolApiSettings> apiSettings)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;
             _signInManager = signInManager;
+            _adminSettings = adminSettings.Value;
             _apiSettings = apiSettings.Value;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -92,6 +96,7 @@ namespace CotacolApp.Services
         public string ProfilePicture => CurrentUser?.ProfilePicture;
         public string Email => CurrentUser?.Email;
         public string UserId => CurrentUser?.Id;
+        public bool IsAdmin => _adminSettings.IsAdmin(UserId);
         public string UserName => CurrentUser?.UserName;
         public string FullName => $"{CurrentUser?.FirstName} {CurrentUser?.LastName}";
 
