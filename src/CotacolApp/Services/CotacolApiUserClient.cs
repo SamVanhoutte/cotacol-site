@@ -32,11 +32,11 @@ namespace CotacolApp.Services
             _settings = settings.Value;
         }
 
-        private string userId => _context.HttpContext.User.GetUserId();
+        private string currentUserId => _context.HttpContext.User.GetUserId();
 
-        public async Task<List<UserClimb>> GetClimbDataAsync()
+        public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
         {
-            var achievements = await GetAchievementsAsync();
+            var achievements = await GetAchievementsAsync(userId);
             var allClimbs =
                 (await _cotacolDataClient
                     .GetClimbDataAsync())
@@ -74,7 +74,7 @@ namespace CotacolApp.Services
             return result;
         }
 
-        public async Task<List<UserColAchievement>> GetColsAsync()
+        public async Task<List<UserColAchievement>> GetColsAsync(string userId)
         {
             var cols = await $"{_settings.ApiUrl}/user/{userId}/cols"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
@@ -88,7 +88,7 @@ namespace CotacolApp.Services
             throw new System.NotImplementedException();
         }
 
-        public async Task<UserAchievements> GetAchievementsAsync(bool includeLocalLegends = false)
+        public async Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false)
         {
             try
             {
@@ -118,8 +118,9 @@ namespace CotacolApp.Services
             }
         }
 
-        public async Task<UserProfile> GetProfileAsync()
+        public async Task<UserProfile> GetProfileAsync(string userId=null)
         {
+            userId ??= currentUserId;
             var profile = await $"{_settings.ApiUrl}/user/{userId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<UserProfile>();
@@ -132,7 +133,7 @@ namespace CotacolApp.Services
             //TODO : add private settings etc
             await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
             {
-                UserId = userId,
+                UserId = currentUserId,
                 UpdateActivityDescription = settings.UpdateActivityDescription,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,
@@ -140,7 +141,7 @@ namespace CotacolApp.Services
             });
         }
 
-        public async Task<SyncStatus> GetSyncStatus()
+        public async Task<SyncStatus> GetSyncStatus(string userId)
         {
             var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
@@ -148,7 +149,7 @@ namespace CotacolApp.Services
             return response;
         }
 
-        public async Task<int> SynchronizeAsync(bool fullSync = false)
+        public async Task<int> SynchronizeAsync(string userId, bool fullSync = false)
         {
             _logger.LogInformation($"Sync request for user {userId}");
             var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
@@ -163,18 +164,18 @@ namespace CotacolApp.Services
             string remark = "")
         {
             _logger.LogInformation(
-                $"Add missing segment for user {userId}: col : {missingCotacolId} : activity : {missingActivityId}");
+                $"Add missing segment for user {currentUserId}: col : {missingCotacolId} : activity : {missingActivityId}");
             var response = await $"{_settings.ApiUrl}/data/missing"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .AllowAnyHttpStatus()
                 .PostJsonAsync(new MissingDataRequest
                 {
-                    UserId = userId,
+                    UserId = currentUserId,
                     ActivityId = missingActivityId,
                     CotacolId = missingCotacolId,
                     Remark = remark
                 });
-            _logger.LogInformation($"Missing col published for user {userId} with status {response.StatusCode}");
+            _logger.LogInformation($"Missing col published for user {currentUserId} with status {response.StatusCode}");
             return response.StatusCode;
         }
     }

@@ -41,7 +41,8 @@ else
         <MatTableRow>
             <td style="text-align: right">@context.Position</td>
             <td>
-                <b>@PrintName(context)</b>
+                @if(context.PrivateProfile??false){<b>@PrintName(context)</b>}
+                else{<a href="achievements/@context.UserId"><b>@PrintName(context)</b></a>}
             </td>
             <td style="text-align: right">@context.TotalPoints.Number()</td>
             <td style="text-align: right">@context.UniqueCols</td>

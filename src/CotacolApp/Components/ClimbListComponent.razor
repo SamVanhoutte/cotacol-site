@@ -64,7 +64,7 @@ else
     {
         if (UserProfile.IsAuthenticated)
         {
-            _climbList = await CotacolUserClient.GetClimbDataAsync();
+            _climbList = await CotacolUserClient.GetClimbDataAsync(UserProfile.UserId);
         }
         else
         {
