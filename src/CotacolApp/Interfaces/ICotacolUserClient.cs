@@ -7,14 +7,14 @@ namespace CotacolApp.Interfaces
 {
     public interface ICotacolUserClient
     {
-        Task<List<UserColAchievement>> GetColsAsync();
-        Task<List<UserClimb>> GetClimbDataAsync();
+        Task<List<UserColAchievement>> GetColsAsync(string userId);
+        Task<List<UserClimb>> GetClimbDataAsync(string userId);
         Task<List<CotacolActivity>> GetActivitiesAsync();
-        Task<UserAchievements> GetAchievementsAsync(bool includeLocalLegends = false);
-        Task<UserProfile> GetProfileAsync();
+        Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false);
+        Task<UserProfile> GetProfileAsync(string userId=null);
         Task UpdateSettingsAsync(UserSettings settings);
-        Task<SyncStatus> GetSyncStatus();
-        Task<int> SynchronizeAsync( bool fullSync = false);
+        Task<SyncStatus> GetSyncStatus(string userId);
+        Task<int> SynchronizeAsync(string userId, bool fullSync = false);
         Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId, string remark = "");
     }
 }

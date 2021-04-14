@@ -7,5 +7,6 @@ namespace CotacolApp.Models.CotacolApi
         public string FullName { get; set; } 
         public int TotalPoints { get; set; } 
         public int UniqueCols { get; set; } 
+        public bool? PrivateProfile { get; set; } 
     }
 }

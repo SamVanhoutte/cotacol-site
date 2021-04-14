@@ -77,7 +77,7 @@ namespace CotacolApp.Services
                 .AllowAnyHttpStatus()
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .PostJsonAsync(userSettings);
-            var bodyResponse = response.ResponseMessage.Content.ReadAsStringAsync();
+            var bodyResponse = await response.ResponseMessage.Content.ReadAsStringAsync();
             _logger.LogInformation($"User setup result ({response.StatusCode}) with content {bodyResponse}");
             return response.ResponseMessage.IsSuccessStatusCode;
         }

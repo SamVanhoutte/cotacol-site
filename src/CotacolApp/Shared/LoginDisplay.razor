@@ -47,7 +47,7 @@
         {
             try
             {
-                var stats = await CotacolUserClient.GetAchievementsAsync();
+                var stats = await CotacolUserClient.GetAchievementsAsync(UserProfile.UserId);
                 uniqueCols = stats.UniqueCols;
                 totalPoints = stats.TotalScore;
             }
@@ -58,5 +58,4 @@
         }   
         await base.OnInitializedAsync();
     }
-
 }

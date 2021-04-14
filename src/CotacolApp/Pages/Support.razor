@@ -16,7 +16,7 @@
             <p>It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the actual Strava Segment (that you can find in the col list) has been ridden.</p>
             <p>We have chosen to stick true to the actual descriptions and routes of the original book, which means that the popular track of a col is not always the exact matching one</p>
             <p>If you feel there is indeed an activity that has not been matched well by the backend, please leave your details here, so we can follow up</p>
-            <MatStringField Label="Activity ID" @bind-value="@MissingActivityId" HelperText="The strava activity id is part of the url of your strava activity page"></MatStringField>
+            <MatStringField Label="Activity ID" @bind-value="@MissingActivityId" HelperText="The Strava activity id is part of the url of your strava activity page"></MatStringField>
             <MatStringField Label="Cotacol Number" @bind-value="@MissingCotacolId"></MatStringField>
             <MatIconButton Icon="send" OnClick="@(async () => await SubmitMissingColAsync())"></MatIconButton><em>@_missingDataMessage</em>
         </MatExpansionPanelDetails>
@@ -24,7 +24,7 @@
     <MatExpansionPanel>
         <MatExpansionPanelSummary Class="lektonic">
             <MatExpansionPanelHeader>Multiple efforts per activity?</MatExpansionPanelHeader>
-            <MatExpansionPanelSubHeader>Multiple efforts of the same col in 1 activity only count for one.</MatExpansionPanelSubHeader>
+            <MatExpansionPanelSubHeader>Multiple efforts of the same Cotacol in 1 activity only count for one.</MatExpansionPanelSubHeader>
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
             <p>This is because of the current implementation in the synchronization backend. It is planned to update this soon, but this will require a resync for those activities, normally. Please follow this article for the latest news.</p>

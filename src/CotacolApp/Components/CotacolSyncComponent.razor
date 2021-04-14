@@ -3,6 +3,7 @@
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IMatDialogService MatDialogService
+@inject IUserProfileManager UserProfile
 
 <table class="table">
     <tbody>
@@ -60,7 +61,7 @@
         _syncStatusRefreshDate = DateTime.Now;
         try
         {
-            _syncStatus = await CotacolUserClient.GetSyncStatus();
+            _syncStatus = await CotacolUserClient.GetSyncStatus(UserProfile.UserId);
         }
         catch (Exception e)
         {
@@ -78,7 +79,7 @@
             _syncRequested = true;
             try
             {
-                var httpStatus = await CotacolUserClient.SynchronizeAsync();
+                var httpStatus = await CotacolUserClient.SynchronizeAsync(UserProfile.UserId);
                 _syncRequestedTime = DateTime.Now;
                 if (httpStatus == 429)
                 {
