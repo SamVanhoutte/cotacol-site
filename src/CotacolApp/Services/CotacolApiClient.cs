@@ -28,30 +28,31 @@ namespace CotacolApp.Services
             _settings = apiSettings.Value;
         }
 
-        private async Task<List<ClimbData>> GetColsFromResource()
-        {
-            var assembly = Assembly.GetAssembly(typeof(CotacolApiClient));
-            var resourceName = "CotacolApp.StaticData.cotacoldata.json";
-            await using var stream = assembly.GetManifestResourceStream(resourceName);
-            using var reader = new StreamReader(stream);
-            var result = await reader.ReadToEndAsync();
-            var newClimbs = JsonConvert.DeserializeObject<List<ClimbData>>(result);
-            return newClimbs;
-        }
+        // private async Task<List<ClimbData>> GetColsFromResource()
+        // {
+        //     var assembly = Assembly.GetAssembly(typeof(CotacolApiClient));
+        //     var resourceName = "CotacolApp.StaticData.cotacoldata.json";
+        //     await using var stream = assembly.GetManifestResourceStream(resourceName);
+        //     using var reader = new StreamReader(stream);
+        //     var result = await reader.ReadToEndAsync();
+        //     var newClimbs = JsonConvert.DeserializeObject<List<ClimbData>>(result);
+        //     return newClimbs;
+        // }
 
         public async Task<List<ClimbData>> GetClimbDataAsync()
         {
-            var fullData = await GetColsFromResource();
+            //var fullData = await GetColsFromResource();
 
-            var segmentData = await $"{_settings.ApiUrl}/climbs"
+            var fullData = await $"{_settings.ApiUrl}/cotacoldata"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .GetJsonAsync<List<Climb>>();
+                .GetJsonAsync<List<ClimbData>>();
 
-            foreach (var climbData in fullData)
-            {
-                climbData.StravaSegment = segmentData.FirstOrDefault(sd =>
-                    sd.Id.Equals(climbData.Id, StringComparison.InvariantCultureIgnoreCase))?.Url;
-            }
+            // foreach (var climbData in fullData)
+            // {
+            //     var apiData = segmentData.FirstOrDefault(sd =>
+            //             sd.Id.Equals(climbData.Id, StringComparison.InvariantCultureIgnoreCase));
+            //     climbData.StravaSegment = apiData.Url;
+            // }
 
             return fullData;
         }
@@ -93,8 +94,6 @@ namespace CotacolApp.Services
 
         public async Task<ClimbDetail> GetClimbDetailAsync(string cotacolId)
         {
-            var fullData = await GetColsFromResource();
-
             var segmentData = await $"{_settings.ApiUrl}/climbs/{cotacolId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<ClimbDetail>();
@@ -108,19 +107,20 @@ namespace CotacolApp.Services
             {
                 stravaSegmentId = stravaSegmentId.Split('/').Last();
             }
+
             var segmentResponse = await $"{_settings.ApiUrl}/climbs/segment/{stravaSegmentId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<StravaSegmentResponse>();
 
             return segmentResponse;
         }
-        
-        public async Task UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update)
+
+        public async Task<int> UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update)
         {
-            await $"{_settings.ApiUrl}/climbs/{cotacolId}"
+            var response = await $"{_settings.ApiUrl}/climbs/{cotacolId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .PostJsonAsync(update);
-
+            return response.StatusCode;
         }
 
         public async Task<List<UserRecord>> GetUsersAsync()
@@ -137,6 +137,15 @@ namespace CotacolApp.Services
                 .GetJsonAsync<UserStateDetail>();
 
             return userState;
+        }
+
+        public async Task<int> UpdateCotacolMetadataAsync(string cotacolId, UpdateSegmentRequest update)
+        {
+            var response = await $"{_settings.ApiUrl}/climbs/{cotacolId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .PutJsonAsync(update);
+
+            return response.StatusCode;
         }
     }
 }

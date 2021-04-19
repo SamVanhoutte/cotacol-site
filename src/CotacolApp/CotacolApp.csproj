@@ -13,7 +13,7 @@
         <PackageReference Include="Azure.Identity" Version="1.3.0" />
         <PackageReference Include="Blazored.SessionStorage" Version="1.0.13" />
         <PackageReference Include="BlazorGoogleMaps" Version="1.0.11" />
-        <PackageReference Include="Columbae" Version="2.2.0" />
+        <PackageReference Include="Columbae" Version="2.3.0" />
         <PackageReference Include="Flurl.Http" Version="3.0.1" />
         <PackageReference Include="Guard.Net" Version="1.2.0" />
         <PackageReference Include="MatBlazor" Version="2.8.0" />
@@ -52,11 +52,6 @@
     </ItemGroup>
     <ItemGroup>
       <Content Remove="StaticData\cotacoldata.json" />
-      <EmbeddedResource Include="StaticData\cotacoldata.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </EmbeddedResource>
       <Content Update="Components\ClimbDetailComponent.razor.css">
         <DependentUpon>ClimbDetailComponent.razor</DependentUpon>
       </Content>
