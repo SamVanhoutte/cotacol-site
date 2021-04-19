@@ -1,4 +1,5 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject IUserProfileManager UserProfile
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href=""><img src="images/cotacol-logo-white-small.png" /></a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -47,6 +48,14 @@
             <li class="nav-item px-5" @onclick="ToggleNavMenu">
                 <NavLink class="nav-link" href="activitystats">
                     <span class="oi oi-pulse" aria-hidden="true"></span> Activities
+                </NavLink>
+            </li>
+        }
+        @if (UserProfile.IsAdmin)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link text-danger" href="admin/users">
+                    <span class="oi oi-people" aria-hidden="true"></span> Users admin
                 </NavLink>
             </li>
         }

@@ -122,5 +122,21 @@ namespace CotacolApp.Services
                 .PostJsonAsync(update);
 
         }
+
+        public async Task<List<UserRecord>> GetUsersAsync()
+        {
+            return await $"{_settings.ApiUrl}/users"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<UserRecord>>();
+        }
+
+        public async Task<UserStateDetail> GetUserAdminInfoAsync(string userId)
+        {
+            var userState = await $"{_settings.ApiUrl}/user/{userId}/state"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<UserStateDetail>();
+
+            return userState;
+        }
     }
 }

@@ -1,0 +1,14 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace CotacolApp.Models.CotacolApi
+{
+    public class UserStateDetail
+    {
+            [JsonProperty("tokens")]
+            public UserTokens UserTokens { get; set; }
+
+            [JsonProperty("state")]
+            public JObject State { get; set; }
+    }
+}

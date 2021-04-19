@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CotacolApp.Interfaces;
 using CotacolApp.Models;
@@ -149,7 +151,7 @@ namespace CotacolApp.Services
             return response;
         }
 
-        public async Task<int> SynchronizeAsync(string userId, bool fullSync = false)
+        public async Task<AsyncWorkflowResult> SynchronizeAsync(string userId, bool fullSync = false)
         {
             _logger.LogInformation($"Sync request for user {userId}");
             var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
@@ -157,7 +159,32 @@ namespace CotacolApp.Services
                 .AllowAnyHttpStatus()
                 .PostJsonAsync(new SyncRequest {ForceSync = false, FullSync = fullSync, MaxActivityCount = 0});
             _logger.LogInformation($"Sync requested for user {userId} with status {response.StatusCode}");
-            return response.StatusCode;
+            var result = new AsyncWorkflowResult();
+            if (response.StatusCode >= 200 && response.StatusCode < 300)
+            {
+                result = await response.ResponseMessage.Content.ReadFromJsonAsync<AsyncWorkflowResult>();
+            }
+
+            result.HttpStatus = response.StatusCode;
+            return result;
+        }
+
+        public async Task<AsyncWorkflowResult> SynchronizeActivityAsync(string userId, string activityId)
+        {
+            _logger.LogInformation($"Sync request for user {userId} activity {activityId}");
+            var response = await $"{_settings.ApiUrl}/user/{userId}/activity/{activityId}/sync"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .AllowAnyHttpStatus()
+                .PostJsonAsync(new { });
+            _logger.LogInformation($"Sync requested for activity {activityId} with status {response.StatusCode}");
+            var result = new AsyncWorkflowResult();
+            if (response.StatusCode >= 200 && response.StatusCode < 300)
+            {
+                result = await response.ResponseMessage.Content.ReadFromJsonAsync<AsyncWorkflowResult>();
+            }
+
+            result.HttpStatus = response.StatusCode;
+            return result;
         }
 
         public async Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId,

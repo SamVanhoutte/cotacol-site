@@ -14,7 +14,8 @@ namespace CotacolApp.Interfaces
         Task<UserProfile> GetProfileAsync(string userId=null);
         Task UpdateSettingsAsync(UserSettings settings);
         Task<SyncStatus> GetSyncStatus(string userId);
-        Task<int> SynchronizeAsync(string userId, bool fullSync = false);
+        Task<AsyncWorkflowResult> SynchronizeAsync(string userId, bool fullSync = false);
+        Task<AsyncWorkflowResult> SynchronizeActivityAsync(string userId, string activityId);
         Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId, string remark = "");
     }
 }
