@@ -27,7 +27,7 @@ else
                     <h3>Trigger full sync</h3>
                     <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Full sync</span>
                     <MatIconButton Icon="refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MatIconButton>
-                    @if(fullSyncResponse!=null)
+                    @if (fullSyncResponse != null)
                     {
                         <MatButtonLink Icon="favorite" Target="_blank" Href="@fullSyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
                     }
@@ -36,12 +36,15 @@ else
                     <h3>Trigger activity sync</h3>
                     <MatTextField @bind-Value="@activityId" TValue="string" Label="Activity ID"></MatTextField>
                     <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync())"></MatIconButton>
-                    @if(activitySyncResponse!=null)
+                    @if (activitySyncResponse != null)
                     {
                         <MatButtonLink Icon="favorite" Target="_blank" Href="@activitySyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
                     }
                 </div>
             </div>
+            <hr/>
+            <MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton>
+            <hr/>
             <div class="mat-layout-grid-inner">
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
                     <h2>Sync status</h2>
@@ -68,40 +71,49 @@ else
                 </div>
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
                     <h2>Strava token</h2>
-                    <MatList SingleSelection="true" TwoLine="true">
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>User Id</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>
-                                    <a href="https://www.strava.com/athletes/@userDetail.UserTokens.UserId" target="_blank">@userDetail.UserTokens.UserId</a>
-                                </MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Is Expired</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@userDetail.UserTokens.IsExpired.ToString()</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Token Expiration</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@userDetail.UserTokens.Expiration</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Last refresh</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@userDetail.UserTokens.LastRefreshTime</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Scope</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@(userDetail.UserTokens.Scope ?? "not set")</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                    </MatList>
+                    @if (userDetail.UserTokens != null)
+                    {
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>User Id</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>
+                                        <a href="https://www.strava.com/athletes/@userDetail.UserTokens.UserId" target="_blank">@userDetail.UserTokens.UserId</a>
+                                    </MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Is Expired</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.UserTokens.IsExpired.ToString()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Token Expiration</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.UserTokens.Expiration</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Last refresh</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.UserTokens.LastRefreshTime</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Scope</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.UserTokens.Scope ?? "not set")</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                    }
+                    else
+                    {
+                        <p>
+                            <em>The Strava authentication of the user is no longer valid. User should re-authenticate to enable sync.</em>
+                        </p>
+                    }
                 </div>
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-8">
                     <h2>User state</h2>
@@ -131,8 +143,13 @@ else
     private UserProfile userProfile;
     private AsyncWorkflowResult fullSyncResponse;
     private AsyncWorkflowResult activitySyncResponse;
-    
+
     protected override async Task OnInitializedAsync()
+    {
+        await RefreshDataAsync();
+    }
+
+    private async Task RefreshDataAsync()
     {
         if (UserProfile.IsAdmin && !string.IsNullOrEmpty(UserId))
         {
@@ -150,13 +167,15 @@ else
     {
         return fullSync ? "Full sync" : "Normal sync";
     }
+
     private async Task PerformActivitySyncAsync()
     {
         activitySyncResponse = await CotacolUserClient.SynchronizeActivityAsync(UserId, activityId);
     }
-    
+
     private async Task PerformUserSyncAsync()
     {
         fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
     }
+
 }

@@ -7,13 +7,38 @@
 @using Serilog
 @using MatBlazor
 @using ILogger = Microsoft.Extensions.Logging.ILogger
+@using Columbae.World.Gpx
+@using Columbae.World
+@using System.IO
 @inject IJSRuntime JsRuntime
 @inject IMapService MapService
 @inject ICotacolClient CotacolClient
 
 @if (_cotacol != null)
 {
-    <MatTextField TValue="string" ValueChanged="@(async (val) => await VerifyNewSegment(val))" HelperText="Enter the url or segment Id" Label="New segment" HelperTextPersistent="true"></MatTextField>
+    <table style="width: 100%">
+        <tr>
+            <td style="text-align: left">
+                <MatTextField TValue="string" ValueChanged="@(async (val) => await VerifyNewSegment(val))" HelperText="Enter the url or segment Id" Label="New segment" HelperTextPersistent="true"></MatTextField>
+            </td>
+            <td style="text-align: right; ">
+                @if (UpdatedRoute != null)
+                {
+                    <span>
+                        <MatIconButton OnClick="@(async (val) => await ConfirmRouteUpdateAsync())">
+                            <MatIcon>@MatIconNames.Check_circle</MatIcon>
+                        </MatIconButton>
+                    </span>
+                }
+                &nbsp;
+            </td>
+            <td style="text-align: right; width: 400px">
+
+                <MatFileUpload OnChange="@(async (files) => await UploadGpxAsync(files))" Label="Upload or drop segment GPX"></MatFileUpload>
+            </td>
+        </tr>
+    </table>
+
     <MatTable Items="@_cotacol.Segments" class="lektonic" PageSize="10"
               AllowSelection="true" SelectionChanged="SelectionChanged"
               ShowPaging="false" UseSortHeaderRow="true">
@@ -75,6 +100,20 @@
             <MatButton OnClick="@(e => { dialogIsOpen = false; })">No Thanks</MatButton>
         </MatDialogActions>
     </MatDialog>
+    <MatDialog @bind-IsOpen="@routeDialogIsOpen">
+        <MatDialogTitle>#@_cotacol.Id @_cotacol.Name</MatDialogTitle>
+        <MatDialogContent>
+            <p>This action is irriversable, please make sure you update the right segment.</p>
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <em style="color:darkred">@ErrorMessage</em>
+            }
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@(async () => await UpdateRouteAsync())">OK</MatButton>
+            <MatButton OnClick="@(e => { routeDialogIsOpen = false; })">No Thanks</MatButton>
+        </MatDialogActions>
+    </MatDialog>
 }
 else
 {
@@ -86,6 +125,9 @@ else
 
 @code {
     private ClimbDetail _cotacol { get; set; }
+    List<string> list = new List<string>();
+
+    private bool routeDialogIsOpen = false;
     private bool dialogIsOpen = false;
     private string remark;
     private string confidence;
@@ -97,6 +139,7 @@ else
     public string NewSegmentId { get; set; }
     public string ErrorMessage { get; set; }
     private StravaSegment NewSegmentDetail { get; set; }
+    private Route UpdatedRoute;
 
     [Parameter]
     public ClimbDetail Cotacol
@@ -159,7 +202,14 @@ else
         }
 
         var lines = new Dictionary<string, PolylineOptions>();
-        lines.Add(climbDetail.Id, DrawMainLine(map1, climbDetail.Polyline, "#FD7D7A"));
+        if (UpdatedRoute != null)
+        {
+            lines.Add(climbDetail.Id, DrawMainLine(map1, UpdatedRoute.ToPolylineString(), "#FD7D7A"));
+        }
+        else
+        {
+            lines.Add(climbDetail.Id, DrawMainLine(map1, climbDetail.Polyline, "#FD7D7A"));
+        }
         var index = 0;
         foreach (var climbDetailSegment in climbDetail.Segments)
         {
@@ -219,7 +269,6 @@ else
     }
 
 
-
     private void SortSegments(MatSortChangedEvent sort)
     {
     }
@@ -261,10 +310,61 @@ else
         return _colors[index];
     }
 
+    private async Task ConfirmRouteUpdateAsync()
+    {
+        routeDialogIsOpen = true;
+    }
+
     private async Task ConfirmSegmentAsync(string? contextSegmentid)
     {
         dialogIsOpen = true;
         NewSegmentId = contextSegmentid;
+    }
+
+    private async Task UploadGpxAsync(IMatFileUploadEntry[] files)
+    {
+        if (files.Any())
+        {
+            try
+            {
+                var memStream = new MemoryStream();
+                await files.First().WriteToStreamAsync(memStream);
+                memStream.Position = 0;
+                var routes = Route.ImportGpx(new StreamReader(memStream));
+                if (routes.Any())
+                {
+                    UpdatedRoute = routes.First();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+
+    private async Task UpdateRouteAsync()
+    {
+        try
+        {
+            Console.WriteLine($"Will update route");
+            var updateRequest = new UpdateSegmentRequest
+            {
+                Polyline = UpdatedRoute.ToPolylineString()
+            };
+            var result = await CotacolClient.UpdateCotacolMetadataAsync(_cotacol.Id, updateRequest);
+            if (result >= 300)
+            {
+                ErrorMessage = $"Error when updating metadata.  Status {result}";
+            }
+            else
+            {
+                routeDialogIsOpen = false;
+            }
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.Message;
+        }
     }
 
     private async Task UpdateSegmentAsync()
