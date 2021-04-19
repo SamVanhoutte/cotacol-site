@@ -79,18 +79,18 @@
             _syncRequested = true;
             try
             {
-                var httpStatus = await CotacolUserClient.SynchronizeAsync(UserProfile.UserId);
+                var wfResult = await CotacolUserClient.SynchronizeAsync(UserProfile.UserId);
                 _syncRequestedTime = DateTime.Now;
-                if (httpStatus == 429)
+                if (wfResult.HttpStatus == 429)
                 {
                     _syncRequested = false;
                     _syncMessage = $"❌ Sync already active";                }
                 else
                 {
-                    if (httpStatus <= 200 || httpStatus >= 300)
+                    if (wfResult.HttpStatus <= 200 || wfResult.HttpStatus >= 300)
                     {
                         _syncRequested = false;
-                        _syncMessage = $"❌ (HTTP error {httpStatus})";
+                        _syncMessage = $"❌ (HTTP error {wfResult})";
                     }
                 }
             }

@@ -37,7 +37,7 @@
         <MatTableRow>
             <td style="background-color: @PickColor(context)">@context.Segmentid</td>
             <td style="max-width: 200px">@context.Name</td>
-            <td>@PrintDate(context.Validto)</td>
+            <td>@context.Validto.Date()</td>
             <td>@context.Distance.Number() m</td>
             <td>
                 @if (context.Confidence.Equals("new"))
@@ -219,10 +219,6 @@ else
     }
 
 
-    private string PrintDate(DateTimeOffset? dateTime)
-    {
-        return dateTime == null ? "-" : dateTime.Value.ToString("d");
-    }
 
     private void SortSegments(MatSortChangedEvent sort)
     {

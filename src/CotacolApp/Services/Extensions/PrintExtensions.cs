@@ -18,6 +18,11 @@ namespace CotacolApp.Services.Extensions
         {
             return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
         }
+        
+        public static string Number(this int? value)
+        {
+            return value==null?"-": value.Value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+        }
         public static string Number(this long value)
         {
             return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
@@ -31,6 +36,16 @@ namespace CotacolApp.Services.Extensions
         public static string WholeNumber(this double value)
         {
             return Math.Round(value, 0).ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
-        }    
+        }
+
+        public static string Date(this DateTime? dateTime)
+        {
+            return dateTime == null ? "-" : dateTime.Value.ToString("d");
+        }
+        
+        public static string DateTime(this DateTime? dateTime)
+        {
+            return dateTime == null ? "-" : dateTime.Value.ToString("g");
+        }
     }
 }

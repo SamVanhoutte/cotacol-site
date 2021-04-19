@@ -15,7 +15,7 @@ namespace CotacolApp.Models.CotacolApi
         public object Validfrom { get; set; }
 
         [JsonProperty("validto")]
-        public DateTimeOffset? Validto { get; set; }
+        public DateTime? Validto { get; set; }
 
         [JsonProperty("userid")]
         public string? Userid { get; set; }

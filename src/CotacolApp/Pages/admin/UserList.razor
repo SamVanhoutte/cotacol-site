@@ -1,0 +1,130 @@
+@page "/admin/users"
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using MatBlazor
+@using Newtonsoft.Json
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+
+<h1>User management</h1>
+@if (UserProfile.IsAdmin)
+{
+    @if (userList != null)
+    {
+        <MatTable Items="@userList" class="lektonic" PageSize="100"
+                  AllowSelection="true" FilterByColumnName="Name"
+                  ShowPaging="true" UseSortHeaderRow="true">
+            <MatTableHeader>
+                <MatSortHeaderRow SortChanged="SortUsers">
+                    <MatSortHeader SortId="id">#</MatSortHeader>
+                    <MatSortHeader SortId="name">
+                        <span style="width:250px">Name</span>
+                    </MatSortHeader>
+                    <MatSortHeader SortId="expired">Expired</MatSortHeader>
+                    <MatSortHeader SortId="valid">
+                        <span style="width:120px">Valid until</span>
+                    </MatSortHeader>
+                    <MatSortHeader SortId="description">Update description</MatSortHeader>
+                    <MatSortHeader SortId="private">Private profile</MatSortHeader>
+                    <MatSortHeader SortId="activities">Total activities</MatSortHeader>
+                    <MatSortHeader SortId="name">Edit</MatSortHeader>
+                </MatSortHeaderRow>
+            </MatTableHeader>
+            <MatTableRow>
+                <td>@context.UserId</td>
+                <td style="max-width: 200px">@context.FullName</td>
+                <td>@(context.TokenExpired)</td>
+                <td>@context.LastSynced.DateTime()</td>
+                <td>@context.UpdateActivityDescription</td>
+                <td>@context.PrivateProfile</td>
+                <td>@context.TotalActivities.Number()</td>
+                <td>
+                    <a href="admin/user/@context.UserId">
+                        Details
+                    </a>
+                </td>
+            </MatTableRow>
+        </MatTable>
+    }
+    else
+    {
+        <p>
+            <em>Loading the users is a long-during operation, please be patient, or navigate directly to the user, by entering the user id in the box below</em>
+        </p>
+        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Edit user" HelperTextPersistent="true"></MatTextField>
+    }
+}
+else
+{
+    <p>
+        <em>Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</em>
+    </p>
+}
+
+@code {
+    List<UserRecord> userList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            userList = await CotacolClient.GetUsersAsync();
+            if (userList != null)
+            {
+            }
+        }
+    }
+
+    private void NavigateUser(string userId)
+    {
+        NavManager.NavigateTo($"admin/user/{userId}");
+    }
+
+    private void SortUsers(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && userList != null)
+        {
+            switch (sort.SortId)
+            {
+                case "id":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.UserId).ToList() :
+                        userList.OrderByDescending(c => c.UserId).ToList();
+                    break;
+                case "name":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.FullName).ToList() :
+                        userList.OrderByDescending(c => c.FullName).ToList();
+                    break;
+                case "expired":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.TokenExpired).ToList() :
+                        userList.OrderByDescending(c => c.TokenExpired).ToList();
+                    break;
+                case "valid":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.LastSynced).ToList() :
+                        userList.OrderByDescending(c => c.LastSynced).ToList();
+                    break;
+                case "description":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.UpdateActivityDescription).ToList() :
+                        userList.OrderByDescending(c => c.UpdateActivityDescription).ToList();
+                    break;
+                case "private":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.PrivateProfile).ToList() :
+                        userList.OrderByDescending(c => c.PrivateProfile).ToList();
+
+                    break;
+                case "activities":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.TotalActivities).ToList() :
+                        userList.OrderByDescending(c => c.TotalActivities).ToList();
+                    break;
+            }
+        }
+    }
+
+}

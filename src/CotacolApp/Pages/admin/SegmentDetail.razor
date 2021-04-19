@@ -30,7 +30,7 @@
         </MatExpansionPanel>
     </MatAccordion>
     <br/>
-    <hr />
+    <hr/>
     @if (climbDetail == null)
     {
         <p>
@@ -72,7 +72,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId);
+        if (UserProfile.IsAdmin)
+        {
+            climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId);
+        }
     }
 
 
