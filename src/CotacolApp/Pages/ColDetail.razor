@@ -1,11 +1,196 @@
 @page "/cotacol/{CotacolId}"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using Columbae.World
+@using System.Text
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 
-<h3>ColDetail</h3>
+@if (climbDetail == null)
+{
+    <h1>Cotacol details</h1>
+}
+else
+{
+    <h1>#@climbDetail.Id - @climbDetail.Name</h1>
+    @if(UserProfile.IsAdmin)
+    {
+        <MatButtonLink Icon="person_pin" Href="@($"admin/segments/{CotacolId}")">Admin access</MatButtonLink>
+    }
+    <div class="mat-layout-grid">
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                <h3>Info</h3>
+                @if (climbDetail != null)
+                {
+                    <div>@climbDetail.City, @climbDetail.Province</div>
+                    <div>
+                        <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
+                        <span class="lektonic">@(climbDetail?.CotacolPoints.Number()) pts</span>
+                    </div>
+                    <table style="width:100%;">
+                        <tr>
+                            <td>
+                                <span class="iconify" data-icon="system-uicons:height" data-inline="false"></span>&nbsp;
+                                <span class="lektonic">@(climbDetail?.ElevationDiff.Number())m</span>
+                            </td>
+                            <td>
+                                <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
+                                <span class="lektonic">@(climbDetail?.AvgGrade.Percentage())</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="iconify" data-icon="mdi:map-marker-distance" data-inline="false"></span>&nbsp;
+                                <span class="lektonic">@(climbDetail?.Distance.Number())m</span>
+
+                            </td>
+                            <td>
+                                <span class="iconify" data-icon="mdi:road-variant" data-inline="false"></span>&nbsp;
+                                <span class="lektonic">@(climbDetail?.Surface)</span>
+                            </td>
+                        </tr>
+                    </table>
+                }
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <hr/>
+                    <MatSlideToggle TValue="bool" Label="     Done" @bind-Value="@CotacolDone" Disabled="true"></MatSlideToggle>
+                    @if (CotacolDone)
+                    {
+                        <div>
+                            <span class="iconify" data-icon="clarity:date-solid-alerted" data-inline="false"></span>&nbsp;
+                            <span class="lektonic">@(FirstAchievement)</span>
+                        </div>
+                        <div>
+                            <span class="iconify" data-icon="grommet-icons:achievement" data-inline="false"></span>&nbsp;
+                            <span class="lektonic">@(BestTime)</span>
+                        </div>
+                        <div>
+                            <span class="iconify" data-icon="fluent:text-word-count-20-filled" data-inline="false"></span>&nbsp;
+                            <span class="lektonic">@(TotalAttempts) attempts</span>
+                        </div>
+                    }
+                }
+                <hr/>
+                @if (climbDetail.Stats?.LocalLegends?.Any() ?? false)
+                {
+                    <span>Local legends</span>
+                }
+                @foreach (var legend in climbDetail.Stats.LocalLegends)
+                {
+                    <div class="lektonic">
+                        <span class="oi oi-star" aria-hidden="true"></span><a href="achievements/@legend.UserId">@legend.UserName</a>
+                    </div>
+                }
+            </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <h3>Your attempts</h3>
+                    @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
+                    {
+                        <div style="overflow-y: auto; scroll-behavior: smooth; height:360px;">
+                            <MatList SingleSelection="true" TwoLine="true">
+                                @foreach (var user in climbDetail.UserColDetail.Activities)
+                                {
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>
+                                                <a href="https://www.strava.com/activities/@user.Id" target="_blank">@(PrintActivityTitle(user))</a>
+                                            </MatListItemPrimaryText>
+                                            <MatListItemSecondaryText>@(TimeSpan.FromSeconds(user.Duration).ToString("g"))</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                }
+                            </MatList>
+                        </div>
+                    }
+                    else
+                    {
+                        <em>No attempts have been made yet</em>
+                    }
+                }
+                else
+                {
+                    <em>Log in to see your attempt history</em>
+                }
+            </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+                <ClimbMapComponent Cotacol="@GetClimbData()" Height="360px"></ClimbMapComponent>
+            </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+                <div style="overflow-y: auto; scroll-behavior: smooth; height:360px;">
+                    <h3>Leader board</h3>
+                    <MatTable Items="@climbDetail.Stats.UserList" class="lektonic" ShowPaging="false" PageSize="100">
+                        <MatTableHeader>
+                            <th>User</th>
+                            <th>Attempts</th>
+                        </MatTableHeader>
+                        <MatTableRow>
+                            <td><a href="achievements/@context.UserId">@context.UserName</a></td>
+                            <td>@context.Attempts</td>
+                        </MatTableRow>
+                    </MatTable>
+                </div>
+            </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+
     [Parameter]
     public string CotacolId { get; set; }
+
+    private ClimbUserDetail climbDetail;
+
+    private bool CotacolDone
+    {
+        get => climbDetail?.UserColDetail?.Activities?.Any() ?? false;
+        set { }
+    }
+
+    private string FirstAchievement => climbDetail.UserColDetail.Activities.Min(a => a.StartTime).ToShortDateString();
+    private string BestTime => TimeSpan.FromSeconds(climbDetail.UserColDetail.Activities.Min(a => a.Duration)).ToString("g");
+    private string TotalAttempts => climbDetail.UserColDetail.Activities.Count().ToString();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = UserProfile.IsAuthenticated ? UserProfile.UserId : null;
+        climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId, userId);
+    }
+
+    private string PrintActivityTitle(ColActivity activity)
+    {
+        if (!string.IsNullOrEmpty(activity.Description)) return activity.Description;
+        return activity.StartTime.ToString("D");
+    }
+
+    private UserClimb GetClimbData()
+    {
+        var climb =
+            new UserClimb
+            {
+                Attempts = climbDetail.Stats.TotalAttempts, City = climbDetail.City, Distance = climbDetail.Distance,
+                Polyline = climbDetail.Polyline,
+                AvgGrade = climbDetail.AvgGrade, Province = climbDetail.Province, Surface = climbDetail.Surface, Url = climbDetail.Url,
+                CotacolPoints = climbDetail.CotacolPoints, Id = climbDetail.Id, ElevationDiff = climbDetail.ElevationDiff,
+                Name = climbDetail.Name, StravaSegment = climbDetail.StravaSegment
+            };
+        if (CotacolDone)
+        {
+            climb.Duration = climbDetail.UserColDetail.Activities.Min(a => a.Duration);
+            climb.FirstAchievement = climbDetail.UserColDetail.Activities.Min(a => a.StartTime);
+            climb.Done = climbDetail.UserColDetail.Activities.Any();
+        }
+        return climb;
+    }
+
+
+
 }

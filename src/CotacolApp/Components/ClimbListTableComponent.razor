@@ -38,17 +38,17 @@
                     </MatSortHeaderRow>
                 </MatTableHeader>
                 <MatTableRow>
-                    <td>@context.Id</td>
                     @if (context.Done)
                     {
-                        <td style="max-width: 200px">
-                            <b>@context.Name.ToUpper()</b>
-                        </td>
+                        <td style="background-color: #FD7D7A; color: white">@context.Id</td>
                     }
                     else
                     {
-                        <td style="max-width: 200px">@context.Name</td>
+                        <td>@context.Id</td>
                     }
+                    <td style="max-width: 200px">
+                        <b><a href="cotacol/@context.Id" target="_self">@context.Name</a></b>
+                    </td>
                     <td>@context.Province</td>
                     <td>@context.Surface</td>
                     <td style="text-align: right">@context.CotacolPoints</td>
@@ -59,7 +59,7 @@
                         <a href="@context.StravaSegment" target="_blank">
                             <img src="images/strava-logo-small.png" asp-append-version="true"/>
                         </a>
-                        @if(UserProfile.IsAdmin)
+                        @if (UserProfile.IsAdmin)
                         {
                             <a href="/admin/segments/@context.Id">Edit</a>
                         }
@@ -92,7 +92,6 @@
 
     [Parameter]
     public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
-
 
     private void SortClimbs(MatSortChangedEvent sort)
     {

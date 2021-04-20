@@ -15,7 +15,7 @@ namespace CotacolApp.Models.CotacolApi
         public long UniqueUsers { get; set; }
 
         [JsonProperty("totalAttempts")]
-        public long TotalAttempts { get; set; }
+        public int TotalAttempts { get; set; }
 
         [JsonProperty("maximumUserAttempts")]
         public long MaximumUserAttempts { get; set; }

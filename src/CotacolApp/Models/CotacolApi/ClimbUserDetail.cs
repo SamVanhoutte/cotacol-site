@@ -26,16 +26,16 @@ namespace CotacolApp.Models.CotacolApi
         public long ElevationDiff { get; set; }
 
         [JsonProperty("avg_grade")]
-        public long AvgGrade { get; set; }
+        public double AvgGrade { get; set; }
 
         [JsonProperty("surface")]
         public string Surface { get; set; }
 
         [JsonProperty("strava_segment")]
-        public long StravaSegment { get; set; }
+        public string StravaSegment { get; set; }
 
         [JsonProperty("id")]
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("url")]
         public Uri Url { get; set; }

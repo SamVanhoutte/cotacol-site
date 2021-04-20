@@ -30,7 +30,7 @@
         margin-bottom: 1px;
     }
 </style>
-<MatCard class="demo-mat-card" Style="width: 260px">
+<MatCard class="demo-mat-card" Style="@Width">
     <MatCardContent>
         @* <MatCardMedia Wide="true" ImageUrl="images/climb-profile.png"></MatCardMedia> *@
         <div class="demo-mat-card-content">
@@ -113,6 +113,9 @@
     [Parameter]
     public UserClimb Cotacol { get; set; }
 
+    [Parameter]
+    public string Width { get; set; } = "width: 260px";
+    
     private bool CotacolDone { get => Cotacol?.Done ?? false; set{} }
 
     private string CotacolUrl => $"https://cotacol.cc/#/climbs/{Cotacol?.Id}/";
@@ -120,5 +123,6 @@
     private void BookMarkClimb()
     {
     }
+
 
 }

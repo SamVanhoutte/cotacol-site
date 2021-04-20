@@ -9,7 +9,7 @@ namespace CotacolApp.Models.CotacolApi
         public string Id { get; set; }
 
         [JsonProperty("startTime")]
-        public DateTimeOffset StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }
