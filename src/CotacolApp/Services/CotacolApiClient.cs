@@ -92,11 +92,23 @@ namespace CotacolApp.Services
             return stats;
         }
 
-        public async Task<ClimbDetail> GetClimbDetailAsync(string cotacolId)
+        public async Task<ClimbDetail> GetClimbSegmentsAsync(string cotacolId)
         {
-            var segmentData = await $"{_settings.ApiUrl}/climbs/{cotacolId}"
+            var segmentData = await $"{_settings.ApiUrl}/segments/{cotacolId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<ClimbDetail>();
+
+            return segmentData;
+        }
+        
+        public async Task<ClimbUserDetail> GetClimbDetailAsync(string cotacolId, string userId)
+        {
+            var url = string.IsNullOrEmpty(userId)
+                ? $"{_settings.ApiUrl}/climbs/{cotacolId}"
+                : $"{_settings.ApiUrl}/climbs/{cotacolId}/{userId}";
+            var segmentData = await url
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<ClimbUserDetail>();
 
             return segmentData;
         }

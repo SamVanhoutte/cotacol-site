@@ -1,0 +1,11 @@
+@page "/cotacol/{CotacolId}"
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+
+<h3>ColDetail</h3>
+
+@code {
+    [Parameter]
+    public string CotacolId { get; set; }
+}
