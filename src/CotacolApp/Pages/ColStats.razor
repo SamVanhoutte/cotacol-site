@@ -26,16 +26,16 @@ else
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
-                <MatSortHeader SortId="name">Name</MatSortHeader>
+                <MatSortHeader SortId="name"><div style="min-width: 250px">Name</div></MatSortHeader>
                 <MatSortHeader SortId="userCount">Users</MatSortHeader>
                 <MatSortHeader SortId="userCount">Legends</MatSortHeader>
-                <MatSortHeader SortId="attemptCount">Total attempts</MatSortHeader>
+                <MatSortHeader SortId="attemptCount"><div style="min-width: 120px">Total attempts</div></MatSortHeader>
                 <MatSortHeader SortId="empty">&nbsp;</MatSortHeader>
             </MatSortHeaderRow>
         </MatTableHeader>
         <MatTableRow Context="climb">
             <td>
-                <b>@climb.CotacolName</b>
+                <b><a href="cotacol/@climb.CotacolId">@climb.CotacolName</a></b>
             </td>
             <td style="text-align: right">@climb.UniqueUsers</td>
             <td style="text-align: center">@if (ColHasLocalLegends(climb.CotacolId))

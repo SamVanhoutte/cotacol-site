@@ -7,7 +7,7 @@
 
 @if (_cotacol != null)
 {
-    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()"></GoogleMap>
+    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()" Height="@Height"></GoogleMap>
 }
 else
 {
@@ -23,6 +23,9 @@ else
     private GoogleMap _googleMap;
     private MapOptions _mapOptions;
     private bool _dataChanged = false;
+
+    [Parameter]
+    public string Height { get; set; } = "100%";
 
     [Parameter]
     public UserClimb Cotacol
@@ -50,7 +53,7 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_googleMap != null && _cotacol!=null && JsRuntime!=null)
+        if (_googleMap != null && _cotacol != null && JsRuntime != null)
         {
             await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
             {
@@ -66,7 +69,6 @@ else
     {
         if (_googleMap != null)
         {
-
             await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
             {
                 CenterMap = true, RedrawNeeded = true,
