@@ -191,7 +191,7 @@ namespace CotacolApp.Services
             string remark = "")
         {
             _logger.LogInformation(
-                $"Add missing segment for user {currentUserId}: col : {missingCotacolId} : activity : {missingActivityId}");
+                $"Removing user missing segment for user {currentUserId}: col : {missingCotacolId} : activity : {missingActivityId}");
             var response = await $"{_settings.ApiUrl}/data/missing"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .AllowAnyHttpStatus()
@@ -203,6 +203,17 @@ namespace CotacolApp.Services
                     Remark = remark
                 });
             _logger.LogInformation($"Missing col published for user {currentUserId} with status {response.StatusCode}");
+            return response.StatusCode;
+        }
+
+        public async Task<int> RemoveUserAsync(string userId)
+        {
+            _logger.LogWarning($"Removing user {userId} from the Backend, executed by admin {currentUserId}");
+            var response = await $"{_settings.ApiUrl}/user/{userId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .AllowAnyHttpStatus()
+                .DeleteAsync();
+            _logger.LogInformation($"User delete requested for user {userId} with status {response.StatusCode}");
             return response.StatusCode;
         }
     }

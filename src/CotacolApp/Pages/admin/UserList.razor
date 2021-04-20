@@ -25,6 +25,7 @@
                     <MatSortHeader SortId="valid">
                         <span style="width:120px">Valid until</span>
                     </MatSortHeader>
+                    <MatSortHeader SortId="syncstatus">Sync Status</MatSortHeader>
                     <MatSortHeader SortId="description">Update description</MatSortHeader>
                     <MatSortHeader SortId="private">Private profile</MatSortHeader>
                     <MatSortHeader SortId="activities">Total activities</MatSortHeader>
@@ -36,6 +37,7 @@
                 <td style="max-width: 200px">@context.FullName</td>
                 <td>@(context.TokenExpired)</td>
                 <td>@context.LastSynced.DateTime()</td>
+                <td>@context.SyncStatus</td>
                 <td>@context.UpdateActivityDescription</td>
                 <td>@context.PrivateProfile</td>
                 <td>@context.TotalActivities.Number()</td>
@@ -118,6 +120,11 @@ else
                         userList.OrderByDescending(c => c.PrivateProfile).ToList();
 
                     break;
+                    case "syncstatus":
+                        userList = sort.Direction == MatSortDirection.Asc ?
+                            userList.OrderBy(c => c.SyncStatus).ToList() :
+                            userList.OrderByDescending(c => c.SyncStatus).ToList();
+                        break;
                 case "activities":
                     userList = sort.Direction == MatSortDirection.Asc ?
                         userList.OrderBy(c => c.TotalActivities).ToList() :
