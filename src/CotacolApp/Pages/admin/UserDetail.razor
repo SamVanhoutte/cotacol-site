@@ -4,9 +4,12 @@
 @using MatBlazor
 @using Newtonsoft.Json
 @inject ICotacolClient CotacolClient
+@inject IMatDialogService MatDialogService
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 
+<MatButtonLink Icon="person_pin" Href="@($"achievements/{UserId}")">Achievements page</MatButtonLink>
+<MatButtonLink Icon="person_pin" Target="_blank" Href="@($"https://www.strava.com/athletes/{UserId}")">Strava page</MatButtonLink>
 @if (userProfile != null)
 {
     <h1>@userProfile.FullName</h1>
@@ -43,7 +46,12 @@ else
                 </div>
             </div>
             <hr/>
-            <MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton>
+            <table style="width: 100%">
+                <tr>
+                    <td style="text-align: left"><MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton></td>
+                    <td style="text-align: right"><MatButton Style="color: darkred" Icon="delete" OnClick="@(async () => await DeleteUserAsync())" Label="Delete User"></MatButton></td>
+                </tr>
+            </table>
             <hr/>
             <div class="mat-layout-grid-inner">
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
@@ -65,6 +73,13 @@ else
                             <MatListItemText>
                                 <MatListItemPrimaryText>Activity count</MatListItemPrimaryText>
                                 <MatListItemSecondaryText>@syncStatus.Processed.Number() / @syncStatus.Total.Number()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>
+                                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/UserHistorySyncWorkflow-@UserId" target="_blank">Fx Monitor</a>
+                                </MatListItemPrimaryText>
                             </MatListItemText>
                         </MatListItem>
                     </MatList>
@@ -117,7 +132,7 @@ else
                 </div>
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-8">
                     <h2>User state</h2>
-                    <textarea name="jsonstate" cols="80" rows="100">@userStateJson</textarea>
+                    <textarea name="jsonstate" cols="80" rows="100" style="width: 100%">@userStateJson</textarea>
                 </div>
             </div>
         </div>
@@ -160,6 +175,15 @@ else
             }
             syncStatus = await CotacolUserClient.GetSyncStatus(UserId);
             userProfile = await CotacolUserClient.GetProfileAsync(UserId);
+        }
+    }
+
+    private async Task DeleteUserAsync()
+    {
+        var result = await MatDialogService.AskAsync("The user will be removed from the platform and stats.  Are you sure?", new[] {"Yes", "Cancel"});
+        if (result.Equals("Yes", StringComparison.InvariantCultureIgnoreCase))
+        {
+            await CotacolUserClient.RemoveUserAsync(UserId);
         }
     }
 

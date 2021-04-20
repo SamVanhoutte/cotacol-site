@@ -34,6 +34,10 @@
             else
             {
                 <h1>@GetUserName()</h1>
+                @if(UserProfile.IsAdmin)
+                {
+                    <MatButtonLink Icon="person_pin" Href="@($"admin/user/{UserId}")">Admin access</MatButtonLink>
+                }
                 <br/>
                 <h2>Score</h2>
                 <div class="lektonic">Total points: @achievements.TotalScore.Number()</div>
