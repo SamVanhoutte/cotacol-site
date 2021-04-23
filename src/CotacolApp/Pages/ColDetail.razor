@@ -15,7 +15,7 @@
 else
 {
     <h1>#@climbDetail.Id - @climbDetail.Name</h1>
-    @if(UserProfile.IsAdmin)
+    @if (UserProfile.IsAdmin)
     {
         <MatButtonLink Icon="person_pin" Href="@($"admin/segments/{CotacolId}")">Admin access</MatButtonLink>
     }
@@ -26,11 +26,22 @@ else
                 @if (climbDetail != null)
                 {
                     <div>@climbDetail.City, @climbDetail.Province</div>
-                    <div>
-                        <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
-                        <span class="lektonic">@(climbDetail?.CotacolPoints.Number()) pts</span>
-                    </div>
                     <table style="width:100%;">
+                        <tr>
+                            <td>
+                                <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
+                                <span class="lektonic">@(climbDetail?.CotacolPoints.Number()) pts</span>
+                            </td>
+                            <td>
+                                @if (climbDetail?.BomScore > 0)
+                                {
+                                    <span>
+                                        <img src="images/bomb.png"/>
+                                    </span>
+                                    <span class="lektonic">@(climbDetail?.BomScore)</span>
+                                }
+                            </td>
+                        </tr>
                         <tr>
                             <td>
                                 <span class="iconify" data-icon="system-uicons:height" data-inline="false"></span>&nbsp;
@@ -130,7 +141,9 @@ else
                             <th>Attempts</th>
                         </MatTableHeader>
                         <MatTableRow>
-                            <td><a href="achievements/@context.UserId">@context.UserName</a></td>
+                            <td>
+                                <a href="achievements/@context.UserId">@context.UserName</a>
+                            </td>
                             <td>@context.Attempts</td>
                         </MatTableRow>
                     </MatTable>

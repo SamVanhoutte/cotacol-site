@@ -41,18 +41,11 @@ namespace CotacolApp.Services
 
         public async Task<List<ClimbData>> GetClimbDataAsync()
         {
-            //var fullData = await GetColsFromResource();
-
             var fullData = await $"{_settings.ApiUrl}/cotacoldata"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                //.GetStringAsync();
+                //return new List<ClimbData>();
                 .GetJsonAsync<List<ClimbData>>();
-
-            // foreach (var climbData in fullData)
-            // {
-            //     var apiData = segmentData.FirstOrDefault(sd =>
-            //             sd.Id.Equals(climbData.Id, StringComparison.InvariantCultureIgnoreCase));
-            //     climbData.StravaSegment = apiData.Url;
-            // }
 
             return fullData;
         }

@@ -34,6 +34,7 @@
                         <MatSortHeader SortId="length">Length</MatSortHeader>
                         <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
                         <MatSortHeader SortId="grade">Grade</MatSortHeader>
+                        <MatSortHeader SortId="bomb"><span style="width:60px">Bomb#</span></MatSortHeader>
                         <MatSortHeader>Segment</MatSortHeader>
                     </MatSortHeaderRow>
                 </MatTableHeader>
@@ -55,8 +56,12 @@
                     <td style="text-align: right">@context.Distance.Number() m</td>
                     <td style="text-align: right">@context.ElevationDiff m</td>
                     <td style="text-align: right">@context.AvgGrade.Percentage()</td>
+                    <td style="text-align: right">
+                        @if(context.BomScore>0){<span>@context.BomScore</span>}
+                        else{<span>-</span>}
+                    </td>
                     <td>
-                        <a href="@context.StravaSegment" target="_blank">
+                        <a href="https://www.strava.com/segments/@context.StravaSegment" target="_blank">
                             <img src="images/strava-logo-small.png" asp-append-version="true"/>
                         </a>
                         @if (UserProfile.IsAdmin)
@@ -138,6 +143,11 @@
                     Climbs = sort.Direction == MatSortDirection.Asc ?
                         Climbs.OrderBy(c => c.AvgGrade) :
                         Climbs.OrderByDescending(c => c.AvgGrade);
+                    break;
+                case "bomb":
+                    Climbs = sort.Direction == MatSortDirection.Asc ?
+                        Climbs.OrderByDescending(c => c.BomScore) :
+                        Climbs.OrderBy(c => c.BomScore);
                     break;
             }
         }

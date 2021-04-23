@@ -30,6 +30,8 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("surface")]
         public string Surface { get; set; }
+        [JsonProperty("bom_score")]
+        public int BomScore { get; set; }
 
         [JsonProperty("strava_segment")]
         public string StravaSegment { get; set; }

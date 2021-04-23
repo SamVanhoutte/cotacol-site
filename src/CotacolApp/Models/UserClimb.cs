@@ -22,6 +22,7 @@ namespace CotacolApp.Models
             StravaSegment = metaData.StravaSegment;
             Id = metaData.Id;
             Url = metaData.Url;
+            BomScore = metaData.BomScore;
             Polyline = metaData.Polyline;
         }
         
