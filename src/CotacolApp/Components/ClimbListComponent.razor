@@ -28,6 +28,7 @@ else
             <MatChip Label="To do" Id="TodoFilter"></MatChip>
         }
         <MatChip Label="Top 50" Id="TopFilter"></MatChip>
+        <MatChip Label="Bomb" Id="BombFilter"></MatChip>
         <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
         <MatChip Label="Highest" Id="HighFilter"></MatChip>
         <MatChip Label="Longest" Id="LongFilter"></MatChip>
@@ -121,6 +122,9 @@ else
                 break;
             case "todofilter":
                 _climbs = _climbList.Where(c => !c.Done);
+                break;
+            case "bombfilter":
+                _climbs = _climbList.Where(c=>c.BomScore>0).OrderByDescending(c => c.BomScore);
                 break;
             case "topfilter":
                 _climbs = _climbList.OrderByDescending(c => c.CotacolPoints).Take(50);

@@ -40,17 +40,11 @@ namespace CotacolApp.Services
         {
             var achievements = await GetAchievementsAsync(userId);
             var allClimbs =
-                (await _cotacolDataClient
-                    .GetClimbDataAsync())
+                (await _cotacolDataClient.GetClimbDataAsync())
                 .Select(climb => new UserClimb(climb));
             var result = new List<UserClimb>();
-            _logger.LogInformation($"Climbs = null? {allClimbs == null}");
-            if (achievements?.ColResults != null && allClimbs!=null)
+            if (achievements?.ColResults != null)
             {
-                // var stats =
-                //     (await _cotacolDataClient
-                //         .GetStatsAsync());
-
                 _logger.LogInformation($"User {userId} has {achievements?.ColResults?.Count() ?? 0} conquered climbs");
                 foreach (var climb in allClimbs)
                 {
@@ -65,9 +59,6 @@ namespace CotacolApp.Services
                         climb.Attempts = achievement.Achievements.Count;
                         climb.Duration = achievement.Achievements.Min(a => TimeSpan.Parse(a.Duration).TotalSeconds);
                     }
-
-                    // Now update with the stats
-                    // TODO
                     result.Add(climb);
                 }
             }

@@ -24,6 +24,9 @@ namespace CotacolApp.Models
         [JsonProperty("elevation_diff")]
         public long ElevationDiff { get; set; }
 
+        [JsonProperty("bom_score")]
+        public int BomScore { get; set; }
+
         [JsonProperty("avg_grade")]
         public double AvgGrade { get; set; }
 
@@ -35,6 +38,8 @@ namespace CotacolApp.Models
 
         [JsonProperty("strava_segment")]
         public string StravaSegment { get; set; }
+        
+        
 
         [JsonProperty("id")]
         public string Id { get; set; }
