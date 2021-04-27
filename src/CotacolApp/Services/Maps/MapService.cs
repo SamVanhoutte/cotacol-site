@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Columbae;
 using CotacolApp.Models;
+using CotacolApp.Services.Extensions;
 using GoogleMapsComponents.Maps;
 using Microsoft.JSInterop;
 
@@ -62,7 +63,7 @@ namespace CotacolApp.Services.Maps
             {
                 Position = new LatLngLiteral(start.Longitude, start.Latitude),
                 Map = map,
-                Icon = new Icon {Url = "images/climb-icon-map-pink.png"},
+                Icon = new Icon {Url = climb.Done ? "images/climb-icon-map-green.png": "images/climb-icon-map-pink.png"},
                 Clickable = true,
                 Title = climb.Name,
                 Visible = true
@@ -99,15 +100,15 @@ namespace CotacolApp.Services.Maps
                         </tr>
                         <tr>
                         <td>Points</td>
-                        <td>{climb.CotacolPoints}</td>
+                        <td style='text-align: right'>{climb.CotacolPoints}</td>
                         </tr>
                         <tr>
                         <td>Length</td>
-                        <td>{climb.Distance}</td>
+                        <td style='text-align: right'>{climb.Distance.Number()} m</td>
                         </tr>
                         <tr>
                         <td>Elevation</td>
-                        <td>{climb.ElevationDiff}</td>
+                        <td style='text-align: right'>{climb.ElevationDiff.Number()}</td>
                         </tr>
                         </tbody>
                         </table>";
