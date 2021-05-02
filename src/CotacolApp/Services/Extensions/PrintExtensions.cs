@@ -47,5 +47,10 @@ namespace CotacolApp.Services.Extensions
         {
             return dateTime == null ? "-" : dateTime.Value.ToString("g");
         }
+        
+        public static string DateTime(this DateTime dateTime)
+        {
+            return dateTime == default ? "-" : dateTime.ToString("g");
+        }
     }
 }
