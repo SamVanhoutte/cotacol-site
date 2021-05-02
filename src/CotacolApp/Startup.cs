@@ -92,7 +92,8 @@ namespace CotacolApp
                 services.AddDataProtection()
                     // .PersistKeysToFileSystem(new DirectoryInfo("/Users/samvanhoutte/Temp/bbb/ee"));
                     .PersistKeysToAzureBlobStorage(new Uri($"{kvSettings.KeySasBlobUri}"))
-                    .ProtectKeysWithAzureKeyVault(new Uri(kvSettings.KeyKeyvaultUri), new DefaultAzureCredential());
+                    .ProtectKeysWithAzureKeyVault(new Uri(kvSettings.KeyKeyvaultUri), new DefaultAzureCredential(
+                        new DefaultAzureCredentialOptions { ExcludeSharedTokenCacheCredential = true }));
                 //        .PersistKeysToFileSystem(new DirectoryInfo(Configuration["KeyPersistenceLocation"]));
             }
 
