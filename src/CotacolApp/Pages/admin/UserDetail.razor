@@ -48,8 +48,12 @@ else
             <hr/>
             <table style="width: 100%">
                 <tr>
-                    <td style="text-align: left"><MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton></td>
-                    <td style="text-align: right"><MatButton Style="color: darkred" Icon="delete" OnClick="@(async () => await DeleteUserAsync())" Label="Delete User"></MatButton></td>
+                    <td style="text-align: left">
+                        <MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton>
+                    </td>
+                    <td style="text-align: right">
+                        <MatButton Style="color: darkred" Icon="delete" OnClick="@(async () => await DeleteUserAsync())" Label="Delete User"></MatButton>
+                    </td>
                 </tr>
             </table>
             <hr/>
@@ -75,6 +79,39 @@ else
                                 <MatListItemSecondaryText>@syncStatus.Processed.Number() / @syncStatus.Total.Number()</MatListItemSecondaryText>
                             </MatListItemText>
                         </MatListItem>
+                        @if (userDetail?.SyncStatus != null)
+                        {
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Full status succeeded</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.Succeeded)</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Full status trigger</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.Trigger)</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Full status sync time</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.SyncTime)</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Full status error</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorCode)</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Full status error</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorDescription)</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        }
                         <MatListItem>
                             <MatListItemText>
                                 <MatListItemPrimaryText>
@@ -85,6 +122,50 @@ else
                     </MatList>
                 </div>
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                    @if (userDetail.Audit != null)
+                    {
+                        <h2>Audit history</h2>
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Web site login</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.Audit?.WebLogin.DateTime()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>iOS login</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.Audit?.IOSLogin.DateTime()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Android login</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.Audit?.AndroidLogin.DateTime()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Last full sync</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.Audit?.FullSync.DateTime()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                        <MatList SingleSelection="true" TwoLine="true">
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Last activity pushed</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText>@userDetail.Audit?.ActivityWebhookSync.DateTime()</MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
+                        </MatList>
+                    }
                     <h2>Strava token</h2>
                     @if (userDetail.UserTokens != null)
                     {

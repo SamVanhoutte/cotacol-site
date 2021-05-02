@@ -123,7 +123,7 @@ namespace CotacolApp.Services.Maps
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
             var options = new PolylineOptions()
             {
-                StrokeColor = "#FD7D7A",
+                StrokeColor = climb.Done?  "#C1E1C1": "#FD7D7A",
                 Clickable = true,
                 Draggable = false,
                 Editable = false,

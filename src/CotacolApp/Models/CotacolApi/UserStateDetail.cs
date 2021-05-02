@@ -10,5 +10,11 @@ namespace CotacolApp.Models.CotacolApi
 
             [JsonProperty("state")]
             public JObject State { get; set; }
+            
+            [JsonProperty("syncStatus")]
+            public FullSyncStatus SyncStatus { get; set; }
+            
+            [JsonProperty("audit")]
+            public ActionHistory Audit { get; set; }
     }
 }
