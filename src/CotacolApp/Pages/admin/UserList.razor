@@ -12,8 +12,9 @@
 {
     @if (userList != null)
     {
+        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
         <MatTable Items="@userList" class="lektonic" PageSize="100"
-                  AllowSelection="true" FilterByColumnName="Name"
+                  AllowSelection="true" FilterByColumnName="FullName"
                   ShowPaging="true" UseSortHeaderRow="true">
             <MatTableHeader>
                 <MatSortHeaderRow SortChanged="SortUsers">
@@ -54,7 +55,7 @@
         <p>
             <em>Loading the users is a long-during operation, please be patient, or navigate directly to the user, by entering the user id in the box below</em>
         </p>
-        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Edit user" HelperTextPersistent="true"></MatTextField>
+        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
     }
 }
 else
