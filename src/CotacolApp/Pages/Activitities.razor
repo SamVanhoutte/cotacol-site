@@ -1,0 +1,167 @@
+@page "/activities"
+@page "/activities/{UserId}"
+
+@using MatBlazor
+@using MatBlazor.Components
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (_activities == null)
+        {
+            <p>
+                <em>We're retrieving the results , please be patient...</em>
+            </p>
+        }
+        else
+        {
+            <h1>@GetName()</h1>
+            @if(UserProfile.IsAdmin)
+            {
+                <MatButtonLink Icon="person_pin" Href="@($"admin/user/{SelectedUserId}")">Admin access</MatButtonLink>
+                <br/>
+            }
+            <MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id" Label="Check activity" HelperTextPersistent="true"></MatTextField>
+            <MatTable Items="@_activities" class="lektonic" PageSize="100"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortActivities">
+                        <MatSortHeader SortId="date">Date</MatSortHeader>
+                        <MatSortHeader SortId="name">Activity</MatSortHeader>
+                        <MatSortHeader SortId="distance">Distance</MatSortHeader>
+                        <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
+                        <MatSortHeader SortId="cols">Cols</MatSortHeader>
+                        <MatSortHeader SortId="points">Points</MatSortHeader>
+                        <MatSortHeader SortId="empty">Sync</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow Context="activity">
+                    <td style="min-width: 240px">
+                        <a href="@activity.ActivityUrl" target="_blank">@activity.ActivityDate.ToString("D")</a>
+                    </td>
+                    <td style="min-width: 320px">
+                        @(activity.ActivityName ?? activity.ActivityId)
+                    </td>
+                    <td style="text-align: right">@((activity.Distance / 1000).Number()) km</td>
+                    <td style="text-align: right">@activity.Elevation.WholeNumber() m</td>
+                    <td style="text-align: right">@activity.UniqueCols</td>
+                    <td style="text-align: right">@activity.TotalPoints.Number()</td>
+                    <td>
+                        <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MatIconButton>
+                        @if (activitySyncResponse?.ActivityId == activity.ActivityId)
+                        {
+                            <span>Sync active. Be patient</span>
+                        }
+                    </td>
+                </MatTableRow>
+            </MatTable>
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string _notAuthorizedMessage;
+    private List<CotacolActivity> _activities;
+    private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    private ActivitySyncStatus activitySyncResponse;
+    private UserProfile _userProfile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                _userProfile = await CotacolUserClient.GetProfileAsync(UserId);
+            }
+            _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId);
+        }
+    }
+
+    private async Task PerformActivitySyncAsync(string activityId)
+    {
+        var status = await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, activityId);
+        activitySyncResponse = new ActivitySyncStatus {ActivityId = activityId, Result = status};
+    }
+
+    private void SortActivities(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && _activities != null)
+        {
+            switch (sort.SortId)
+            {
+                case "date":
+                    _activities = sort.Direction == MatSortDirection.Desc ?
+                        _activities.OrderBy(c => c.ActivityDate).ToList() :
+                        _activities.OrderByDescending(c => c.ActivityDate).ToList();
+                    break;
+                case "name":
+                    _activities = sort.Direction == MatSortDirection.Asc ?
+                        _activities.OrderBy(c => c.ActivityName).ToList() :
+                        _activities.OrderByDescending(c => c.ActivityName).ToList();
+                    break;
+                case "distance":
+                    _activities = sort.Direction == MatSortDirection.Desc ?
+                        _activities.OrderBy(c => c.Distance).ToList() :
+                        _activities.OrderByDescending(c => c.Distance).ToList();
+                    break;
+                case "elevation":
+                    _activities = sort.Direction == MatSortDirection.Desc ?
+                        _activities.OrderBy(c => c.Elevation).ToList() :
+                        _activities.OrderByDescending(c => c.Elevation).ToList();
+                    break;
+                case "cols":
+                    _activities = sort.Direction == MatSortDirection.Desc ?
+                        _activities.OrderBy(c => c.UniqueCols).ToList() :
+                        _activities.OrderByDescending(c => c.UniqueCols).ToList();
+                    break;
+                case "points":
+                    _activities = sort.Direction == MatSortDirection.Desc ?
+                        _activities.OrderBy(c => c.TotalPoints).ToList() :
+                        _activities.OrderByDescending(c => c.TotalPoints).ToList();
+                    break;
+            }
+        }
+    }
+
+    private class ActivitySyncStatus
+    {
+        public string ActivityId { get; set; }
+        public AsyncWorkflowResult Result { get; set; }
+    }
+
+    private async Task AddActivity(string segmentId)
+    {
+    }
+    
+    private string GetName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's achievements";
+    }
+
+}

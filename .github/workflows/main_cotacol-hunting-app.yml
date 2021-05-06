@@ -95,7 +95,7 @@ jobs:
                                 "slotSetting": false
                               },
                               {
-                                "name": "keyvault:KeySasBlobUri",
+                                "name": "keyvault:KeySasBlobUri2",
                                 "value": "${{ secrets.KeySasBlobUri }}",
                                 "slotSetting": false
                               },
