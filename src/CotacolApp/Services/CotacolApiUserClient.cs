@@ -76,9 +76,15 @@ namespace CotacolApp.Services
             return cols;
         }
 
-        public Task<List<CotacolActivity>> GetActivitiesAsync()
+        public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId=null)
         {
-            throw new System.NotImplementedException();
+            userId ??= currentUserId;
+
+            var cols = await $"{_settings.ApiUrl}/user/{userId}/activities"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<CotacolActivity>>();
+
+            return cols;
         }
 
         public async Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false)

@@ -9,6 +9,7 @@
 @inject IUserProfileManager UserProfile
 
 <MatButtonLink Icon="person_pin" Href="@($"achievements/{UserId}")">Achievements page</MatButtonLink>
+<MatButtonLink Icon="map" Href="@($"activities/{UserId}")">Activities page</MatButtonLink>
 <MatButtonLink Icon="person_pin" Target="_blank" Href="@($"https://www.strava.com/athletes/{UserId}")">Strava page</MatButtonLink>
 @if (userProfile != null)
 {
@@ -28,7 +29,7 @@ else
             <div class="mat-layout-grid-inner">
                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
                     <h3>Trigger full sync</h3>
-                    <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Full sync</span>
+                    <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Resync all activities</span>
                     <MatIconButton Icon="refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MatIconButton>
                     @if (fullSyncResponse != null)
                     {

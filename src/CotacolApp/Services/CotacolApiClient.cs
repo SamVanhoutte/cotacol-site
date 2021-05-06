@@ -113,7 +113,7 @@ namespace CotacolApp.Services
                 stravaSegmentId = stravaSegmentId.Split('/').Last();
             }
 
-            var segmentResponse = await $"{_settings.ApiUrl}/climbs/segment/{stravaSegmentId}"
+            var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<StravaSegmentResponse>();
 
