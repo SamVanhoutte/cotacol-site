@@ -3,11 +3,13 @@
 @using System.Xml
 @inject ICotacolClient CotacolClient
 @inject ILogger<HomeStatsComponent> Logger
+@inject IUserProfileManager UserProfile
 
-<h2>Combined achievements</h2>
 
 @if (Stats != null)
 {
+    <h2>Combined achievements</h2>
+
     <div>
         <span class="iconify" data-icon="carbon:user-multiple" data-inline="false"></span>&nbsp;
         <span class="lektonic">@(Stats?.Users) registered users</span>
@@ -23,17 +25,19 @@
     <ul>
         @foreach (var recent in Stats.RecentActivities.Take(15))
         {
-            <li class="lektonicgrey">@(recent.FullName.Split(" ").FirstOrDefault()) did @(recent.CotacolName) @(PrintTime(recent.ActivityDate))</li>
+            @if (UserProfile.IsAuthenticated)
+            {
+                <li class="lektonicgrey"><a href="achievements/@(recent.UserId)">@(recent.FullName.Split(" ").FirstOrDefault())</a> did @(recent.CotacolName) <a href="https://www.strava.com/activities/@recent.ActivityId">@(PrintTime(recent.ActivityDate))</a></li>
+            }
+            else
+            {
+                <li class="lektonicgrey">@(recent.FullName.Split(" ").FirstOrDefault()) did @(recent.CotacolName) @(PrintTime(recent.ActivityDate))</li>
+            }
         }
     </ul>
 
 }
-else
-{
-    <span>
-        <em>Loading recent activities...</em>
-    </span>
-}
+
 
 @code {
     private HomeStats Stats;

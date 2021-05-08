@@ -10,13 +10,26 @@ namespace CotacolApp.Services.Extensions
             return value.ToString("#.##");
         }
 
-        public static string Number(this double value)
+        public static string Number(this double value, string suffix=null, bool belowZeroIsNull = false)
         {
-            return value.ToString("#,###.00", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (belowZeroIsNull && value <= 0) return "-";
+            var numberValue = value.ToString("#,###.00", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (!string.IsNullOrEmpty(suffix))
+            {
+                numberValue += suffix;
+            }
+
+            return numberValue;
         }
-        public static string Number(this int value)
+        public static string Number(this int value, string suffix=null, bool belowZeroIsNull = false)
         {
-            return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (belowZeroIsNull && value <= 0) return "-";
+            var numberValue = value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (!string.IsNullOrEmpty(suffix))
+            {
+                numberValue += suffix;
+            }
+            return numberValue;
         }
         
         public static string Number(this int? value)
@@ -33,9 +46,16 @@ namespace CotacolApp.Services.Extensions
             return $"{value:#.0}%";
         }
         
-        public static string WholeNumber(this double value)
+        public static string WholeNumber(this double value, string suffix=null, bool belowZeroIsNull = false)
         {
-            return Math.Round(value, 0).ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (belowZeroIsNull && value <= 0) return "-";
+            var numberValue = Math.Round(value, 0).ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (!string.IsNullOrEmpty(suffix))
+            {
+                numberValue += suffix;
+            }
+
+            return numberValue;
         }
 
         public static string Date(this DateTime? dateTime)

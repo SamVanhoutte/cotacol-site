@@ -1,6 +1,8 @@
 ﻿@inject IUserProfileManager UserProfile
 <div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href=""><img src="images/cotacol-logo-white-small.png" /></a>
+    <a class="navbar-brand" href="">
+        <img src="images/cotacol-logo-white-small.png"/>
+    </a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,59 +12,72 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true" style="width: 30px"></span> Home
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="map">
-                <span class="oi oi-map" aria-hidden="true"></span> The map
+                <span class="oi oi-map" aria-hidden="true" style="width: 30px"></span> The map
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="climbs">
-                <img src="images/climb-icon-white.png" />&nbsp;The list
+                <img src="images/climb-icon-white.png"/>&nbsp;The list
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="achievements">
-                <span class="oi oi-star" aria-hidden="true"></span> My Achievements
+                <span class="oi oi-star" aria-hidden="true" style="width: 30px"></span> My Achievements
             </NavLink>
         </li>
-        @* <li class="nav-item px-3"> *@
-        @*     <NavLink class="nav-link" href="activities"> *@
-        @*         <span class="oi oi-timer" aria-hidden="true"></span> My activities *@
-        @*     </NavLink> *@
-        @* </li> *@
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="activities">
+                <span class="oi oi-timer" aria-hidden="true" style="width: 30px"></span> My activities
+            </NavLink>
+        </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" @onclick="ToggleStatsmenu">
-                <span class="oi oi-bar-chart" aria-hidden="true"></span> Statistics
+                <span class="oi oi-bar-chart" aria-hidden="true" style="width: 30px"></span> Statistics
             </NavLink>
         </li>
         @if (expandStats)
         {
             <li class="nav-item px-5" @onclick="ToggleNavMenu">
                 <NavLink class="nav-link" href="stats">
-                    <span class="oi oi-people" aria-hidden="true"></span> Rankings
+                    <span class="oi oi-people" aria-hidden="true" style="width: 30px"></span> Rankings
                 </NavLink>
             </li>
             <li class="nav-item px-5" @onclick="ToggleNavMenu">
                 <NavLink class="nav-link" href="colstats">
-                    <span class="oi oi-flag" aria-hidden="true"></span> Col stats
+                    <span class="oi oi-flag" aria-hidden="true" style="width: 30px"></span> Col stats
                 </NavLink>
             </li>
             <li class="nav-item px-5" @onclick="ToggleNavMenu">
                 <NavLink class="nav-link" href="activitystats">
-                    <span class="oi oi-pulse" aria-hidden="true"></span> Activities
+                    <span class="oi oi-pulse" aria-hidden="true" style="width: 30px"></span> Activities
                 </NavLink>
             </li>
         }
         @if (UserProfile.IsAdmin)
         {
             <li class="nav-item px-3">
-                <NavLink class="nav-link text-danger" href="admin/users">
-                    <span class="oi oi-people" aria-hidden="true"></span> Users admin
+                <NavLink class="nav-link text-danger" @onclick="ToggleAdminmenu">
+                    <span class="iconify" data-icon="dashicons:admin-tools" data-inline="false" style="width: 30px"></span> Admin section
                 </NavLink>
             </li>
+            @if (expandAdmin)
+            {
+                <li class="nav-item px-5">
+                    <NavLink class="nav-link" href="admin/dashboard">
+                        <span class="oi oi-people" aria-hidden="true" style="width: 30px"></span> Dashboard
+                    </NavLink>
+                </li>
+                <li class="nav-item px-5">
+                    <NavLink class="nav-link" href="admin/users">
+                        <span class="oi oi-people" aria-hidden="true" style="width: 30px"></span> Users admin
+                    </NavLink>
+                </li>
+            }
         }
     </ul>
 </div>
@@ -70,7 +85,8 @@
 @code {
     private bool collapseNavMenu = true;
     private bool expandStats = false;
-    
+    private bool expandAdmin = false;
+
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
@@ -82,4 +98,11 @@
     {
         expandStats = !expandStats;
     }
+    
+    private void ToggleAdminmenu()
+    {
+        expandAdmin = !expandAdmin;
+    }
+    
+
 }
