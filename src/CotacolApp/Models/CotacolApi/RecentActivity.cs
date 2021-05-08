@@ -19,5 +19,9 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("fullName")]
         public string FullName { get; set; }
+        [JsonProperty("activityId")]
+        public string ActivityId { get; set; }
+        [JsonProperty("userId")]
+        public string UserId { get; set; }
     }
 }

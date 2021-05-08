@@ -21,18 +21,34 @@
         @if (_activities == null)
         {
             <p>
-                <em>We're retrieving the results , please be patient...</em>
+                <em>Fetching your activities...</em>
             </p>
         }
         else
         {
             <h1>@GetName()</h1>
-            @if(UserProfile.IsAdmin)
+            @if (UserProfile.IsAdmin)
             {
                 <MatButtonLink Icon="person_pin" Href="@($"admin/user/{SelectedUserId}")">Admin access</MatButtonLink>
                 <br/>
             }
-            <MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id" Label="Check activity" HelperTextPersistent="true"></MatTextField>
+            @if (ActivitiesMissingMetadata)
+            {
+                <p>
+                    <em>You might see some metadata is missing from your activities. We are fetching them and they will be made available in a few minutes...</em>
+                </p>
+            }
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id you want to add or validate" Label="Add activity" HelperTextPersistent="true"></MatTextField>
+                    </td>
+                    <td style="text-align: right; width: 30%">
+                        You might want to resync an activity, if you believe there were segments missing, or the activity description should've been updated.  Click the sync icons for that.  Adding an activity that is not shown, is possible by entering the activtiy id in the text box on the left
+                    </td>   
+                </tr>
+            </table>
+            <hr/>
             <MatTable Items="@_activities" class="lektonic" PageSize="100"
                       ShowPaging="false" UseSortHeaderRow="true">
                 <MatTableHeader>
@@ -51,12 +67,12 @@
                         <a href="@activity.ActivityUrl" target="_blank">@activity.ActivityDate.ToString("D")</a>
                     </td>
                     <td style="min-width: 320px">
-                        @(activity.ActivityName ?? activity.ActivityId)
+                        @(activity.ActivityName ?? $"Activity id: {activity.ActivityId}")
                     </td>
-                    <td style="text-align: right">@((activity.Distance / 1000).Number()) km</td>
-                    <td style="text-align: right">@activity.Elevation.WholeNumber() m</td>
-                    <td style="text-align: right">@activity.UniqueCols</td>
-                    <td style="text-align: right">@activity.TotalPoints.Number()</td>
+                    <td style="text-align: right">@((activity.Distance / 1000).Number(" km", true))</td>
+                    <td style="text-align: right">@activity.Elevation.WholeNumber(" m", true)</td>
+                    <td style="text-align: right">@activity.UniqueCols.Number(belowZeroIsNull: true)</td>
+                    <td style="text-align: right">@activity.TotalPoints.Number(belowZeroIsNull: true)</td>
                     <td>
                         <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MatIconButton>
                         @if (activitySyncResponse?.ActivityId == activity.ActivityId)
@@ -151,10 +167,12 @@
         public AsyncWorkflowResult Result { get; set; }
     }
 
+    private bool ActivitiesMissingMetadata => _activities?.Take(10).Any(a => string.IsNullOrEmpty(a.ActivityName)) ?? true;
+
     private async Task AddActivity(string segmentId)
     {
     }
-    
+
     private string GetName()
     {
         if (string.IsNullOrEmpty(UserId))

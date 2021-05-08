@@ -1,6 +1,7 @@
 @using CotacolApp.Models.CotacolApi
 @using System.Drawing.Imaging
 @using System.IO
+@using System.Drawing
 
 @if (ImageContent != null)
 {
@@ -30,27 +31,31 @@ else
     {
         if (Achievements?.ColResults != null)
         {
-            var achievements = Achievements.ColResults.OrderBy(cr => cr.Achievements.Min(a => a.AchievementDate));
-            var days = new List<double>();
-            var points = new List<double>();
-            var currentPoints = 0;
-            foreach (var colResult in achievements)
+            var achievements = Achievements.ColResults.OrderBy(cr => cr.Achievements?.Min(a => a.AchievementDate));
+            if (achievements.Any())
             {
-                currentPoints += colResult.CotacolPoints;
-                points.Add(currentPoints);
-                days.Add(colResult.Achievements.Min(a => a.AchievementDate).ToOADate());
+                var days = new List<double>();
+                var points = new List<double>();
+                var currentPoints = 0;
+                foreach (var colResult in achievements)
+                {
+                    currentPoints += colResult.CotacolPoints;
+                    points.Add(currentPoints);
+                    days.Add(colResult.Achievements.Min(a => a.AchievementDate).ToOADate());
+                }
+
+                var plt = new ScottPlot.Plot(Width, Height);
+                plt.Style(figureBackground: Color.FromArgb(249,241,230));
+                plt.Style(dataBackground: Color.FromArgb(249,241,230));
+                plt.AddScatter(days.ToArray(), points.ToArray(), color: Color.FromArgb(253,125,122));
+                plt.XAxis.TickLabelFormat("MMM\\/yy", dateTimeFormat: true);
+
+                var imageStream = new MemoryStream();
+                plt.Render(1600, 600).Save(imageStream, ImageFormat.Png);
+                imageStream.Position = 0;
+
+                ImageContent = $"data:image/png;base64, {Convert.ToBase64String(imageStream.ToArray())}";
             }
-
-            var plt = new ScottPlot.Plot(Width, Height);
-    // plot the data with custom tick format (https://tinyurl.com/ycwh45af)
-            plt.AddScatter(days.ToArray(), points.ToArray());
-            plt.XAxis.TickLabelFormat("MMM\\/yy", dateTimeFormat: true);
-
-            var imageStream = new MemoryStream();
-            plt.Render(1600, 600).Save(imageStream, ImageFormat.Png);
-            imageStream.Position = 0;
-
-            ImageContent = $"data:image/png;base64, {Convert.ToBase64String(imageStream.ToArray())}";
         }
     }
 

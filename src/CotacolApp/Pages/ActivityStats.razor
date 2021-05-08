@@ -36,7 +36,14 @@ else
         </MatTableHeader>
         <MatTableRow>
             <td style="min-width: 240px">
-                @PrintName(context)
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <a href="achievements/@context.UserId">@PrintName(context)</a>
+                }
+                else
+                {
+                    @PrintName(context)
+                }
             </td>
             <td style="min-width: 240px">
                 @if (UserProfile.IsAuthenticated)

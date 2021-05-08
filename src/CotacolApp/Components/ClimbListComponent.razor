@@ -19,7 +19,7 @@ else
             <MatButtonLink Icon="cloud_download" Target="_top" Href="/admin/downloaddata?name=cols.csv">Download data (admins)</MatButtonLink>
         </div>
     }
-    <MatChipSet Choice="true" SelectedChipChanged="ApplyFilter">
+    <MatChipSet Choice="true" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
         <MatChip Label="All" Id="NoFilter"></MatChip>
         @if (UserProfile.IsAuthenticated)
         {
@@ -29,12 +29,13 @@ else
         }
         <MatChip Label="Top 50" Id="TopFilter"></MatChip>
         <MatChip Label="Bomb" Id="BombFilter"></MatChip>
+        <MatChip Label="Unconquered" Id="VirginFilter"></MatChip>
         <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
         <MatChip Label="Highest" Id="HighFilter"></MatChip>
         <MatChip Label="Longest" Id="LongFilter"></MatChip>
         <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
     </MatChipSet>
-    <MatChipSet Id="ProvinceFilter" Choice="false" Filter="true" SelectedChipChanged="ApplyProvinceFilter">
+    <MatChipSet Id="ProvinceFilter" Choice="false" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
         <MatChip Label="WFL" IsCheckable="true" Id="WestVlFilter"></MatChip>
         <MatChip Label="EFL" IsCheckable="true" Id="OostVlFilter"></MatChip>
         <MatChip Label="ANT" IsCheckable="true" Id="AntwerpenFilter"></MatChip>
@@ -80,7 +81,7 @@ else
         _climbs = _climbList;
     }
 
-    private void ApplyProvinceFilter(MatChip filter)
+    private async Task ApplyProvinceFilterAsync(MatChip filter)
     {
         if (filter == null)
         {
@@ -91,13 +92,13 @@ else
             _provinceFilters = filter.ChipSet.SelectedChips
                 .Select(chip => GetSystemName(chip.Id)).ToList();
         }
-        FilterClimbs();
+        await FilterClimbsAsync();
     }
 
-    private void ApplyFilter(MatChip filter)
+    private async Task ApplyFilterAsync(MatChip filter)
     {
         _currentFilter = filter.Id;
-        FilterClimbs();
+        await FilterClimbsAsync();
     }
 
     private string GetSystemName(string value)
@@ -108,7 +109,7 @@ else
             .ToLower();
     }
 
-    private void FilterClimbs()
+    private async Task FilterClimbsAsync()
     {
         _climbs = _climbList;
 
@@ -134,6 +135,11 @@ else
                 break;
             case "highfilter":
                 _climbs = _climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
+                break;
+            case "virginfilter":
+                var colStats =await  CotacolClient.GetStatsAsync();
+                var virginCols = colStats.GetVirginCols();
+                _climbs = _climbList.Where(col => virginCols.Contains(col.Id));
                 break;
             case "longfilter":
                 _climbs = _climbList.OrderByDescending(c => c.Distance).Take(50);

@@ -1,0 +1,20 @@
+@page "/admin/dashboard"
+@using MatBlazor
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+<h3>Admin dashboard</h3>
+@if (UserProfile.IsAdmin)
+{
+<MatList>
+    <MatListItem>
+        <MatListItemText>
+            <MatListItemPrimaryText>
+                <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacolmetadataentity@@CotacolMetadataEntity" target="_blank">Col metadata</a>
+            </MatListItemPrimaryText>
+        </MatListItemText>
+    </MatListItem>
+</MatList>
+}
+@code {
+
+}
