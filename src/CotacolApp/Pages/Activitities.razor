@@ -10,6 +10,8 @@
 @inject IUserProfileManager UserProfile
 @inject ILogger<Climbs> Logger
 @inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+<Title Value="Cotacol Activities" />
 <AuthorizeView>
     <NotAuthorized>
         @if (true)

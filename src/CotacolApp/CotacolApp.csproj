@@ -18,6 +18,7 @@
         <PackageReference Include="Guard.Net" Version="1.2.0" />
         <PackageReference Include="MatBlazor" Version="2.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web.Extensions" Version="5.0.0-preview9.20513.1" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
