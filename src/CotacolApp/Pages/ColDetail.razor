@@ -7,6 +7,8 @@
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+<Title Value="Cotacol detail"/>
 
 @if (climbDetail == null)
 {
@@ -90,11 +92,14 @@ else
                 {
                     <span>Local legends</span>
                 }
-                @foreach (var legend in climbDetail.Stats.LocalLegends)
+                @if (climbDetail.Stats?.LocalLegends != null)
                 {
-                    <div class="lektonic">
-                        <span class="oi oi-star" aria-hidden="true"></span><a href="achievements/@legend.UserId">@legend.UserName</a>
-                    </div>
+                    foreach (var legend in climbDetail.Stats.LocalLegends)
+                    {
+                        <div class="lektonic">
+                            <span class="oi oi-star" aria-hidden="true"></span><a href="achievements/@legend.UserId">@legend.UserName</a>
+                        </div>
+                    }
                 }
             </div>
             <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
@@ -134,19 +139,22 @@ else
             </div>
             <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
                 <div style="overflow-y: auto; scroll-behavior: smooth; height:360px;">
-                    <h3>Leader board</h3>
-                    <MatTable Items="@climbDetail.Stats.UserList" class="lektonic" ShowPaging="false" PageSize="100">
-                        <MatTableHeader>
-                            <th>User</th>
-                            <th>Attempts</th>
-                        </MatTableHeader>
-                        <MatTableRow>
-                            <td>
-                                <a href="achievements/@context.UserId">@context.UserName</a>
-                            </td>
-                            <td>@context.Attempts</td>
-                        </MatTableRow>
-                    </MatTable>
+                    @if (climbDetail.Stats?.UserList != null)
+                    {
+                        <h3>Leader board</h3>
+                        <MatTable Items="@climbDetail.Stats.UserList" class="lektonic" ShowPaging="false" PageSize="100">
+                            <MatTableHeader>
+                                <th>User</th>
+                                <th>Attempts</th>
+                            </MatTableHeader>
+                            <MatTableRow>
+                                <td>
+                                    <a href="achievements/@context.UserId">@context.UserName</a>
+                                </td>
+                                <td>@context.Attempts</td>
+                            </MatTableRow>
+                        </MatTable>
+                    }
                 </div>
             </div>
             <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
@@ -189,7 +197,7 @@ else
         var climb =
             new UserClimb
             {
-                Attempts = climbDetail.Stats.TotalAttempts, City = climbDetail.City, Distance = climbDetail.Distance,
+                Attempts = climbDetail.Stats?.TotalAttempts??0, City = climbDetail.City, Distance = climbDetail.Distance,
                 Polyline = climbDetail.Polyline,
                 AvgGrade = climbDetail.AvgGrade, Province = climbDetail.Province, Surface = climbDetail.Surface, Url = climbDetail.Url,
                 CotacolPoints = climbDetail.CotacolPoints, Id = climbDetail.Id, ElevationDiff = climbDetail.ElevationDiff,
