@@ -1,0 +1,14 @@
+@using MatBlazor
+@inject IUserProfileManager UserProfile
+
+<MatButtonLink Icon="person_pin" Href="@($"admin/user/{SelectedUserId}")">Admin access</MatButtonLink>
+<MatButtonLink Icon="multiline_chart" Href="@($"achievements/{SelectedUserId}")">Achievements page</MatButtonLink>
+<MatButtonLink Icon="map" Href="@($"activities/{SelectedUserId}")">Activities page</MatButtonLink>
+<MatButtonLink Icon="motorcycle" Target="_blank" Href="@($"https://www.strava.com/athletes/{SelectedUserId}")">Strava page</MatButtonLink>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+}
