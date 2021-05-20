@@ -70,7 +70,8 @@ else
                 @if (UserProfile.IsAuthenticated)
                 {
                     <hr/>
-                    <MatSlideToggle TValue="bool" Label="     Done" @bind-Value="@CotacolDone" Disabled="true"></MatSlideToggle>
+                    <MatSlideToggle TValue="bool" Label="       Done" @bind-Value="@CotacolDone" Disabled="true"></MatSlideToggle>
+                    <MatSlideToggle TValue="bool" Label="       Planned" @bind-Value="@CotacolPlanned" Disabled="false"></MatSlideToggle>
                     @if (CotacolDone)
                     {
                         <div>
@@ -176,6 +177,12 @@ else
         set { }
     }
 
+    private bool CotacolPlanned 
+    {
+        get => climbDetail?.UserColDetail?.Bookmarked ?? false;
+        set => SetBookmarkAsync(value).Wait();
+    }
+
     private string FirstAchievement => climbDetail.UserColDetail.Activities.Min(a => a.StartTime).ToShortDateString();
     private string BestTime => TimeSpan.FromSeconds(climbDetail.UserColDetail.Activities.Min(a => a.Duration)).ToString("g");
     private string TotalAttempts => climbDetail.UserColDetail.Activities.Count().ToString();
@@ -197,7 +204,7 @@ else
         var climb =
             new UserClimb
             {
-                Attempts = climbDetail.Stats?.TotalAttempts??0, City = climbDetail.City, Distance = climbDetail.Distance,
+                UserAttempts = climbDetail.Stats?.TotalAttempts??0, City = climbDetail.City, Distance = climbDetail.Distance,
                 Polyline = climbDetail.Polyline,
                 AvgGrade = climbDetail.AvgGrade, Province = climbDetail.Province, Surface = climbDetail.Surface, Url = climbDetail.Url,
                 CotacolPoints = climbDetail.CotacolPoints, Id = climbDetail.Id, ElevationDiff = climbDetail.ElevationDiff,
@@ -205,7 +212,7 @@ else
             };
         if (CotacolDone)
         {
-            climb.Duration = climbDetail.UserColDetail.Activities.Min(a => a.Duration);
+            climb.BestTime = climbDetail.UserColDetail.Activities.Min(a => a.Duration);
             climb.FirstAchievement = climbDetail.UserColDetail.Activities.Min(a => a.StartTime);
             climb.Done = climbDetail.UserColDetail.Activities.Any();
         }
@@ -213,5 +220,16 @@ else
     }
 
 
+    private async Task SetBookmarkAsync(bool bookmark)
+    {
+        if (bookmark)
+        {
+            await CotacolUserClient.BookmarkClimbAsync(CotacolId);
+        }
+        else
+        {
+            await CotacolUserClient.UnbookmarkClimbAsync(CotacolId);
+        }
+    }
 
 }

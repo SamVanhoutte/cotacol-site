@@ -9,7 +9,10 @@ namespace CotacolApp.Interfaces
     {
         Task<List<UserColAchievement>> GetColsAsync(string userId);
         Task<List<UserClimb>> GetClimbDataAsync(string userId);
-        Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null);
+        Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null, bool allActivities = false);
+        Task<bool> GetBookmarkClimbAsync(string climbId, string userId = null);
+        Task<bool> BookmarkClimbAsync(string climbId, string userId = null);
+        Task<bool> UnbookmarkClimbAsync(string climbId, string userId = null);
         Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false);
         Task<UserProfile> GetProfileAsync(string userId=null);
         Task UpdateSettingsAsync(UserSettings settings);

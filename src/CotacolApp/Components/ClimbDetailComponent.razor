@@ -55,11 +55,11 @@
                     </div>
                     <div>
                         <span class="iconify" data-icon="grommet-icons:achievement" data-inline="false"></span>&nbsp;
-                        <span class="lektonic">@(TimeSpan.FromSeconds(Cotacol.Duration).ToString("g"))</span>
+                        <span class="lektonic">@(TimeSpan.FromSeconds(Cotacol.BestTime).ToString("g"))</span>
                     </div>
                     <div>
                         <span class="iconify" data-icon="fluent:text-word-count-20-filled" data-inline="false"></span>&nbsp;
-                        <span class="lektonic">@(Cotacol.Attempts) attempts</span>
+                        <span class="lektonic">@(Cotacol.UserAttempts) attempts</span>
                     </div>                    
                 }
             }

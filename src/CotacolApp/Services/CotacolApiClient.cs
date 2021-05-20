@@ -43,8 +43,6 @@ namespace CotacolApp.Services
         {
             var fullData = await $"{_settings.ApiUrl}/cotacoldata"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                //.GetStringAsync();
-                //return new List<ClimbData>();
                 .GetJsonAsync<List<ClimbData>>();
 
             return fullData;

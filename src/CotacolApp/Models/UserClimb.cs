@@ -24,11 +24,17 @@ namespace CotacolApp.Models
             Url = metaData.Url;
             BomScore = metaData.BomScore;
             Polyline = metaData.Polyline;
+            UniqueUsers = metaData.UniqueUsers;
+            TotalAttempts = metaData.TotalAttempts;
+            LocalLegends = metaData.LocalLegends;
         }
         
         public bool Done { get; set; }
         public DateTime FirstAchievement { get; set; }
-        public int Attempts { get; set; }
-        public double Duration { get; set; }
+        public int UserAttempts { get; set; }
+        public double BestTime { get; set; }
+        public bool Bookmarked { get; set; }
+        public bool LocalLegend { get; set; }
+
     }
 }
