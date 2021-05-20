@@ -5,75 +5,89 @@
 @inject IUserProfileManager UserProfile
 @inject ILogger<ClimbListTableComponent> Logger
 
-@if (Climbs.Count() < 1000)
-{
-    <div>Showing @Climbs.Count() results.</div>
-}
-<MatDrawerContainer>
-    <MatDrawer Mode="MatDrawerMode.Dismissible" @bind-Opened="@_colSelected" Style="width: 270px">
-        <MatIconButton OnClick="CloseClimb">
-            <MatIcon>@MatIconNames.Close</MatIcon>
-        </MatIconButton>
-        <ClimbDetailComponent Cotacol="@_selectedClimb"/>
-    </MatDrawer>
-    <MatDrawerContent>
-        <div style="overflow-y: scroll; height:100vh;">
 
-            <MatTable FilterByColumnName="Name" Items="@Climbs" class="lektonic" PageSize="2000"
-                      AllowSelection="true" SelectionChanged="SelectionChanged"
-                      ShowPaging="false" UseSortHeaderRow="true">
-                <MatTableHeader>
-                    <MatSortHeaderRow SortChanged="SortClimbs">
-                        <MatSortHeader SortId="id">#</MatSortHeader>
-                        <MatSortHeader SortId="name">
-                            <span style="width:250px">Name</span>
-                        </MatSortHeader>
-                        <MatSortHeader SortId="province">Province</MatSortHeader>
-                        <MatSortHeader SortId="surface">Surface</MatSortHeader>
-                        <MatSortHeader SortId="points">Points</MatSortHeader>
-                        <MatSortHeader SortId="length">Length</MatSortHeader>
-                        <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
-                        <MatSortHeader SortId="grade">Grade</MatSortHeader>
-                        <MatSortHeader SortId="bomb"><span style="width:60px">Bomb#</span></MatSortHeader>
-                        <MatSortHeader>Segment</MatSortHeader>
-                    </MatSortHeaderRow>
-                </MatTableHeader>
-                <MatTableRow>
-                    @if (context.Done)
+<div style="overflow-y: scroll; height:100vh;">
+
+    <MatTable FilterByColumnName="Name" Items="@Climbs" class="lektonic" PageSize="2000"
+              AllowSelection="false"
+              ShowPaging="false" UseSortHeaderRow="true">
+        <MatTableHeader>
+            <MatSortHeaderRow SortChanged="SortClimbs">
+                <MatSortHeader SortId="id">#</MatSortHeader>
+                <MatSortHeader SortId="name">
+                    <span style="width:250px">Name</span>
+                </MatSortHeader>
+                <MatSortHeader SortId="province">Province</MatSortHeader>
+                <MatSortHeader SortId="surface">Surface</MatSortHeader>
+                <MatSortHeader SortId="points">Points</MatSortHeader>
+                <MatSortHeader SortId="length">Length</MatSortHeader>
+                <MatSortHeader SortId="elevation">Elevation</MatSortHeader>
+                <MatSortHeader SortId="grade">Grade</MatSortHeader>
+                <MatSortHeader SortId="bomb">
+                    <span style="width:60px">Bomb#</span>
+                </MatSortHeader>
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <MatSortHeader>Plan</MatSortHeader>
+                }
+                <MatSortHeader>Segment</MatSortHeader>
+            </MatSortHeaderRow>
+        </MatTableHeader>
+        <MatTableRow>
+            @if (context.Done)
+            {
+                <td style="background-color: #FD7D7A; color: white">@context.Id</td>
+            }
+            else
+            {
+                <td>@context.Id</td>
+            }
+            <td style="max-width: 200px">
+                <b>
+                    <a href="cotacol/@context.Id" target="_self">@context.Name</a>
+                </b>
+            </td>
+            <td>@context.Province</td>
+            <td>@context.Surface</td>
+            <td style="text-align: right">@context.CotacolPoints</td>
+            <td style="text-align: right">@context.Distance.Number() m</td>
+            <td style="text-align: right">@context.ElevationDiff m</td>
+            <td style="text-align: right">@context.AvgGrade.Percentage()</td>
+            <td style="text-align: right">
+                @if (context.BomScore > 0)
+                {
+                    <span>@context.BomScore</span>
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </td>
+            @if (UserProfile.IsAuthenticated)
+            {
+                <td>
+                    @if (context.Bookmarked)
                     {
-                        <td style="background-color: #FD7D7A; color: white">@context.Id</td>
+                        <MatIconButton Icon="@MatIconNames.Favorite" OnClick="async() => await UnbookMarkClimb(context.Id)"></MatIconButton>
                     }
                     else
                     {
-                        <td>@context.Id</td>
+                        <MatIconButton Icon="@MatIconNames.Favorite_border" OnClick="async() => await BookMarkClimb(context.Id)"></MatIconButton>
                     }
-                    <td style="max-width: 200px">
-                        <b><a href="cotacol/@context.Id" target="_self">@context.Name</a></b>
-                    </td>
-                    <td>@context.Province</td>
-                    <td>@context.Surface</td>
-                    <td style="text-align: right">@context.CotacolPoints</td>
-                    <td style="text-align: right">@context.Distance.Number() m</td>
-                    <td style="text-align: right">@context.ElevationDiff m</td>
-                    <td style="text-align: right">@context.AvgGrade.Percentage()</td>
-                    <td style="text-align: right">
-                        @if(context.BomScore>0){<span>@context.BomScore</span>}
-                        else{<span>-</span>}
-                    </td>
-                    <td>
-                        <a href="https://www.strava.com/segments/@context.StravaSegment" target="_blank">
-                            <img src="images/strava-logo-small.png" asp-append-version="true"/>
-                        </a>
-                        @if (UserProfile.IsAdmin)
-                        {
-                            <a href="/admin/segments/@context.Id">Edit</a>
-                        }
-                    </td>
-                </MatTableRow>
-            </MatTable>
-        </div>
-    </MatDrawerContent>
-</MatDrawerContainer>
+                </td>
+            }
+            <td>
+                <a href="https://www.strava.com/segments/@context.StravaSegment" target="_blank">
+                    <img src="images/strava-logo-small.png" asp-append-version="true"/>
+                </a>
+                @if (UserProfile.IsAdmin)
+                {
+                    <a href="/admin/segments/@context.Id">Edit</a>
+                }
+            </td>
+        </MatTableRow>
+    </MatTable>
+</div>
 
 @code {
     private IEnumerable<UserClimb> _climbList;
@@ -90,9 +104,6 @@
             ClimbsChanged.InvokeAsync(value);
         }
     }
-
-    private UserClimb _selectedClimb = null;
-    private bool _colSelected = false;
 
 
     [Parameter]
@@ -153,22 +164,36 @@
         }
     }
 
-    private void CloseClimb()
-    {
-        _selectedClimb = null;
-        _colSelected = false;
-        StateHasChanged();
-    }
 
-    private void SelectionChanged(object col)
+    private async Task BookMarkClimb(string colId)
     {
-        if (col is UserClimb climb)
+        try
         {
-            _selectedClimb = climb;
-            Console.WriteLine(climb.Name);
+            var succeeded = await CotacolUserClient.BookmarkClimbAsync(colId);
+            if (succeeded)
+            {
+                Climbs.First(c => c.Id.Equals(colId)).Bookmarked = true;
+            }
             StateHasChanged();
         }
-        _colSelected = col != null;
+        catch (Exception e)
+        {
+        }
     }
-
+    
+    private async Task UnbookMarkClimb(string colId)
+    {
+        try
+        {
+            var succeeded = await CotacolUserClient.UnbookmarkClimbAsync(colId);
+            if (succeeded)
+            {
+                Climbs.First(c => c.Id.Equals(colId)).Bookmarked = false;
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+        }
+    }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CotacolApp.Models.CotacolApi;
 using Newtonsoft.Json;
 
 namespace CotacolApp.Models
@@ -49,5 +50,12 @@ namespace CotacolApp.Models
 
         [JsonProperty("polyline")]
         public string Polyline { get; set; }
+        
+        [JsonProperty("unique_users")]
+        public int UniqueUsers { get; set; }
+        [JsonProperty("total_attempts")]
+        public int TotalAttempts { get; set; }
+        [JsonProperty("local_legends")]
+        public List<LocalLegend> LocalLegends { get; set; }
     }
 }

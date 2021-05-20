@@ -9,6 +9,7 @@ using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Services.Extensions;
 using CotacolApp.Settings;
+using Flurl;
 using Flurl.Http;
 using GuardNet;
 using Microsoft.AspNetCore.Http;
@@ -38,33 +39,12 @@ namespace CotacolApp.Services
 
         public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
         {
-            var achievements = await GetAchievementsAsync(userId);
-            var allClimbs =
-                (await _cotacolDataClient.GetClimbDataAsync())
-                .Select(climb => new UserClimb(climb));
-            var result = new List<UserClimb>();
-            if (achievements?.ColResults != null)
-            {
-                _logger.LogInformation($"User {userId} has {achievements?.ColResults?.Count() ?? 0} conquered climbs");
-                foreach (var climb in allClimbs)
-                {
-                    // First check users results for the climb
-                    var achievement = achievements.ColResults.FirstOrDefault(c => c.CotacolId.Equals(climb.Id));
-                    climb.Done = achievement != null;
-                    if (achievement != null)
-                    {
-                        climb.FirstAchievement = achievement.Achievements.OrderBy(a => a.AchievementDate)
-                            .FirstOrDefault()
-                            ?.AchievementDate ?? default;
-                        climb.Attempts = achievement.Achievements.Count;
-                        climb.Duration = achievement.Achievements.Min(a => TimeSpan.Parse(a.Duration).TotalSeconds);
-                    }
-                    result.Add(climb);
-                }
-            }
+            var userClimbs  = await $"{_settings.ApiUrl}/cotacoldata/{userId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<UserClimb>>();
 
-            _logger.LogInformation($"Returned cotacols with {result.Count(c => c.Done)} marked climbs");
-            return result;
+            _logger.LogInformation($"Returned cotacols with {userClimbs.Count(c => c.Done)} marked climbs");
+            return userClimbs;
         }
 
         public async Task<List<UserColAchievement>> GetColsAsync(string userId)
@@ -76,15 +56,46 @@ namespace CotacolApp.Services
             return cols;
         }
 
-        public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId=null)
+        public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId=null, bool allActivities = true)
         {
             userId ??= currentUserId;
-
             var cols = await $"{_settings.ApiUrl}/user/{userId}/activities"
+                .SetQueryParam("allactivities", allActivities)
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<CotacolActivity>>();
 
             return cols;
+        }
+
+        public async Task<bool> GetBookmarkClimbAsync(string climbId, string userId = null)
+        {
+            userId ??= currentUserId;
+
+            var isBookmarked = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<bool>();
+
+            return isBookmarked;
+        }
+
+        public async Task<bool> BookmarkClimbAsync(string climbId, string userId = null)
+        {
+            userId ??= currentUserId;
+
+            var response = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .PostAsync();
+            return response.StatusCode >= 200 && response.StatusCode < 299;
+        }
+
+        public async Task<bool> UnbookmarkClimbAsync(string climbId, string userId = null)
+        {
+            userId ??= currentUserId;
+
+            var response = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .DeleteAsync();
+            return response.StatusCode >= 200 && response.StatusCode < 299;
         }
 
         public async Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false)

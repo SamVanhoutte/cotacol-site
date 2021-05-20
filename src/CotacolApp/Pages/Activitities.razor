@@ -11,7 +11,8 @@
 @inject ILogger<Climbs> Logger
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol Activities" />
+@using OneOf.Types
+<Title Value="Cotacol Activities"/>
 <AuthorizeView>
     <NotAuthorized>
         @if (true)
@@ -43,16 +44,17 @@
             <table style="width: 100%">
                 <tr>
                     <td>
-                        <MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id you want to add or validate" Label="Add activity" HelperTextPersistent="true"></MatTextField>
+                        <MatSlideToggle TValue="bool" Label="       Show all activities" ValueChanged="@(async (val) => { await LoadActivitiesAsync(val); })" Disabled="false"></MatSlideToggle>
+                        <!--MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id you want to add or validate" Label="Add activity" HelperTextPersistent="true"></!--MatTextField-->
                     </td>
                     <td style="text-align: right; width: 30%">
-                        You might want to resync an activity, if you believe there were segments missing, or the activity description should've been updated.  Click the sync icons for that.  Adding an activity that is not shown, is possible by entering the activtiy id in the text box on the left
-                    </td>   
+                        You might want to resync an activity, if you believe there were segments missing, or the activity description should've been updated. Click the sync icons for that.  By default only the 'Cotacol Activities' are shown, but you can use the toggle to show all activities and resync them. 
+                    </td>
                 </tr>
             </table>
             <hr/>
-            <MatTable Items="@_activities" class="lektonic" PageSize="100"
-                      ShowPaging="false" UseSortHeaderRow="true">
+            <MatTable Items="@_activities" class="lektonic" PageSize="100" FilterByColumnName="ActivityName"
+                      ShowPaging="true" UseSortHeaderRow="true">
                 <MatTableHeader>
                     <MatSortHeaderRow SortChanged="SortActivities">
                         <MatSortHeader SortId="date">Date</MatSortHeader>
@@ -113,8 +115,14 @@
             {
                 _userProfile = await CotacolUserClient.GetProfileAsync(UserId);
             }
-            _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId);
+            Console.WriteLine("init");
+            _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, false);
         }
+    }
+
+    private async Task LoadActivitiesAsync(bool allActivities)
+    {
+        _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, allActivities);
     }
 
     private async Task PerformActivitySyncAsync(string activityId)

@@ -53,14 +53,12 @@
                     <p>
                         <em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em>
                     </p>
-                    <ol>
                         @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
                         {
                             <div class="lektonic">
                                 <span class="oi oi-star" aria-hidden="true"></span> <a href="cotacol/@legend.Key">@GetLegendString(legend.Key)</a>
                             </div>
                         }
-                    </ol>
                 }
 
                 <h2>Most popular climbs</h2>

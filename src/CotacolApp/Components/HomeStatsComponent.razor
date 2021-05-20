@@ -27,7 +27,7 @@
         {
             @if (UserProfile.IsAuthenticated)
             {
-                <li class="lektonicgrey"><a href="achievements/@(recent.UserId)">@(recent.FullName.Split(" ").FirstOrDefault())</a> did @(recent.CotacolName) <a href="https://www.strava.com/activities/@recent.ActivityId">@(PrintTime(recent.ActivityDate))</a></li>
+                <li class="lektonicgrey"><a href="achievements/@(recent.UserId)">@(recent.FullName.Split(" ").FirstOrDefault())</a> did <a href="cotacol/@(recent.CotacolId)">@(recent.CotacolName)</a>, <a href="https://www.strava.com/activities/@recent.ActivityId">@(PrintTime(recent.ActivityDate))</a></li>
             }
             else
             {

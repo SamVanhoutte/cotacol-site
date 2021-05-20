@@ -7,5 +7,8 @@ namespace CotacolApp.Models.CotacolApi
     {
         [JsonProperty("activities")]
         public List<ColActivity> Activities { get; set; }
+
+        [JsonProperty("bookmarked")]
+        public bool Bookmarked { get; set; }
     }
 }
