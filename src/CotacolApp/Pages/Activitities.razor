@@ -5,6 +5,7 @@
 @using MatBlazor.Components
 @using CotacolApp.Models.CotacolApi
 @using CotacolApp.Services.Extensions
+@using CotacolApp.Components
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -32,7 +33,7 @@
             <h1>@GetName()</h1>
             @if (UserProfile.IsAdmin)
             {
-                <MatButtonLink Icon="person_pin" Href="@($"admin/user/{SelectedUserId}")">Admin access</MatButtonLink>
+                <UserAdminLinks UserId="@UserId" />
                 <br/>
             }
             @if (ActivitiesMissingMetadata)

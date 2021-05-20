@@ -8,21 +8,19 @@
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 
-<MatButtonLink Icon="person_pin" Href="@($"achievements/{UserId}")">Achievements page</MatButtonLink>
-<MatButtonLink Icon="map" Href="@($"activities/{UserId}")">Activities page</MatButtonLink>
-<MatButtonLink Icon="person_pin" Target="_blank" Href="@($"https://www.strava.com/athletes/{UserId}")">Strava page</MatButtonLink>
-@if (userProfile != null)
-{
-    <h1>@userProfile.FullName</h1>
-}
-else
-{
-    <h1>User details</h1>
-}
-
-
 @if (UserProfile.IsAdmin)
 {
+    <UserAdminLinks UserId="@UserId" />
+    @if (userProfile != null)
+    {
+        <h1>@userProfile.FullName</h1>
+    }
+    else
+    {
+        <h1>User details</h1>
+    }
+
+
     @if (userDetail != null)
     {
         <div class="mat-layout-grid">
