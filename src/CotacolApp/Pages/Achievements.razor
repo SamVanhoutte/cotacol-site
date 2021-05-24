@@ -10,7 +10,7 @@
 @inject ILogger<Climbs> Logger
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol Achievements" />
+<Title Value="Cotacol Achievements"/>
 
 <AuthorizeView>
     <NotAuthorized>
@@ -28,7 +28,7 @@
         }
         else
         {
-            @if (achievements == null)
+            @if (_achievements == null)
             {
                 <p>
                     <em>We're retrieving the results , please be patient...</em>
@@ -37,28 +37,28 @@
             else
             {
                 <h1>@GetUserName()</h1>
-                @if(UserProfile.IsAdmin)
+                @if (UserProfile.IsAdmin)
                 {
-                    <UserAdminLinks UserId="@UserId" />
+                    <UserAdminLinks UserId="@UserId"/>
                 }
                 <br/>
                 <h2>Score</h2>
-                <div class="lektonic">Total points: @achievements.TotalScore.Number()</div>
-                <div class="lektonic">Unique cols: @achievements.UniqueCols.Number()</div>
-                <AchievementChartComponent Achievements="@achievements"/>
+                <div class="lektonic">Total points: @_achievements.TotalScore.Number()</div>
+                <div class="lektonic">Unique cols: @_achievements.UniqueCols.Number()</div>
+                <AchievementChartComponent Achievements="@_achievements"/>
 
-                @if (achievements.LocalLegends?.Any() ?? false)
+                @if (_achievements.LocalLegends?.Any() ?? false)
                 {
                     <h2>Local legend at the following climbs</h2>
                     <p>
                         <em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em>
                     </p>
-                        @foreach (var legend in achievements.LocalLegends.OrderByDescending(cr => cr.Value))
-                        {
-                            <div class="lektonic">
-                                <span class="oi oi-star" aria-hidden="true"></span> <a href="cotacol/@legend.Key">@GetLegendString(legend.Key)</a>
-                            </div>
-                        }
+                    @foreach (var legend in _achievements.LocalLegends.OrderByDescending(cr => cr.Value))
+                    {
+                        <div class="lektonic">
+                            <span class="oi oi-star" aria-hidden="true"></span> <a href="cotacol/@legend.Key">@GetLegendString(legend.Key)</a>
+                        </div>
+                    }
                 }
 
                 <h2>Most popular climbs</h2>
@@ -73,13 +73,13 @@
                     }
                 </p>
                 <ol>
-                    @if (achievements?.ColResults != null)
+                    @if (_achievements?.ColResults != null)
                     {
-                        @foreach (var climb in achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
+                        @foreach (var climb in _achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
                         {
                             <li class="lektonic">
                                 <a href="cotacol/@climb.CotacolId">@climb.CotacolName</a> (@climb.Achievements.Count() attempts)
-                                @if (achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
+                                @if (_achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
                                 {
                                     <span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>
                                 }
@@ -87,6 +87,18 @@
                         }
                     }
                 </ol>
+                @if (_nearLegendClimbs.Any())
+                {
+                    <h2>These cols require few attempts for you to become Local Legend</h2>
+                    <ol>
+                        @foreach (var climb in _nearLegendClimbs)
+                        {
+                            <li class="lektonic">
+                                <a href="cotacol/@climb.Id">@climb.Name</a> (@climb.AttemptsNeededToLegend attempts needed for @climb.CurrentLegendLimit)
+                            </li>
+                        }
+                    </ol>
+                }
                 <h2>Badges</h2>
                 <div class="lektonic">West Flanders (@WflLabel)</div>
                 <MatProgressBar Indeterminate="false" Progress="@WflResult"/>
@@ -121,8 +133,9 @@
     [Parameter]
     public string UserId { get; set; }
 
-    private UserAchievements achievements;
-    private IEnumerable<UserClimb> climbs;
+    private UserAchievements _achievements;
+    private IEnumerable<UserClimb> _climbs;
+    private IEnumerable<UserClimb> _nearLegendClimbs;
     private UserProfile _userProfile;
     private string _notAuthorizedMessage;
 
@@ -160,9 +173,16 @@
                 _notAuthorizedMessage = "The user profile is not public";
                 return;
             }
-            achievements = await CotacolUserClient.GetAchievementsAsync(userIdToShow, true);
-            climbs = await CotacolUserClient.GetClimbDataAsync(userIdToShow);
-
+            _achievements = await CotacolUserClient.GetAchievementsAsync(userIdToShow, true);
+            _climbs = await CotacolUserClient.GetClimbDataAsync(userIdToShow);
+            _nearLegendClimbs = _climbs.Where(c => c.AttemptsNeededToLegend == 1);
+            if (!_nearLegendClimbs.Any())
+            {
+                _nearLegendClimbs = _climbs
+                    .Where(c => c.AttemptsNeededToLegend is >0 and <= 3)
+                    .OrderBy(c => c.AttemptsNeededToLegend)
+                    .Take(10);
+            }
             WflResult = GetProvinceProgress("West-Vl", out var wflLabel);
             EflResult = GetProvinceProgress("Oost-Vl", out var eflLabel);
             AntResult = GetProvinceProgress("Antwerpen", out var antLabel);
@@ -202,9 +222,9 @@
     {
         label = "";
         Logger.LogInformation($"Getting province stats for {province}");
-        if (climbs == null) return 0;
+        if (_climbs == null) return 0;
 
-        var provinceClimbs = climbs.Where(c => c.Province.Equals(province, StringComparison.InvariantCultureIgnoreCase));
+        var provinceClimbs = _climbs.Where(c => c.Province.Equals(province, StringComparison.InvariantCultureIgnoreCase));
         var totalClimbs = (double) provinceClimbs.Count();
         if (totalClimbs == 0) return 0;
         var climbsDone = (double) provinceClimbs.Count(c => c.Done);
@@ -214,7 +234,7 @@
 
     private string GetLegendString(string colId)
     {
-        var col = achievements.ColResults.FirstOrDefault(cr => cr.CotacolId.Equals(colId));
+        var col = _achievements.ColResults.FirstOrDefault(cr => cr.CotacolId.Equals(colId));
         return $" {col.CotacolId} {col.CotacolName} - {col.Achievements.Count} attempts";
     }
 

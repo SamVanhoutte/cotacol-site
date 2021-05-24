@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CotacolApp.Models.CotacolApi;
 using Newtonsoft.Json;
 
@@ -57,5 +58,6 @@ namespace CotacolApp.Models
         public int TotalAttempts { get; set; }
         [JsonProperty("local_legends")]
         public List<LocalLegend> LocalLegends { get; set; }
+        public int CurrentLegendLimit => LocalLegends?.FirstOrDefault()?.Attempts ?? 5;
     }
 }
