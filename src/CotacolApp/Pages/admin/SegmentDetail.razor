@@ -1,12 +1,13 @@
 @page "/admin/segments/{CotacolId}"
 @using MatBlazor
 @using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
 @using Microsoft.ApplicationInsights
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
 @attribute [Authorize]
-<h1>Segment integration</h1>
-<h2>Admin page</h2>
+<h1>Segment integration (Admin)</h1>
+<MatButtonLink Icon="person_pin" Href="@($"cotacol/{CotacolId}")">Cotacol page</MatButtonLink>
 
 <br/>
 @if (UserProfile.IsAdmin)
@@ -46,6 +47,9 @@
     {
         <h3>#@CotacolId: @climbDetail.Name</h3>
         <ul>
+            <li>
+                <b>Length:</b> @climbDetail.Distance.Number() m
+            </li>
             <li>
                 <b>Points:</b> @climbDetail.Cotacolpoints
             </li>

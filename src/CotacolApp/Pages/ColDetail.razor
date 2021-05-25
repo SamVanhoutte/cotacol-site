@@ -8,7 +8,7 @@
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol detail"/>
+<Title Value="@(climbDetail?.Name ?? "Cotacol detail")"/>
 
 @if (climbDetail == null)
 {

@@ -37,6 +37,8 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("segments")]
         public List<SegmentDetail> Segments { get; set; }
+        [JsonProperty("distance", NullValueHandling = NullValueHandling.Ignore)]
+        public long Distance { get; set; }
     }
 }
 

@@ -8,6 +8,7 @@ using CotacolApp.Interfaces;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Settings;
+using Flurl;
 using Flurl.Http;
 using GuardNet;
 using Microsoft.Extensions.Logging;
@@ -104,7 +105,7 @@ namespace CotacolApp.Services
             return segmentData;
         }
 
-        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId)
+        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId, bool persistMetadata = false)
         {
             if (stravaSegmentId.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -112,6 +113,7 @@ namespace CotacolApp.Services
             }
 
             var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
+                .SetQueryParam("UpdateMetadata", persistMetadata)
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<StravaSegmentResponse>();
 
@@ -131,6 +133,13 @@ namespace CotacolApp.Services
             return await $"{_settings.ApiUrl}/users"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<UserRecord>>();
+        }
+
+        public async Task<List<SegmentDataValidation>> GetSegmentListAsync()
+        {
+            return await $"{_settings.ApiUrl}/segmentdata"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<SegmentDataValidation>>();
         }
 
         public async Task<UserStateDetail> GetUserAdminInfoAsync(string userId)
