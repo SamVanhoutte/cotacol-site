@@ -51,7 +51,7 @@
                 <MatSortHeader SortId="valid">
                     <span style="width:120px">Valid until</span>
                 </MatSortHeader>
-                <MatSortHeader SortId="surface">Distance</MatSortHeader>
+                <MatSortHeader SortId="surface"><span style="width:120px">Distance (off)</span></MatSortHeader>
                 <MatSortHeader SortId="surface">Confidence</MatSortHeader>
                 <MatSortHeader SortId="remark">
                     <span style="width:250px">Remark</span>
@@ -63,7 +63,7 @@
             <td style="background-color: @PickColor(context)">@context.Segmentid</td>
             <td style="max-width: 200px">@context.Name</td>
             <td>@context.Validto.Date()</td>
-            <td>@context.Distance.Number() m</td>
+            <td>@context.Distance.Number() m (@Math.Abs(context.Distance - _cotacol.Distance))</td>
             <td>
                 @if (context.Confidence.Equals("new"))
                 {

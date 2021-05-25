@@ -1,0 +1,150 @@
+@page "/admin/segments"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using Microsoft.ApplicationInsights
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+<h1>Segment overview (Admin)</h1>
+
+@if (UserProfile.IsAdmin)
+{
+    @if (segmentList == null)
+    {
+        <p>
+            <em>Loading the details from Strava &nbsp;Cotacol API...</em>
+        </p>
+    }
+    else
+    {
+        <div style="overflow-y: scroll; height:100vh;">
+
+            <MatTable FilterByColumnName="Name" Items="@segmentList" class="lektonic" PageSize="2000"
+                      AllowSelection="false"
+                      ShowPaging="false" UseSortHeaderRow="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow SortChanged="SortSegments">
+                        <MatSortHeader SortId="id">#</MatSortHeader>
+                        <MatSortHeader SortId="name">
+                            <span style="width:250px">Name</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="segmentname">
+                            <span style="width:250px">Segment Name</span>
+                        </MatSortHeader>
+                        <MatSortHeader SortId="updated">Updated</MatSortHeader>
+                        <MatSortHeader SortId="length">Official Length</MatSortHeader>
+                        <MatSortHeader SortId="segmentlength">Segment Length</MatSortHeader>
+                        <MatSortHeader SortId="difference">Difference</MatSortHeader>
+                        <MatSortHeader SortId="user">User</MatSortHeader>
+                        <MatSortHeader SortId="confidence">Confidence</MatSortHeader>
+                        <MatSortHeader SortId="id">Actions</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.CotacolId</td>
+                    <td style="max-width: 200px">
+                        <b>
+                            <a href="admin/segments/@context.CotacolId" target="_self">@context.Name</a>
+                        </b>
+                    </td>
+                    <td style="max-width: 200px">@context.SegmentName</td>
+                    <td>@context.SegmentUpdated.DateTime()</td>
+                    <td style="text-align: right">@context.CotacolLength.WholeNumber() m</td>
+                    <td style="text-align: right">@context.SegmentLength.WholeNumber() m</td>
+                    <td style="text-align: right">@context.LengthDifference.WholeNumber() m</td>
+                    <td>@context.User</td>
+                    <td>@context.SegmentConfidence</td>
+                    <td>
+                        <MatIconButton Icon="refresh" OnClick="@(async () => await FetchSegmentAsync(context.CotacolId, context.SegmentId))"></MatIconButton>
+                    </td>
+                </MatTableRow>
+            </MatTable>
+        </div>
+    }
+}
+else
+{
+    <p>
+        <em>Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</em>
+    </p>
+}
+
+@code {
+    private List<SegmentDataValidation> segmentList;
+    private StravaSegment segmentDetail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            segmentList = await CotacolClient.GetSegmentListAsync();
+        }
+    }
+
+    private void SortSegments(MatSortChangedEvent sort)
+    {
+        if (!(sort == null || sort.Direction == MatSortDirection.None || string.IsNullOrEmpty(sort.SortId)) && segmentList != null)
+        {
+            switch (sort.SortId)
+            {
+                case "id":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.CotacolId).ToList() :
+                        segmentList.OrderByDescending(c => c.CotacolId).ToList();
+                    break;
+                case "updated":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.SegmentUpdated).ToList() :
+                        segmentList.OrderByDescending(c => c.SegmentUpdated).ToList();
+
+                    break;
+                case "length":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.CotacolLength).ToList() :
+                        segmentList.OrderByDescending(c => c.CotacolLength).ToList();
+
+                    break;
+                case "segmentlength":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.SegmentLength).ToList() :
+                        segmentList.OrderByDescending(c => c.SegmentLength).ToList();
+
+                    break;
+                case "difference":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.LengthDifference).ToList() :
+                        segmentList.OrderByDescending(c => c.LengthDifference).ToList();
+
+                    break;
+                case "user":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.User).ToList() :
+                        segmentList.OrderByDescending(c => c.User).ToList();
+
+                    break;
+                case "confidence":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.SegmentConfidence).ToList() :
+                        segmentList.OrderByDescending(c => c.SegmentConfidence).ToList();
+
+                    break;
+            }
+        }
+    }
+
+    private async Task FetchSegmentAsync(string cotacolId, string segmentId)
+    {
+        Console.WriteLine("Calling " + segmentId);
+        var status = await CotacolClient.FetchStravaSegmentAsync(segmentId, true);
+        if (status.Succeeded)
+        {
+            segmentDetail = status.Segment;
+            var segment = segmentList.First(s => s.CotacolId.Equals(cotacolId));
+            segment.SegmentName = segmentDetail.Name;
+            segment.SegmentLength = segmentDetail.Distance;
+            segment.SegmentId = segmentDetail.Id.ToString();
+        }
+    }
+
+}

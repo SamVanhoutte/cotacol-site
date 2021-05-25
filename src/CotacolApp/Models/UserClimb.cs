@@ -35,6 +35,7 @@ namespace CotacolApp.Models
         public double BestTime { get; set; }
         public bool Bookmarked { get; set; }
         public bool LocalLegend { get; set; }
+        public int AttemptsNeededToLegend => CurrentLegendLimit - UserAttempts;
 
     }
 }
