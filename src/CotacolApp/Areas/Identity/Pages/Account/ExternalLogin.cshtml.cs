@@ -95,51 +95,59 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             var info = await _signInManager.GetExternalLoginInfoAsync();
             //var info = await GetLoginInfo(User);
 
-
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
-                isPersistent: false, bypassTwoFactor: true);
-
-
-            if (result.Succeeded)
+            if (info != null)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
-                    info.LoginProvider);
-                await PersistStravaClaimsAsync(info, info.GetUserId());
-                return LocalRedirect(returnUrl);
-            }
+                // Sign in the user with this external login provider if the user already has a login.
+                var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
+                    isPersistent: false, bypassTwoFactor: true);
 
-            if (result.IsLockedOut)
-            {
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                _logger.LogInformation($"User {info.Principal.GetUserName()} logged in & does not have an account");
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                // AccessTokens
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-                _logger.LogInformation($"New user tokens received {accessToken} - {refreshToken}");
 
-                ProviderDisplayName = info.ProviderDisplayName;
-                var userName = info.GetUserName();
-                if (string.IsNullOrEmpty(userName))
+                if (result.Succeeded)
                 {
-                    userName = "Your strava user";
+                    _logger.LogInformation("{Name} logged in with {LoginProvider} provider.",
+                        info.Principal.Identity.Name,
+                        info.LoginProvider);
+                    await PersistStravaClaimsAsync(info, info.GetUserId());
+                    return LocalRedirect(returnUrl);
                 }
 
-                Input = new InputModel
+                if (result.IsLockedOut)
                 {
-                    UserName = userName
-                };
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                    return RedirectToPage("./Lockout");
+                }
+                else
                 {
-                    Input.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                    _logger.LogInformation($"User {info.Principal.GetUserName()} logged in & does not have an account");
+                    // If the user does not have an account, then ask the user to create an account.
+                    ReturnUrl = returnUrl;
+                    // AccessTokens
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+                    _logger.LogInformation($"New user tokens received {accessToken} - {refreshToken}");
+
+                    ProviderDisplayName = info.ProviderDisplayName;
+                    var userName = info.GetUserName();
+                    if (string.IsNullOrEmpty(userName))
+                    {
+                        userName = "Your strava user";
+                    }
+
+                    Input = new InputModel
+                    {
+                        UserName = userName
+                    };
+                    if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                    {
+                        Input.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                    }
                 }
 
                 return Page();
+            }
+            else
+            {
+                return Redirect("/StravaBusy");
+
             }
         }
 
@@ -168,9 +176,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                         var props = new AuthenticationProperties();
                         props.StoreTokens(info.AuthenticationTokens);
                         props.IsPersistent = true;
-                        
+
                         await _signInManager.SignInAsync(user, props);
-                        
+
                         await CreateCotacolUserInBackendAsync(user, info);
 
                         _logger.LogInformation(
@@ -189,9 +197,9 @@ namespace CotacolApp.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             return Page();
         }
-        
-        
-        private async Task CreateCotacolUserInBackendAsync( CotacolUser user, ExternalLoginInfo info)
+
+
+        private async Task CreateCotacolUserInBackendAsync(CotacolUser user, ExternalLoginInfo info)
         {
             var rights = await PersistStravaClaimsAsync(info, user.Id);
 
@@ -213,16 +221,17 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 await _cotacolClient.SetupUserAsync(request);
             }
         }
-        
+
         private async Task<StravaClaimSettings> PersistStravaClaimsAsync(ExternalLoginInfo info, string userId)
         {
-            var updateActivity = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ActivityWriteClaim))?.Value ?? "false";
-            var updateProfile = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ProfileUpdateClaim))?.Value ?? "false";
+            var updateActivity = info.AuthenticationTokens
+                .FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ActivityWriteClaim))?.Value ?? "false";
+            var updateProfile = info.AuthenticationTokens
+                .FirstOrDefault(t => t.Name.Equals(IdentityExtensions.ProfileUpdateClaim))?.Value ?? "false";
             var refreshToken = info.AuthenticationTokens.FirstOrDefault(t => t.Name.Equals("refresh_token"))?.Value;
-            return await _profileManager.AddStravaClaims(updateActivity.Equals("true", StringComparison.InvariantCultureIgnoreCase), 
-                updateProfile.Equals("true", StringComparison.InvariantCultureIgnoreCase),refreshToken, userId);
+            return await _profileManager.AddStravaClaims(
+                updateActivity.Equals("true", StringComparison.InvariantCultureIgnoreCase),
+                updateProfile.Equals("true", StringComparison.InvariantCultureIgnoreCase), refreshToken, userId);
         }
-
-
     }
 }
