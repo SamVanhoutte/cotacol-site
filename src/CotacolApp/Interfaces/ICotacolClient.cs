@@ -15,7 +15,7 @@ namespace CotacolApp.Interfaces
         Task<ClimbUserDetail> GetClimbDetailAsync(string cotacolId, string userId);
         Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId, bool persistMetadata = false);
         Task<int> UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update);
-        Task<List<UserRecord>> GetUsersAsync();
+        Task<List<UserRecord>> GetUsersAsync(bool loadTokens, bool loadSyncStatus);
         Task<List<SegmentDataValidation>> GetSegmentListAsync();
         Task<UserStateDetail> GetUserAdminInfoAsync(string userId);
         Task<int> UpdateCotacolMetadataAsync(string cotacolId, UpdateSegmentRequest updateRequest);

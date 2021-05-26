@@ -10,6 +10,14 @@
 <h1>User management</h1>
 @if (UserProfile.IsAdmin)
 {
+    <MatSlideToggle TValue="bool" Label="       Check strava auth (slow)" @bind-Value="@loadTokens" Disabled="false"></MatSlideToggle>
+    <MatSlideToggle TValue="bool" Label="       Retrieve sync status (slow)" @bind-Value="@loadSync" Disabled="false"></MatSlideToggle>
+    <MatIconButton Icon="@MatIconNames.Search" OnClick="async () => await LoadUserListAsync()"></MatIconButton>
+    @if (queryLaunched && userList==null)
+    {
+        <span>Getting data</span>
+    }
+    <hr/>
     @if (userList != null)
     {
         <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
@@ -67,15 +75,21 @@ else
 
 @code {
     List<UserRecord> userList;
-
+    private bool loadTokens = false;
+    private bool loadSync = false;
+    private bool queryLaunched = false;
+    
     protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task LoadUserListAsync()
     {
         if (UserProfile.IsAdmin)
         {
-            userList = await CotacolClient.GetUsersAsync();
-            if (userList != null)
-            {
-            }
+            queryLaunched = true;
+            userList = null;
+            userList = await CotacolClient.GetUsersAsync(loadTokens, loadSync);
         }
     }
 
@@ -121,11 +135,11 @@ else
                         userList.OrderByDescending(c => c.PrivateProfile).ToList();
 
                     break;
-                    case "syncstatus":
-                        userList = sort.Direction == MatSortDirection.Asc ?
-                            userList.OrderBy(c => c.SyncStatus).ToList() :
-                            userList.OrderByDescending(c => c.SyncStatus).ToList();
-                        break;
+                case "syncstatus":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.SyncStatus).ToList() :
+                        userList.OrderByDescending(c => c.SyncStatus).ToList();
+                    break;
                 case "activities":
                     userList = sort.Direction == MatSortDirection.Asc ?
                         userList.OrderBy(c => c.TotalActivities).ToList() :

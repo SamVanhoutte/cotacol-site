@@ -128,10 +128,12 @@ namespace CotacolApp.Services
             return response.StatusCode;
         }
 
-        public async Task<List<UserRecord>> GetUsersAsync()
+        public async Task<List<UserRecord>> GetUsersAsync(bool loadTokens, bool loadSyncStatus)
         {
             return await $"{_settings.ApiUrl}/users"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .SetQueryParam("loadtokens", loadTokens)
+                .SetQueryParam("loadsyncstatus", loadSyncStatus)
                 .GetJsonAsync<List<UserRecord>>();
         }
 
