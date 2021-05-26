@@ -50,7 +50,7 @@ namespace CotacolApp.Services.Extensions
         {
             return loginInfo?.Principal?.GetClaim(claimType);
         }
-        
+
 
         public static IDictionary<string, string> AddClaims(this OAuthCreatingTicketContext context, string claimsJson)
         {

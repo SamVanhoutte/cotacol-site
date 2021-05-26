@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Blazored.SessionStorage;
@@ -93,7 +94,7 @@ namespace CotacolApp
                     // .PersistKeysToFileSystem(new DirectoryInfo("/Users/samvanhoutte/Temp/bbb/ee"));
                     .PersistKeysToAzureBlobStorage(new Uri($"{kvSettings.KeySasBlobUri}"))
                     .ProtectKeysWithAzureKeyVault(new Uri(kvSettings.KeyKeyvaultUri), new DefaultAzureCredential(
-                        new DefaultAzureCredentialOptions { ExcludeSharedTokenCacheCredential = true }));
+                        new DefaultAzureCredentialOptions {ExcludeSharedTokenCacheCredential = true}));
                 //        .PersistKeysToFileSystem(new DirectoryInfo(Configuration["KeyPersistenceLocation"]));
             }
 
@@ -119,6 +120,8 @@ namespace CotacolApp
                         options.TokenEndpoint = stravaSettings.AccessTokenUrl;
                         options.UserInformationEndpoint = "https://www.strava.com/api/v3/athlete";
 
+                        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "athlete:id");
+                        
                         options.Scope.Clear();
                         options.Scope.Add(
                             "read,read_all,activity:read_all,activity:read,activity:write,profile:write");
@@ -129,31 +132,27 @@ namespace CotacolApp
                             {
                                 try
                                 {
+
+                                    var x  = context.TokenResponse.Response.RootElement.GetProperty("athlete");
                                     var request = new HttpRequestMessage(HttpMethod.Get,
                                         context.Options.UserInformationEndpoint);
                                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                                     request.Headers.Authorization =
                                         new AuthenticationHeaderValue("Bearer", context.AccessToken);
 
-                                    var response = await context.Backchannel.SendAsync(request,
-                                        HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
-                                    response.EnsureSuccessStatusCode();
-                                    var claimsJson = await response.Content.ReadAsStringAsync();
-                                    //context.RunClaimActions(user.RootElement);
-                                    var userSettings = context.AddClaims(claimsJson);
-                                
                                     var tokens = context.Properties.GetTokens().ToList();
-                                    tokens.AddRange(
-                                        userSettings.Select(userSetting => new AuthenticationToken() 
-                                            {Name = userSetting.Key, Value = userSetting.Value}));
 
+                                    var userSettings = context.AddClaims(x.ToString());
+                                    tokens.AddRange(
+                                        userSettings.Select(userSetting => new AuthenticationToken()
+                                            {Name = userSetting.Key, Value = userSetting.Value}));
                                     context.Properties.StoreTokens(tokens);
                                 }
                                 catch (Exception e)
                                 {
                                 }
                             },
-                            OnRedirectToAuthorizationEndpoint =  ctx =>
+                            OnRedirectToAuthorizationEndpoint = ctx =>
                             {
                                 if (ctx.Properties.Items.ContainsKey(StravaAuthenticationProperties.ApprovalPrompt))
                                 {
@@ -163,6 +162,7 @@ namespace CotacolApp
                                 {
                                     ctx.HttpContext.Response.Redirect(ctx.RedirectUri);
                                 }
+
                                 return Task.FromResult(0);
                             },
                             OnTicketReceived = async context =>
@@ -241,7 +241,8 @@ namespace CotacolApp
                 app.UseHsts();
             }
 
-            app.UseCookiePolicy(new CookiePolicyOptions{ MinimumSameSitePolicy = SameSiteMode.None, Secure =  CookieSecurePolicy.None});
+            app.UseCookiePolicy(new CookiePolicyOptions
+                {MinimumSameSitePolicy = SameSiteMode.None, Secure = CookieSecurePolicy.None});
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
