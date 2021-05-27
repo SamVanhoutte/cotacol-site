@@ -1,5 +1,8 @@
 @using MatBlazor
 @using CotacolApp.Services.Extensions
+@using CotacolApp.Services.Maps
+@using System.IO
+@using Columbae.World
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -13,12 +16,20 @@
 }
 else
 {
-    @if (UserProfile.IsAdmin)
-    {
-        <div style="text-align: right; width: 100%">
-            <MatButtonLink Icon="cloud_download" Target="_top" Href="/admin/downloaddata?name=cols.csv">Download data (admins)</MatButtonLink>
-        </div>
-    }
+
+    <table>
+        <tr>
+            <td></td>
+            <td style="text-align: right">
+                @if (UserProfile.IsAdmin && Mode== ClimbViewMode.Table)
+                {
+                    <div style="text-align: right; width: 100%">
+                        <MatButtonLink Icon="cloud_download" Target="_top" Href="/admin/downloaddata?name=cols.csv">Download data (admins)</MatButtonLink>
+                    </div>
+                }
+            </td>
+        </tr>
+    </table>
     <MatChipSet Choice="true" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
         <MatChip Label="All" Id="NoFilter"></MatChip>
         @if (UserProfile.IsAuthenticated)
@@ -73,7 +84,7 @@ else
     private IEnumerable<UserClimb> _climbList;
     private IEnumerable<UserClimb> _climbs;
     private string _filterMessage;
-
+    
     protected override async Task OnInitializedAsync()
     {
         if (UserProfile.IsAuthenticated)
@@ -101,6 +112,8 @@ else
         await FilterClimbsAsync();
     }
 
+    
+    
     private async Task ApplyFilterAsync(MatChip filter)
     {
         _currentFilter = filter.Id;
@@ -192,5 +205,4 @@ else
         if (_climbs.Count() == 1) return "this one Cotacol";
         return $"these {_climbs.Count()} Cotacols";
     }
-
 }

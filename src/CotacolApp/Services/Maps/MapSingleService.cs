@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Columbae.World;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using GoogleMapsComponents.Maps;
@@ -33,6 +34,11 @@ namespace CotacolApp.Services.Maps
             }
         }
 
+        public Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task ShowSegmentsAsync(Map map1, IJSRuntime jsRuntime, ClimbDetail climb, MapLayout mapLayout)
         {
             throw new NotImplementedException();    
@@ -55,6 +61,12 @@ namespace CotacolApp.Services.Maps
                     await ClusterMarkersAsync(map1, jsRuntime, false);
                 }
             }
+        }
+
+        public Route RouteToPlot
+        {
+            get;
+            set;
         }
 
         public async Task ClearClimbsAsync()

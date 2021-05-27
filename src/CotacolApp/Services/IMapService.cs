@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Columbae;
+using Columbae.World;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Services.Maps;
@@ -17,9 +18,11 @@ namespace CotacolApp.Services
 
         Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout);
-        
+
+        Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route);
         Task ClearClimbsAsync();
         Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime, Polypoint position=null);
         Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> toList, MapLayout layout, Action<MouseEvent, string> handleClick = null);
+        Route RouteToPlot {  set; }
     }
 }

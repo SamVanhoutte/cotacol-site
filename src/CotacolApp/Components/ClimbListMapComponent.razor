@@ -2,11 +2,15 @@
 @using GoogleMapsComponents.Maps
 @using CotacolApp.Services.Extensions
 @using CotacolApp.Services.Maps
+@using MatBlazor
+@using System.IO
+@using Columbae.World
 @inject ILogger<ClimbListMapComponent> Logger
 @inject IJSRuntime JsRuntime
 @inject IMapService MapService
 @if (Climbs != null)
 {
+    <MatFileUpload OnChange="@(async (files) => await UploadGpxAsync(files))" Style="height: 20px" Label="Show route on map"></MatFileUpload>
     <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
 }
 else
@@ -28,6 +32,8 @@ else
     private int _polylineTreshold = 12;
     private int _arrowTreshold = 14;
     private bool _dataChanged = false;
+    private Route _routeToPlot;
+
 
     [Parameter]
     public IEnumerable<UserClimb> Climbs
@@ -43,6 +49,7 @@ else
         }
     }
 
+
     [Parameter]
     public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
 
@@ -57,7 +64,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         if (_map1 == null)
         {
             await InitializeMap();
@@ -80,6 +86,7 @@ else
                 Logger.LogError(e, $"An error occurred while rendering the map: {e.Message}");
             }
         }
+
         _previousZoom = currentzoom;
         _previousLayout = layout;
         await base.OnAfterRenderAsync(firstRender);
@@ -94,11 +101,11 @@ else
         _existingWindow = await MapService.CreateInfoWindowAsync(Climbs.First(c => c.Id.Equals(colId)), JsRuntime);
         await _existingWindow.Open(_map1);
     }
-    
+
     private MapLayout CheckMapRequirements(bool firstRender, int currentzoom)
     {
         var layout = new MapLayout();
-        // Redraw map, on first render, when map1 was reset or when data was changed
+    // Redraw map, on first render, when map1 was reset or when data was changed
         layout.ShowStartFinish = currentzoom > _arrowTreshold;
         layout.ShowPolylines = currentzoom >= _polylineTreshold;
         layout.ShowMarkers = currentzoom <= _polylineTreshold;
@@ -134,6 +141,32 @@ else
     {
         Logger.LogInformation("Zoom");
         StateHasChanged();
+    }
+
+    private async Task UploadGpxAsync(IMatFileUploadEntry[] files)
+    {
+        Console.WriteLine("File upload");
+        if (files.Any())
+        {
+            try
+            {
+                var memStream = new MemoryStream();
+                await files.First().WriteToStreamAsync(memStream);
+                memStream.Position = 0;
+                var routes = Route.ImportGpx(new StreamReader(memStream));
+                if (routes.Any())
+                {
+                    Console.WriteLine("Route found");
+                    _routeToPlot = routes.First();
+                    await MapService.PlotRoute(_map1, JsRuntime, _routeToPlot);
+                    Console.WriteLine("Route plotted");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
     }
 
 }
