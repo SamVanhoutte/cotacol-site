@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Columbae.World;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
 using CotacolApp.Pages;
@@ -18,6 +19,11 @@ namespace CotacolApp.Services.Maps
         private PolylineList _lineList;
         private ILogger<MapListService> _logger;
 
+        public Route RouteToPlot
+        {
+            get;
+            set;
+        }
         public MapListService(ILoggerFactory factory)
         {
             _logger = factory.CreateLogger<MapListService>();
@@ -27,11 +33,52 @@ namespace CotacolApp.Services.Maps
         {
             return Task.FromResult(_markerList.Markers.Values.ToList());
         }
-        
-        
+
+
+        public async Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route)
+        {
+            var color = "green";
+            RouteToPlot = route;
+            var path = route.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
+            var options = new PolylineOptions()
+            {
+                StrokeColor = color,
+                Clickable = false,
+                Draggable = false,
+                Editable = false, StrokeOpacity = 0f,
+                Map = map1, Path = path
+            };
+            options.Icons = new[]
+            {
+                new IconSequence
+                {
+                    Icon = new Symbol
+                    {
+                        Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f,
+                        FillColor = color
+                    },
+                    Offset = "0%", Repeat = "10px"
+                },
+                new IconSequence
+                {
+                    Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color},
+                    Offset = "25%"
+                },
+                new IconSequence
+                {
+                    Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color},
+                    Offset = "75%"
+                },
+            };
+            if (_lineList == null)
+            {
+                _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
+            }
+            await _lineList.AddMultipleAsync(new Dictionary<string, PolylineOptions> {{"route", options}});
+        }
+
         public async Task ClearClimbsAsync()
         {
-
         }
 
         private async Task ClearClusterAsync()
@@ -42,7 +89,7 @@ namespace CotacolApp.Services.Maps
                 await MarkerCluster.SetMap(null);
             }
         }
-        
+
         public async Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout)
         {
@@ -55,7 +102,7 @@ namespace CotacolApp.Services.Maps
             _logger.LogInformation($"Showing multiple climbs {climbs.Count()}");
 
             var climbsToShow = climbs.Where(c => !string.IsNullOrEmpty(c.Polyline));
-            
+
             if (mapLayout.ShowPolylines == false) await RemoveLinesAsync();
 
             if (mapLayout.ShowMarkers == false)
@@ -79,13 +126,17 @@ namespace CotacolApp.Services.Maps
                 {
                     await _lineList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
                 }
-
             }
 
             if (climbs.Count.Equals(1))
             {
                 var l = Columbae.Polyline.ParsePolyline(climbs.First().Polyline);
                 await ZoomToClimbAsync(map1, l);
+            }
+
+            if (RouteToPlot != null)
+            {
+                await PlotRoute(map1, jsRuntime, RouteToPlot);
             }
         }
 
@@ -113,7 +164,6 @@ namespace CotacolApp.Services.Maps
                 climbs.ToDictionary(
                     s => s.Id, c => GetClimbMarker(c, map1)));
             await ClusterMarkersAsync(map1, jsRuntime);
-
         }
 
 
@@ -123,7 +173,7 @@ namespace CotacolApp.Services.Maps
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
             var options = new PolylineOptions()
             {
-                StrokeColor = climb.Done?  "#C1E1C1": "#FD7D7A",
+                StrokeColor = climb.Done ? "#C1E1C1" : "#FD7D7A",
                 Clickable = true,
                 Draggable = false,
                 Editable = false,
@@ -164,6 +214,7 @@ namespace CotacolApp.Services.Maps
                 await Task.WhenAll(tasks);
                 await _markerList.RemoveAllAsync();
             }
+
             await ClearClusterAsync();
         }
 
@@ -177,6 +228,5 @@ namespace CotacolApp.Services.Maps
                 await _lineList.RemoveAllAsync();
             }
         }
-
     }
 }
