@@ -13,12 +13,12 @@ namespace CotacolApp.Models.CotacolApi
         [JsonProperty("userId")]
         public string UserId { get; set; }
 
-        [JsonProperty("segmentConfidence")]
+        [JsonProperty("segmentConfidence", NullValueHandling = NullValueHandling.Ignore)]
         public string SegmentConfidence { get; set; }
 
-        [JsonProperty("name")] public string Name { get; set; }
-        [JsonProperty("polyline")] public string Polyline { get; set; }
-        [JsonProperty("distance")]public double Distance { get; set; }
+        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)] public string Name { get; set; }
+        [JsonProperty("polyline", NullValueHandling = NullValueHandling.Ignore)] public string Polyline { get; set; }
+        [JsonProperty("distance", NullValueHandling = NullValueHandling.Ignore)]public long Distance { get; set; }
 
     }
 }
