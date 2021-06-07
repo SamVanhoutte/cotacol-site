@@ -32,7 +32,8 @@
                         <MatSortHeader SortId="segmentname">
                             <span style="width:250px">Segment Name</span>
                         </MatSortHeader>
-                        <MatSortHeader SortId="updated">Updated</MatSortHeader>
+                        <MatSortHeader SortId="segmentupdated">Segment Updated</MatSortHeader>
+                        <MatSortHeader SortId="colupdated">Col Updated</MatSortHeader>
                         <MatSortHeader SortId="length">Official Length</MatSortHeader>
                         <MatSortHeader SortId="segmentlength">Segment Length</MatSortHeader>
                         <MatSortHeader SortId="difference">Difference</MatSortHeader>
@@ -50,6 +51,7 @@
                     </td>
                     <td style="max-width: 200px">@context.SegmentName</td>
                     <td>@context.SegmentUpdated.DateTime()</td>
+                    <td>@context.ClimbUpdated.DateTime()</td>
                     <td style="text-align: right">@context.CotacolLength.WholeNumber() m</td>
                     <td style="text-align: right">@context.SegmentLength.WholeNumber() m</td>
                     <td style="text-align: right">@context.LengthDifference.WholeNumber() m</td>
@@ -93,10 +95,16 @@ else
                         segmentList.OrderBy(c => c.CotacolId).ToList() :
                         segmentList.OrderByDescending(c => c.CotacolId).ToList();
                     break;
-                case "updated":
+                case "segmentupdated":
                     segmentList = sort.Direction == MatSortDirection.Asc ?
                         segmentList.OrderBy(c => c.SegmentUpdated).ToList() :
                         segmentList.OrderByDescending(c => c.SegmentUpdated).ToList();
+
+                    break;
+                case "colupdated":
+                    segmentList = sort.Direction == MatSortDirection.Asc ?
+                        segmentList.OrderBy(c => c.ClimbUpdated).ToList() :
+                        segmentList.OrderByDescending(c => c.ClimbUpdated).ToList();
 
                     break;
                 case "length":

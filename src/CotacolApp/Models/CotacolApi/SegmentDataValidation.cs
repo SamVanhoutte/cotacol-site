@@ -13,6 +13,7 @@ namespace CotacolApp.Models.CotacolApi
         public double CotacolLength { get; set; }
         public double SegmentLength { get; set; }
         public DateTime SegmentUpdated { get; set; }
+        public DateTime ClimbUpdated { get; set; }
         public double LengthDifference => SegmentLength==0 ? 0: Math.Abs(SegmentLength - CotacolLength);
     }
 }
