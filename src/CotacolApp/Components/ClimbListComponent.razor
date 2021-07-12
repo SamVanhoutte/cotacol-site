@@ -39,7 +39,6 @@ else
             <MatChip Label="Done" Id="DoneFilter" Style="color: #FD7D7A"></MatChip>
             <MatChip Label="Owned" Id="OwnedFilter" Style="color: #FD7D7A"></MatChip>
         }
-        <MatChip Label="Unconquered" Id="VirginFilter"></MatChip>
         <MatChip Label="Top 50" Id="TopFilter"></MatChip>
         <MatChip Label="Bomb" Id="BombFilter"></MatChip>
         <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
@@ -157,36 +156,32 @@ else
                 break;
             case "bombfilter":
                 _climbs = _climbList.Where(c => c.BomScore > 0).OrderByDescending(c => c.BomScore);
-                _filterMessage = $"These Cotacols have a Bomb score, which means they cause a lot of suffering on a relatively shorter distance";
+                _filterMessage = $"You did __DONE-COUNT__ of __COUNT-SUFFIX__ that have a Bomb score, which means they cause a lot of suffering on a relatively shorter distance";
                 break;
             case "topfilter":
                 _climbs = _climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
-                _filterMessage = $"The 50 toughest Cotacols.  These will help increasing your score quickly.";
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 toughest Cotacols.  These will help increasing your score quickly.";
                 break;
             case "easyfilter":
                 _climbs = _climbList.OrderBy(c => c.CotacolPoints).Take(50);
-                _filterMessage = $"The 50 easiest Cotacols.  Good to get started.";
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 easiest Cotacols.  Good to get started.";
                 break;
             case "highfilter":
                 _climbs = _climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
-                _filterMessage = $"The 50 Cotacols with the highest elevation";
-                break;
-            case "virginfilter":
-                _climbs = _climbList.Where(col => col.TotalAttempts == 0);
-                _filterMessage = $"Will you be the first to own one of these Cotacols?";
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 Cotacols with the highest elevation";
                 break;
             case "longfilter":
                 _climbs = _climbList.OrderByDescending(c => c.Distance).Take(50);
-                _filterMessage = $"The 50 longest Cotacols.  One for the diesels.";
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 longest Cotacols.  The ones for the diesels.";
                 break;
             case "steepfilter":
                 _climbs = _climbList.OrderByDescending(c => c.AvgGrade).Take(50);
-                _filterMessage = $"The 50 steepest Cotacols.  Unleash the Watts!";
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 steepest Cotacols.  Unleash the Watts!";
                 break;
         }
 
 
-    // Filter on province
+        // Filter on province
         if (_provinceFilters?.Any() ?? false)
         {
             _climbs = _climbs.Where(c =>
@@ -196,6 +191,7 @@ else
         {
             _filterMessage = _filterMessage.Replace("__COUNT__", _climbs.Count().ToString());
             _filterMessage = _filterMessage.Replace("__COUNT-SUFFIX__", GetCountSuffix());
+            _filterMessage = _filterMessage.Replace("__DONE-COUNT__", _climbs.Count(c=>c.Done).ToString());
         }
     }
 
