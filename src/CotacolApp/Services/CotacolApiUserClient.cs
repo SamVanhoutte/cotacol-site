@@ -145,6 +145,7 @@ namespace CotacolApp.Services
             {
                 UserId = currentUserId,
                 UpdateActivityDescription = settings.UpdateActivityDescription,
+                DisplayUserName = settings.DisplayUserName,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,
                 PrivateProfile = settings.PrivateProfile

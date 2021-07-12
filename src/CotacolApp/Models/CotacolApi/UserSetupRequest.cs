@@ -4,6 +4,7 @@ namespace CotacolApp.Models.CotacolApi
     {
             public string UserId { get; set; } 
             public string StravaRefreshToken { get; set; } 
+            public string DisplayUserName { get; set; }
             public bool UpdateActivityDescription { get; set; } 
             public string FullName { get; set; } 
             public string UserName { get; set; } 

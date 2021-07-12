@@ -31,6 +31,10 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
+            [Display(Name = "Name to be displayed on the site")]
+            public string DisplayUserName { get; set; }
+            
+            [Required]
             [Display(Name = "Add cotacols to Activity description")]
             public bool UpdateDescription { get; set; }
 
@@ -49,6 +53,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                DisplayUserName = userSettings.UserSettings?.DisplayUserName ?? userSettings.UserName,
                 UpdateDescription = userSettings.UserSettings?.UpdateActivityDescription ?? false,
                 PrivateProfile = userSettings.UserSettings?.PrivateProfile ?? false,
                 EnableBetaFeatures = userSettings.UserSettings?.EnableBetaFeatures ?? false
@@ -91,7 +96,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account.Manage
             {
                 await _cotacolClient.UpdateSettingsAsync(new UserSettings
                 {
-                    CotacolHunter = true, EnableBetaFeatures = Input.EnableBetaFeatures,
+                    CotacolHunter = true, EnableBetaFeatures = Input.EnableBetaFeatures, DisplayUserName = Input.DisplayUserName,
                     PrivateProfile = Input.PrivateProfile, UpdateActivityDescription = Input.UpdateDescription
                 });
                 StatusMessage = "Settings were successfully updated.";
