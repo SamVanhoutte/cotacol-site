@@ -1,6 +1,8 @@
 @using CotacolApp.Models.CotacolApi
 @using CotacolApp.Services.Extensions
 @using System.Xml
+@using System.Text
+@using System.ComponentModel
 @inject ICotacolClient CotacolClient
 @inject ILogger<HomeStatsComponent> Logger
 @inject IUserProfileManager UserProfile
@@ -16,32 +18,37 @@
     </div>
     <div>
         <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
-        <span class="lektonic">conquered @(Stats?.UniqueCols) of 1000 climbs</span>
+        <span class="lektonic">conquered all 1000 climbs</span>
     </div>
     <div>
         <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
         <span class="lektonic">and collected @(Stats?.TotalPoints.Number()) points</span>
     </div>
     <ul>
-        @foreach (var recent in Stats.RecentActivities.Take(15))
+        @foreach (var recent in Stats.RecentActivities
+            .GroupBy(act => act.UserId)
+            .Take(20))
+// 
         {
+            var act = recent.First();
             @if (UserProfile.IsAuthenticated)
             {
-                <li class="lektonicgrey"><a href="achievements/@(recent.UserId)">@(recent.FullName.Split(" ").FirstOrDefault())</a> did <a href="cotacol/@(recent.CotacolId)">@(recent.CotacolName)</a>, <a href="https://www.strava.com/activities/@recent.ActivityId">@(PrintTime(recent.ActivityDate))</a></li>
+                // 
+                <li class="lektonicgrey"><a href="achievements/@(recent.Key)">@(act.FullName.Split(" ").FirstOrDefault())</a> did @GetCotacolsFromActivity(recent, true) <a href="https://www.strava.com/activities/@act.ActivityId">@(PrintTime(act.ActivityDate))</a></li>
             }
             else
             {
-                <li class="lektonicgrey">@(recent.FullName.Split(" ").FirstOrDefault()) did @(recent.CotacolName) @(PrintTime(recent.ActivityDate))</li>
+                // 
+                <li class="lektonicgrey">@(act.FullName.Split(" ").FirstOrDefault()) did @GetCotacolsFromActivity(recent,false) @(PrintTime(act.ActivityDate))</li>
             }
         }
     </ul>
-
 }
 
 
 @code {
     private HomeStats Stats;
-    
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -59,29 +66,55 @@
     {
         Console.WriteLine(recentActivityDate);
         var timeSpan = DateTime.UtcNow - recentActivityDate;
-        // if (timeSpan < TimeSpan.FromHours(1))
-        // {
-        //     // return minutes
-        //     return $"{timeSpan.TotalMinutes.WholeNumber()} minutes ago";
-        // }
-        // if (timeSpan < TimeSpan.FromHours(10))
-        // {
-        //     // return hours
-        //     return $"{timeSpan.TotalHours.WholeNumber()} hours ago";
-        // }
+    // if (timeSpan < TimeSpan.FromHours(1))
+    // {
+    //     // return minutes
+    //     return $"{timeSpan.TotalMinutes.WholeNumber()} minutes ago";
+    // }
+    // if (timeSpan < TimeSpan.FromHours(10))
+    // {
+    //     // return hours
+    //     return $"{timeSpan.TotalHours.WholeNumber()} hours ago";
+    // }
         if (recentActivityDate.DayOfYear == DateTime.UtcNow.DayOfYear)
         {
-            // return today
+    // return today
             return "today";
         }
         if (recentActivityDate.DayOfYear + 1 == DateTime.UtcNow.DayOfYear)
         {
-            // return yesterday
+    // return yesterday
             return "yesterday";
         }
-        // return days
+    // return days
         return $"{timeSpan.Days} days ago";
+    }
 
+    private MarkupString GetCotacolsFromActivity(IGrouping<string, RecentActivity> recent, bool includeLinks)
+    {
+        var totalCols = recent.Count();
+        int iteration = 0;
+        var builder = new StringBuilder();
+        foreach (var col in recent.Take(3))
+        {
+            iteration++;
+            if (builder.Length > 0 && iteration < totalCols) builder.Append(", ");
+            if (builder.Length > 0 && iteration == totalCols) builder.Append(" and ");
+            if (includeLinks)
+            {
+                builder.Append($"<a href='cotacol/{col.CotacolId}'>{col.CotacolName}</a>");
+            }
+            else
+            {
+                // 
+                builder.Append($"{col.CotacolName}");
+            }
+        }
+        if (recent.Count() > 3)
+        {
+            builder.Append($" and {recent.Count() - 3} more");
+        }
+        return new MarkupString(builder.ToString());
     }
 
 }
