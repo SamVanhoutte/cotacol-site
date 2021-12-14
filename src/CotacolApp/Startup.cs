@@ -23,6 +23,7 @@ using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
 using CotacolApp.Services;
 using CotacolApp.Services.Extensions;
+using CotacolApp.Services.Imaging;
 using CotacolApp.Services.Maps;
 using CotacolApp.Settings;
 using MatBlazor;
@@ -30,6 +31,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
@@ -87,6 +89,10 @@ namespace CotacolApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddRazorPages();
+            services
+                .AddMvc(options => options.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            
             services.AddServerSideBlazor().AddHubOptions(config => config.MaximumReceiveMessageSize = 1048576);
             if (!string.IsNullOrEmpty(kvSettings?.KeySasBlobUri))
             {
@@ -197,6 +203,7 @@ namespace CotacolApp
             });
             services.AddScoped<IUserProfileManager, CotacolProfileManager>();
             services.AddScoped<IMapService, MapListService>();
+            services.AddScoped<IYearImageGenerator, YearImageGenerator>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<ICotacolClient, CotacolApiClient>();
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
@@ -247,6 +254,7 @@ namespace CotacolApp
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseMvcWithDefaultRoute();
 
             app.UseAuthentication();
             app.UseAuthorization();

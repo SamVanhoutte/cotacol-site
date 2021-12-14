@@ -8,4 +8,5 @@ namespace CotacolApp.Models.CotacolApi
         public int CotacolPoints { get; set; } 
         public List<Achievement> Achievements { get; set; }
     }
+    
 }

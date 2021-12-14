@@ -224,5 +224,13 @@ namespace CotacolApp.Services
             _logger.LogInformation($"User delete requested for user {userId} with status {response.StatusCode}");
             return response.StatusCode;
         }
+
+        public async Task<YearReview> GetYearReviewAsync(string userId, int year)
+        {
+            var response = await $"{_settings.ApiUrl}/user/{userId}/year"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<YearReview>();
+            return response;
+        }
     }
 }

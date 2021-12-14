@@ -1,0 +1,50 @@
+@using CotacolApp.Models.CotacolApi
+@inject IYearImageGenerator ImageGenerator
+@inject ICotacolUserClient CotacolApiClient
+@inject IUserProfileManager UserProfile
+
+
+@if (ImageContent != null)
+{
+    <img src=@ImageContent style="width: @(Width)px ; height: @(Height)px"/>
+}
+else
+{
+    if (string.IsNullOrEmpty(Error))
+    {
+        <span>
+            <em>Loading chart...</em>
+        </span>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public int Width { get; set; } = 600;
+
+    [Parameter]
+    public int Height { get; set; } = 300;
+
+    private string ImageContent { get; set; }
+    private string Error { get; set; }
+    private YearReview yearReview;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var year = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
+            yearReview = await CotacolApiClient.GetYearReviewAsync(UserProfile.UserId, year);
+            var image = await ImageGenerator.CreateImageAsync(yearReview);
+
+            ImageContent = $"data:image/png;base64, {Convert.ToBase64String(image)}";
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+}
