@@ -22,7 +22,7 @@ namespace CotacolApp.Controllers
         }
         
         [HttpGet]
-        [Route("api/year/{userId}")]
+        [Route("img/year/{userId}")]
         public async Task<IActionResult> Get(string userId)
         {
             var year = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;

@@ -117,7 +117,7 @@ namespace CotacolApp
                     {
                         options.ClientId = stravaSettings.ClientId;
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
-                        options.CallbackPath = "/stravalogin"; //"/signin-strava";
+                        options.CallbackPath = "/signin-strava"; //"/stravalogin"; //
 
                         options.SaveTokens = true; // Save the auth/refresh token for later retrieval
 
