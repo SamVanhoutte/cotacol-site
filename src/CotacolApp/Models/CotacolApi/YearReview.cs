@@ -5,6 +5,7 @@ namespace CotacolApp.Models.CotacolApi
 {
     public class YearReview
     {
+        public string UserName { get; set; }
         public int MostPopularColCount { get; set; }
         public int UniqueColsInYear { get; set; }
         public int PointsInYear { get; set; }

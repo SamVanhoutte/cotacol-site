@@ -25,14 +25,29 @@ namespace CotacolApp.Controllers
         [Route("img/year/{userId}")]
         public async Task<IActionResult> Get(string userId)
         {
-            var year = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
-            var summary = await _userClient.GetYearReviewAsync(userId, year);
+            YearReview summary = null;
+            try
+            {
+                var year = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
+                summary = await _userClient.GetYearReviewAsync(userId, year);
+            }
+            catch (Exception e)
+            {
+            }
 
-            var imageContent = await _imageGenerator.CreateImageAsync(summary);
-            return File(imageContent, "image/png");
+            try
+            {
+                var imageContent = await _imageGenerator.CreateImageAsync(summary);
+                return File(imageContent, "image/png");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            return null;
+
         }
-
-
-
     }
 }
