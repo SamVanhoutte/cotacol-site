@@ -28,7 +28,7 @@ else
     private ElementReference _mapElementRef;
     private Map _map1;
     private MapLayout _previousLayout = new MapLayout();
-    private int _previousZoom = 9;
+    private double _previousZoom = 9;
     private int _polylineTreshold = 12;
     private int _arrowTreshold = 14;
     private bool _dataChanged = false;
@@ -102,7 +102,7 @@ else
         await _existingWindow.Open(_map1);
     }
 
-    private MapLayout CheckMapRequirements(bool firstRender, int currentzoom)
+    private MapLayout CheckMapRequirements(bool firstRender, double currentzoom)
     {
         var layout = new MapLayout();
     // Redraw map, on first render, when map1 was reset or when data was changed

@@ -46,7 +46,6 @@
                 <tr>
                     <td>
                         <MatSlideToggle TValue="bool" Label="       Show all activities" ValueChanged="@(async (val) => { await LoadActivitiesAsync(val); })" Disabled="false"></MatSlideToggle>
-                        <!--MatTextField TValue="string" ValueChanged="@(async (val) => await AddActivity(val))" HelperText="Enter the url or activity Id you want to add or validate" Label="Add activity" HelperTextPersistent="true"></!--MatTextField-->
                     </td>
                     <td style="text-align: right; width: 30%">
                         You might want to resync an activity, if you believe there were segments missing, or the activity description should've been updated. Click the sync icons for that.  By default only the 'Cotacol Activities' are shown, but you can use the toggle to show all activities and resync them. 
