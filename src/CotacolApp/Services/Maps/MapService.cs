@@ -15,11 +15,11 @@ namespace CotacolApp.Services.Maps
     {
         protected MarkerClustering MarkerCluster;
 
-        public async Task<MapOptions> GetLayoutAsync(bool miniView = false, int zoom = 9)
+        public async Task<MapOptions> GetLayoutAsync(bool miniView = false, double zoom = 9)
         {
             return new()
             {
-                Zoom = zoom,
+                Zoom = (int)zoom,
                 Center = new LatLngLiteral(4.52, 50.28),
                 MapTypeId = MapTypeId.Roadmap,
                 ZoomControl = !miniView,

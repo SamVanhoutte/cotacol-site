@@ -13,7 +13,7 @@ namespace CotacolApp.Services
 {
     public interface IMapService
     {
-        Task<MapOptions> GetLayoutAsync(bool miniView = false, int zoom = 9);
+        Task<MapOptions> GetLayoutAsync(bool miniView = false, double zoom = 9);
         Task ClusterMarkersAsync(Map map1, IJSRuntime jsRuntime, bool fitMarkers = false);
 
         Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
