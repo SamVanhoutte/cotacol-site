@@ -36,8 +36,8 @@ namespace CotacolApp.Services.Imaging
 
             var yearValuesRightBorder = 480f;
             var totalValuesLeftBorder = 520f;
-            var startHeightYear = 390f;
-            var startHeightTotals = 373f;
+            var startHeightYear = 405f;
+            var startHeightTotals = 376f;
             var rowHeight = 82f;
             await using (var stream = assembly.GetManifestResourceStream(resourceName))
             {
@@ -47,7 +47,7 @@ namespace CotacolApp.Services.Imaging
                 {
                     if (summary != null)
                     {
-                        using (Font f = new Font(boldFont, 48, FontStyle.Bold))
+                        using (Font f = new Font(boldFont, 58, FontStyle.Bold, GraphicsUnit.Pixel))
                         {
                             gfx.DrawString($"{summary?.UniqueColsInYear.Number()}", f, Brushes.Black,
                                 new RectangleF(0, startHeightYear, yearValuesRightBorder, 100f), rightAlignFormat);
@@ -62,7 +62,7 @@ namespace CotacolApp.Services.Imaging
                                 rightAlignFormat);
                         }
 
-                        using (Font f = new Font(lightFont, 16, FontStyle.Bold))
+                        using (Font f = new Font(lightFont, 20, FontStyle.Bold, GraphicsUnit.Pixel))
                         {
                             gfx.DrawString($"{summary?.TotalCols.Number()} cols overall", f, Brushes.Black,
                                 new RectangleF(totalValuesLeftBorder, startHeightTotals + rowHeight,
@@ -80,19 +80,19 @@ namespace CotacolApp.Services.Imaging
                                 Brushes.Black, new RectangleF(0, 980, 1000, 100f), rightAlignFormat);
                         }
 
-                        using (Font f = new Font(boldFont, 29, FontStyle.Bold))
+                        using (Font f = new Font(boldFont, 32, FontStyle.Bold, GraphicsUnit.Pixel))
                         {
                             gfx.DrawString(
                                 $"#{summary?.MostPopularCol.CotacolId} {summary?.MostPopularCol.CotacolName}", f,
-                                Brushes.Black, new RectangleF(148, 850, 804, 200f));
+                                Brushes.Black, new RectangleF(156, 855, 804, 200f));
                             gfx.DrawString(
                                 $"{summary?.MostPopularColCount} times"
-                                , f, Brushes.White, new RectangleF(462, 804, 804, 200f));
+                                , f, Brushes.White, new RectangleF(462, 810, 804, 200f));
                         }
                     }
                     else
                     {
-                        using (Font f = new Font(boldFont, 32, FontStyle.Bold))
+                        using (Font f = new Font(boldFont, 32, FontStyle.Bold, GraphicsUnit.Pixel))
                         {
                             gfx.DrawString("The year review generation went wrong.  Did you conquer Cotacols, this year?", f, Brushes.Black,
                                 new RectangleF(84, 520, yearValuesRightBorder, 350f));
