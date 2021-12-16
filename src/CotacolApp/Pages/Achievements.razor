@@ -10,6 +10,7 @@
 @inject ILogger<Climbs> Logger
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using Microsoft.IdentityModel.Clients.ActiveDirectory
 <Title Value="Cotacol Achievements"/>
 
 <AuthorizeView>
@@ -44,7 +45,9 @@
                 <br/>
                 <h2>Your year in a Pic</h2>
                 <span style="text-align: left; display: block; ">
-                    <a href="img/year/@UserProfile.UserId" target="_blank"><img src="img/year/@UserProfile.UserId" style="width: 350px"/></a>
+                    <a href="img/year/@UserIdToShow" target="_blank">
+                        <img src="img/year/@UserIdToShow" style="width: 350px"/>
+                    </a>
                 </span>
                 <p class="lektonic">Share you achievements with your friends on social media!</p>
                 <br/>
@@ -139,6 +142,7 @@
     [Parameter]
     public string UserId { get; set; }
 
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
     private UserAchievements _achievements;
     private IEnumerable<UserClimb> _climbs;
     private IEnumerable<UserClimb> _nearLegendClimbs;
@@ -172,15 +176,14 @@
     {
         if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
         {
-            var userIdToShow = string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
-            _userProfile = await CotacolUserClient.GetProfileAsync(userIdToShow);
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
             if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
             {
                 _notAuthorizedMessage = "The user profile is not public";
                 return;
             }
-            _achievements = await CotacolUserClient.GetAchievementsAsync(userIdToShow, true);
-            _climbs = await CotacolUserClient.GetClimbDataAsync(userIdToShow);
+            _achievements = await CotacolUserClient.GetAchievementsAsync(UserIdToShow, true);
+            _climbs = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
             _nearLegendClimbs = _climbs.Where(c => c.AttemptsNeededToLegend == 1);
             if (!_nearLegendClimbs.Any())
             {
