@@ -14,7 +14,7 @@ namespace CotacolApp.Services.Imaging
     public class GdiYearImageGenerator : IYearImageGenerator
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public bool IsExperimental => false;
+        public bool IsExperimental => true;
 
         public GdiYearImageGenerator(IWebHostEnvironment hostingEnvironment)
         {
@@ -26,8 +26,6 @@ namespace CotacolApp.Services.Imaging
             var fonts = new PrivateFontCollection();
             fonts.AddFontFile(Path.Combine(_hostingEnvironment.WebRootPath, "fonts/cooper_black_regular.ttf"));
             fonts.AddFontFile(Path.Combine(_hostingEnvironment.WebRootPath, "fonts/merkury_bold.otf"));
-            // fonts.AddFontFile(Path.Combine(_hostingEnvironment.WebRootPath, "fonts/lekton-regular.ttf"));
-            //fonts.AddFontFile(Path.Combine(_hostingEnvironment.WebRootPath, "fonts/cooper_light_bt-webfont.ttf"));
             var boldFont = fonts.Families[0];
             var lightFont = fonts.Families[1];
 
