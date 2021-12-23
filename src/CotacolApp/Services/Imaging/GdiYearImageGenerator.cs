@@ -11,11 +11,12 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace CotacolApp.Services.Imaging
 {
-    public class YearImageGenerator : IYearImageGenerator
+    public class GdiYearImageGenerator : IYearImageGenerator
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
+        public bool IsExperimental => false;
 
-        public YearImageGenerator(IWebHostEnvironment hostingEnvironment)
+        public GdiYearImageGenerator(IWebHostEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
         }
@@ -30,7 +31,7 @@ namespace CotacolApp.Services.Imaging
             var boldFont = fonts.Families[0];
             var lightFont = fonts.Families[1];
 
-            var assembly = Assembly.GetAssembly(typeof(YearImageGenerator));
+            var assembly = Assembly.GetAssembly(typeof(GdiYearImageGenerator));
             var resourceName = "CotacolApp.StaticData.year-a.png";
             var rightAlignFormat = new StringFormat {Alignment = StringAlignment.Far};
 
@@ -94,7 +95,9 @@ namespace CotacolApp.Services.Imaging
                     {
                         using (Font f = new Font(boldFont, 32, FontStyle.Bold, GraphicsUnit.Pixel))
                         {
-                            gfx.DrawString("The year review generation went wrong.  Did you conquer Cotacols, this year?", f, Brushes.Black,
+                            gfx.DrawString(
+                                "The year review generation went wrong.  Did you conquer Cotacols, this year?", f,
+                                Brushes.Black,
                                 new RectangleF(84, 520, yearValuesRightBorder, 350f));
                         }
                     }
