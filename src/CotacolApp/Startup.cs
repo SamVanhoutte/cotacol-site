@@ -203,7 +203,8 @@ namespace CotacolApp
             });
             services.AddScoped<IUserProfileManager, CotacolProfileManager>();
             services.AddScoped<IMapService, MapListService>();
-            services.AddScoped<IYearImageGenerator, YearImageGenerator>();
+            services.AddScoped<IYearImageGenerator, ImgSharpYearImageGenerator>();
+            services.AddScoped<IYearImageGenerator, GdiYearImageGenerator>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<ICotacolClient, CotacolApiClient>();
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();

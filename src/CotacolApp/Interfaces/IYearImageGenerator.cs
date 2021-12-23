@@ -5,6 +5,7 @@ namespace CotacolApp.Interfaces
 {
     public interface IYearImageGenerator
     {
+        bool IsExperimental { get; }
         Task<byte[]> CreateImageAsync(YearReview summary);
     }
 }

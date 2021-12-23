@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CotacolApp.Interfaces;
@@ -8,16 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CotacolApp.Controllers
 {
-    // [Route("api/yearimage")]
     [ApiController]
     public class YearImageController : ControllerBase
     {
-        private IYearImageGenerator _imageGenerator;
+        private IEnumerable<IYearImageGenerator> _imageGenerators;
         private ICotacolUserClient _userClient;
 
-        public YearImageController(IYearImageGenerator imageGenerator, ICotacolUserClient userClient)
+        public YearImageController(IEnumerable<IYearImageGenerator> imageGenerators, ICotacolUserClient userClient)
         {
-            _imageGenerator = imageGenerator;
+            _imageGenerators = imageGenerators;
             _userClient = userClient;
         }
         
@@ -37,7 +38,9 @@ namespace CotacolApp.Controllers
 
             try
             {
-                var imageContent = await _imageGenerator.CreateImageAsync(summary);
+                var experimental = Request.Query.ContainsKey("experimental");
+                var imageGenerator = _imageGenerators.FirstOrDefault(ig=>ig.IsExperimental==experimental);
+                var imageContent = await imageGenerator.CreateImageAsync(summary);
                 return File(imageContent, "image/png");
             }
             catch (Exception e)
