@@ -55,25 +55,22 @@ namespace CotacolApp.Services.Imaging
                     // Year values
                     var bigFont = boldFamily.CreateFont(58, FontStyle.Bold);
                     image.Mutate(
-                        i => i.DrawText(rightAlignFormat, $"{summary?.YearCotacolActivityCount.Number()}/{summary?.YearAllActivityCount.Number()}", bigFont, Color.Black, 
-                            new PointF( yearValuesRightBorder, startHeightYear) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(rightAlignFormat, $"{summary?.UniqueColsInYear.Number()}", bigFont, Color.Black, 
-                            new PointF( yearValuesRightBorder, startHeightYear+ rowHeight) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(rightAlignFormat, $"{summary?.PointsInYear.Number()}", bigFont, Color.Black, 
-                            new PointF( yearValuesRightBorder, startHeightYear + rowHeight*2) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(rightAlignFormat, $"{(summary.DistanceInYear / 1000).Number()}", bigFont, Color.Black, 
-                            new PointF( yearValuesRightBorder, startHeightYear + rowHeight*3) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(rightAlignFormat, $"{summary.ElevationInYear.Number()}", bigFont, Color.Black, 
-                            new PointF( yearValuesRightBorder, startHeightYear + rowHeight*4) )
-                    );
+                        i =>
+                        {
+                            i.DrawText(rightAlignFormat,
+                                $"{summary?.YearCotacolActivityCount.Number()}/{summary?.YearAllActivityCount.Number()}",
+                                bigFont, Color.Black,
+                                new PointF(yearValuesRightBorder, startHeightYear));
+                            i.DrawText(rightAlignFormat, $"{summary?.UniqueColsInYear.Number()}", bigFont, Color.Black,
+                                new PointF(yearValuesRightBorder, startHeightYear + rowHeight));
+                            i.DrawText(rightAlignFormat, $"{summary?.PointsInYear.Number()}", bigFont, Color.Black,
+                                new PointF(yearValuesRightBorder, startHeightYear + rowHeight * 2));
+                            i.DrawText(rightAlignFormat, $"{(summary.DistanceInYear / 1000).Number()}", bigFont,
+                                Color.Black,
+                                new PointF(yearValuesRightBorder, startHeightYear + rowHeight * 3));
+                            i.DrawText(rightAlignFormat, $"{summary.ElevationInYear.Number()}", bigFont, Color.Black,
+                                new PointF(yearValuesRightBorder, startHeightYear + rowHeight * 4));
+                        });
                     // Total values
                     var smallFont = lightFamily.CreateFont(24, FontStyle.Bold);
                     if (summary?.HeaviestActivity != null)
@@ -84,35 +81,36 @@ namespace CotacolApp.Services.Imaging
                         );
                     }
                     image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"{summary.TotalCols.Number()} cols overall", smallFont, Color.Black, 
-                            new PointF( totalValuesLeftBorder, startHeightTotals + rowHeight*2) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"{summary.TotalPoints.Number()} points overall", smallFont, Color.Black, 
-                            new PointF( totalValuesLeftBorder, startHeightTotals + rowHeight*3) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"{(summary.TotalLength / 1000).Number()} km cols overall", smallFont, Color.Black, 
-                            new PointF( totalValuesLeftBorder, startHeightTotals + rowHeight*4) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"{summary.TotalElevation.Number()} m elevation overall", smallFont, Color.Black, 
-                            new PointF( totalValuesLeftBorder, startHeightTotals + rowHeight*5) )
-                    );
-                    image.Mutate(
-                        i => i.DrawText(rightAlignFormat, summary.UserName, smallFont, Color.Black, 
-                            new PointF( 760, 990) )
-                    );
+                        i =>
+                        {
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalCols.Number()} cols overall", smallFont,
+                                Color.Black,
+                                new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 2));
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalPoints.Number()} points overall",
+                                smallFont, Color.Black,
+                                new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 3));
+                            i.DrawText(new DrawingOptions(), $"{(summary.TotalLength / 1000).Number()} km cols overall",
+                                smallFont, Color.Black,
+                                new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 4));
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalElevation.Number()} m elevation overall",
+                                smallFont, Color.Black,
+                                new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 5));
+                            i.DrawText(rightAlignFormat, summary.UserName, smallFont, Color.Black,
+                                new PointF(760, 990));
+                        });
                     // Col values
                     var regularFont = boldFamily.CreateFont(32, FontStyle.Bold);
                     image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"#{summary?.MostPopularCol.CotacolId} {summary?.MostPopularCol.CotacolName}", regularFont, Color.Black, 
-                            new PointF( 156, 855) )
-                    );                    
-                    image.Mutate(
-                        i => i.DrawText(new DrawingOptions(), $"{summary?.MostPopularColCount} times", regularFont, Color.White, 
-                            new PointF( 464, 812) )
-                    );                    
+                        i =>
+                        {
+                            i.DrawText(new DrawingOptions(),
+                                $"#{summary?.MostPopularCol.CotacolId} {summary?.MostPopularCol.CotacolName}",
+                                regularFont, Color.Black,
+                                new PointF(156, 855));
+                            i.DrawText(new DrawingOptions(), $"{summary?.MostPopularColCount} times", regularFont,
+                                Color.White,
+                                new PointF(464, 812));
+                        });                    
                 }
                 else
                 {
