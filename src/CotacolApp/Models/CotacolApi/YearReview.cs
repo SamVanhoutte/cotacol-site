@@ -9,13 +9,17 @@ namespace CotacolApp.Models.CotacolApi
         public int MostPopularColCount { get; set; }
         public int UniqueColsInYear { get; set; }
         public int PointsInYear { get; set; }
+        public int YearCotacolActivityCount { get; set; }
+        
         public long ElevationInYear { get; set; }
         public long DistanceInYear { get; set; }
+        public int YearAllActivityCount { get; set; }
         public int TotalCols { get; set; }
         public int TotalPoints { get; set; }
         public long TotalElevation { get; set; }
         public long TotalLength { get; set; }
         public CotacolClimbTrackRecord MostPopularCol { get; set; }
+        public CotacolActivity HeaviestActivity { get; set; }
     }
     
     public class CotacolClimbTrackRecord
