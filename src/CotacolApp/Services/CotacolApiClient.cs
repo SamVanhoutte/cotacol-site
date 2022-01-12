@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CotacolApp.Interfaces;
 using CotacolApp.Models;
 using CotacolApp.Models.CotacolApi;
+using CotacolApp.Pages.admin;
 using CotacolApp.Settings;
 using Flurl;
 using Flurl.Http;
@@ -28,17 +29,6 @@ namespace CotacolApp.Services
             _logger = logger;
             _settings = apiSettings.Value;
         }
-
-        // private async Task<List<ClimbData>> GetColsFromResource()
-        // {
-        //     var assembly = Assembly.GetAssembly(typeof(CotacolApiClient));
-        //     var resourceName = "CotacolApp.StaticData.cotacoldata.json";
-        //     await using var stream = assembly.GetManifestResourceStream(resourceName);
-        //     using var reader = new StreamReader(stream);
-        //     var result = await reader.ReadToEndAsync();
-        //     var newClimbs = JsonConvert.DeserializeObject<List<ClimbData>>(result);
-        //     return newClimbs;
-        // }
 
         public async Task<List<ClimbData>> GetClimbDataAsync()
         {
@@ -92,7 +82,7 @@ namespace CotacolApp.Services
 
             return segmentData;
         }
-        
+
         public async Task<ClimbUserDetail> GetClimbDetailAsync(string cotacolId, string userId)
         {
             var url = string.IsNullOrEmpty(userId)
@@ -105,7 +95,8 @@ namespace CotacolApp.Services
             return segmentData;
         }
 
-        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId, bool persistMetadata = false)
+        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId,
+            bool persistMetadata = false)
         {
             if (stravaSegmentId.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -160,6 +151,28 @@ namespace CotacolApp.Services
                 .PutJsonAsync(update);
 
             return response.StatusCode;
+        }
+
+        public async Task<IEnumerable<BadgeOfMonthData>> GetBadgeOfMonthListAsync()
+        {
+            var response = await $"{_settings.ApiUrl}/system/badges/month"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<BadgeOfMonthData>>();
+            return response.OrderByDescending(b=>b.MonthKey);
+        }
+        
+        public async Task UpdateBadgeOfMonthAsync(BadgeOfMonthData badgeOfMonthData)
+        {
+            var response = await $"{_settings.ApiUrl}/system/badges/month"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .PutJsonAsync(badgeOfMonthData);
+        }
+        
+        public async Task DeleteBadgeOfMonthAsync(int year, int month)
+        {
+            var response = await $"{_settings.ApiUrl}/system/badges/month/{year}/{month}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .DeleteAsync();
         }
     }
 }

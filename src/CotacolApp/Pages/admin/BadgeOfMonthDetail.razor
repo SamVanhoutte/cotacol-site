@@ -1,0 +1,130 @@
+@page "/admin/badges/month/{year}/{month}"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using Microsoft.ApplicationInsights
+@inject NavigationManager NavManager
+@using System.Globalization
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+<h1>Badge of the month: @CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(int.Parse(Month)) @Year</h1>
+@if (UserProfile.IsAdmin)
+{
+    @if (currentBadge == null)
+    {
+        <p>
+            <em>Loading the details from the backend&nbsp;Cotacol API...</em>
+        </p>
+    }
+    else
+    {
+        <table style="width: 100%">
+
+            <tr>
+                <td style="vertical-align: top">
+                    <b>Name:</b>
+                </td>
+                <td>
+                    <MatTextField FullWidth="true" @bind-Value="@currentBadge.BadgeName" HelperText="The name of the badge"></MatTextField>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top">
+                    <b>Description:</b>
+                </td>
+                <td>
+                    <MatTextField FullWidth="true" TextArea="true" style="height: 140px" @bind-Value="@currentBadge.BadgeDescription" HelperText="The full description of the badge"></MatTextField>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top">
+                    <b>Cols of the month:</b>
+                    <p>
+                        <MatAutocompleteList Items="@climbs" FullWidth="true" TItem="ClimbData" Label="Add climbs here" CustomStringSelector="@(i => i.Name)" ValueChanged="@(async (val) => await AddClimbAsync(val))">
+                            <ItemTemplate>
+                                <div style="display: flex; flex-direction: row; width: 100%;">#@context.Id - @context.Name : @context.CotacolPoints points</div>
+                            </ItemTemplate>
+                        </MatAutocompleteList>
+                    </p>
+                    <p>
+                        <MatButton Outlined="true" Icon="save" OnClick="@(async (val) => await PersistMonthBadgeAsync(val))">Save badge of month</MatButton>
+                    </p>
+                </td>
+                <td>
+                    @if (climbs != null)
+                    {
+                        {
+                            int totalPoints = 0;
+                            @foreach (var cotacolId in currentBadge.CotacolIds)
+                            {
+                                {
+                                    var col = climbs.First(c => c.Id.Equals(cotacolId.ToString()));
+                                    totalPoints += col.CotacolPoints;
+                                    <p><MatIconButton Icon="delete" OnClick="() => RemoveCol(col.Id)"/> @col.Id : @col.Name (@col.CotacolPoints) points</p>
+                                }
+                            }
+                            <p>Total points for this challenge: <b>@totalPoints.Number()</b></p>
+                        }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+}
+else
+{
+    <p>
+        <em>Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</em>
+    </p>
+}
+
+@code {
+
+    [Parameter]
+    public string Year { get; set; }
+
+    [Parameter]
+    public string Month { get; set; }
+
+    private IEnumerable<BadgeOfMonthData> monthBadges;
+    private BadgeOfMonthData currentBadge;
+    private IEnumerable<ClimbData> climbs;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            monthBadges = await CotacolClient.GetBadgeOfMonthListAsync();
+            currentBadge = monthBadges.FirstOrDefault(mb => mb.Year == int.Parse(Year) && mb.Month == int.Parse(Month));
+            climbs = await CotacolClient.GetClimbDataAsync();
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private void RemoveCol(string colId)
+    {
+        currentBadge.CotacolIds ??= new List<int>();
+        if (currentBadge.CotacolIds.Contains(int.Parse(colId)))
+        {
+            currentBadge.CotacolIds.Remove(int.Parse(colId));
+        }
+    }
+
+    private async Task AddClimbAsync(ClimbData climbData)
+    {
+        if (climbData != null)
+        {
+            currentBadge.CotacolIds ??= new List<int>();
+            currentBadge.CotacolIds.Add(int.Parse(climbData.Id));
+        }
+    }
+
+    private async Task PersistMonthBadgeAsync(MouseEventArgs val)
+    {
+        await CotacolClient.UpdateBadgeOfMonthAsync(currentBadge);
+        NavManager.NavigateTo($"/admin/badges/month");
+
+    }
+
+}

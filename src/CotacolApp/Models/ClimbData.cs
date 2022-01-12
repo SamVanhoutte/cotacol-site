@@ -18,13 +18,13 @@ namespace CotacolApp.Models
         public string Province { get; set; }
 
         [JsonProperty("cotacol_points")]
-        public long CotacolPoints { get; set; }
+        public int CotacolPoints { get; set; }
 
         [JsonProperty("distance")]
-        public long Distance { get; set; }
+        public int Distance { get; set; }
 
         [JsonProperty("elevation_diff")]
-        public long ElevationDiff { get; set; }
+        public int ElevationDiff { get; set; }
 
         [JsonProperty("bom_score")]
         public int BomScore { get; set; }
