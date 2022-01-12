@@ -1,0 +1,104 @@
+@page "/admin/badges/month"
+@using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using Microsoft.ApplicationInsights
+@using System.Globalization
+@inject ICotacolClient CotacolClient
+@inject NavigationManager NavManager
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+<h1>Monthly badges (Admin)</h1>
+<br/>
+@if (UserProfile.IsAdmin)
+{
+    @if (monthBadges == null)
+    {
+        <p>
+            <em>Loading the details from the backend&nbsp;Cotacol API...</em>
+        </p>
+    }
+    else
+    {
+        <div class="mat-layout-grid">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell">
+                    <b>Month:</b> <MatTextField FullWidth="false" HelperText="Month" @bind-value="@month" TValue="int"></MatTextField>
+                </div>
+                <div class="mat-layout-grid-cell">
+                    <b>Year:</b> <MatTextField FullWidth="false" HelperText="Year" @bind-value="@year" TValue="int"></MatTextField>
+                </div>
+                <div class="mat-layout-grid-cell">
+                    <MatButton Outlined="true" Icon="add" OnClick="@(async (val) => await CreateNewMonthBadgeAsync(val))">Define monthly badge</MatButton>
+                </div>
+            </div>
+        </div>
+        <MatTable Items="@monthBadges" class="lektonic" ShowPaging="false" PageSize="100" Style="width: 100%">
+            <MatTableHeader>
+                <th>Month</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </MatTableHeader>
+            <MatTableRow>
+                <td style="width:15%">@CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(context.Month) @context.Year</td>
+                <td style="width:30%">@context.BadgeName</td>
+                <td style="width:40%">@context.BadgeDescription</td>
+                <td>
+                    <MatIconButton Icon="slideshow" Link='@($"admin/badges/month/{context.Year}/{context.Month}")'/>
+                    <MatIconButton Icon="delete" OnClick="@(async (val) => await DeleteMonthlyBadgeAsync(context.Year, context.Month))"/>
+                </td>
+            </MatTableRow>
+        </MatTable>
+    }
+}
+else
+{
+    <p>
+        <em>Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</em>
+    </p>
+}
+
+@code {
+    private IEnumerable<BadgeOfMonthData> monthBadges;
+    private BadgeOfMonthData currentBadge;
+    private int month;
+    private int year;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            monthBadges = await CotacolClient.GetBadgeOfMonthListAsync();
+            var compareDate = DateTime.UtcNow;
+            while (true)
+            {
+                if (!monthBadges.Any(mb => mb.Year == compareDate.Year && mb.Month == compareDate.Month))
+                {
+                    month = compareDate.Month;
+                    year = compareDate.Year;
+                    break;
+                }
+                compareDate = compareDate.AddMonths(1);
+            }
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private async Task CreateNewMonthBadgeAsync(MouseEventArgs val)
+    {
+        await CotacolClient.UpdateBadgeOfMonthAsync(new BadgeOfMonthData
+        {
+            Month = month, Year = year, BadgeName = $"Badge of month {month} {year}", BadgeDescription = "", BadgeType = "Grinta", CotacolIds = new List<int>()
+        });
+        NavManager.NavigateTo($"/admin/badges/month/{year}/{month}");
+    }
+
+    private async Task DeleteMonthlyBadgeAsync(int year, int month)
+    {
+        await CotacolClient.DeleteBadgeOfMonthAsync(year, month);
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        monthBadges = await CotacolClient.GetBadgeOfMonthListAsync();
+    }
+
+}

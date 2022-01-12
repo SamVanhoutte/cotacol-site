@@ -19,5 +19,9 @@ namespace CotacolApp.Interfaces
         Task<List<SegmentDataValidation>> GetSegmentListAsync();
         Task<UserStateDetail> GetUserAdminInfoAsync(string userId);
         Task<int> UpdateCotacolMetadataAsync(string cotacolId, UpdateSegmentRequest updateRequest);
+
+        Task<IEnumerable<BadgeOfMonthData>> GetBadgeOfMonthListAsync();
+        Task UpdateBadgeOfMonthAsync(BadgeOfMonthData badgeOfMonthData);
+        Task DeleteBadgeOfMonthAsync(int year, int month);
     }
 }   
