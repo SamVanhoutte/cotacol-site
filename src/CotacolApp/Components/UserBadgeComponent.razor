@@ -1,0 +1,27 @@
+@using CotacolApp.Models.CotacolApi
+@using MatBlazor
+<div class="mat-layout-grid-cell-span-2">
+    <div style="background-color: white;">
+        <img src='@($"images/badges/{BadgeStatus.BadgeId}.png")' onerror="this.onerror=null; this.src='images/badges/default.png'" alt="@BadgeStatus.Description" style='width: @Width;opacity: @(0.5 + (BadgeStatus.Progress*0.5));'/><br/>
+        <MatProgressBar Progress="@BadgeStatus.Progress" Style="width:100%"></MatProgressBar>
+        <p class="lektonic" style="text-align: center; background-color: silver; width: 100%; height: 50px">@BadgeStatus.Name</p>
+        @if(BadgeStatus.Completed)
+        {
+            <p class="lektonic" style="text-align: center"><b>Completed @(BadgeStatus.AchievementDate?.Date.ToString("dd MMM yy"))</b></p>
+        }
+        else
+        {
+            <p class="lektonic" style="text-align: center"><b>@(BadgeStatus.NumberColsNeeded -BadgeStatus.NumberColsAchieved ) cols missing</b></p>
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public UserBadgeStatus BadgeStatus { get; set; }
+
+    [Parameter]
+    public string Width { get; set; } = "100%";
+
+}

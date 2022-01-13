@@ -22,5 +22,6 @@ namespace CotacolApp.Interfaces
         Task<int> SubmitMissingSegmentAsync(string missingActivityId, string missingCotacolId, string remark = "");
         Task<int> RemoveUserAsync(string userId);
         Task<YearReview> GetYearReviewAsync(string userId, int year);
+        Task<List<UserBadgeStatus>> GetBadgesAsync(string userId);
     }
 }
