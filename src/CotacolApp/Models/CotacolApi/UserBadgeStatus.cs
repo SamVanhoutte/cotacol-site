@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace CotacolApp.Models.CotacolApi
@@ -21,9 +23,9 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("numberColsNeeded")] public long NumberColsNeeded { get; set; }
 
-        [JsonProperty("colsAchieved")] public object ColsAchieved { get; set; }
+        [JsonProperty("colsAchieved")] public IEnumerable<string> ColsAchieved { get; set; }
 
-        [JsonProperty("colsMissing")] public object ColsMissing { get; set; }
+        [JsonProperty("colsMissing")] public IEnumerable<string> ColsMissing { get; set; }
 
         [JsonProperty("remark")] public string Remark { get; set; }
 
@@ -38,7 +40,7 @@ namespace CotacolApp.Models.CotacolApi
             {
                 if (NumberColsNeeded > 0)
                 {
-                    return ((double)NumberColsAchieved / (double)NumberColsNeeded);
+                    return ((double) NumberColsAchieved / (double) NumberColsNeeded);
                 }
 
                 return 1;

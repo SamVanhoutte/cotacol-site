@@ -240,5 +240,13 @@ namespace CotacolApp.Services
                 .GetJsonAsync<List<UserBadgeStatus>>();
             return response;
         }
+
+        public async Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId)
+        {
+            var response = await $"{_settings.ApiUrl}/user/{userId}/badges/{badgeId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<UserBadgeStatus>();
+            return response;
+        }
     }
 }

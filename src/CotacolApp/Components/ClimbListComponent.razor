@@ -16,12 +16,11 @@
 }
 else
 {
-
     <table>
         <tr>
             <td></td>
             <td style="text-align: right">
-                @if (UserProfile.IsAdmin && Mode== ClimbViewMode.Table)
+                @if (UserProfile.IsAdmin && Mode == ClimbViewMode.Table && !HideFilters)
                 {
                     <div style="text-align: right; width: 100%">
                         <MatButtonLink Icon="cloud_download" Target="_top" Href="/admin/downloaddata?name=cols.csv">Download data (admins)</MatButtonLink>
@@ -30,38 +29,41 @@ else
             </td>
         </tr>
     </table>
-    <MatChipSet Choice="true" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
-        <MatChip Label="All" Id="NoFilter"></MatChip>
-        @if (UserProfile.IsAuthenticated)
-        {
-            <MatChip Label="To do" Id="TodoFilter" Style="color: #FD7D7A"></MatChip>
-            <MatChip Label="Planned" Id="PlannedFilter" Style="color: #FD7D7A"></MatChip>
-            <MatChip Label="Done" Id="DoneFilter" Style="color: #FD7D7A"></MatChip>
-            <MatChip Label="Owned" Id="OwnedFilter" Style="color: #FD7D7A"></MatChip>
-        }
-        <MatChip Label="Top 50" Id="TopFilter"></MatChip>
-        <MatChip Label="Bomb" Id="BombFilter"></MatChip>
-        <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
-        <MatChip Label="Highest" Id="HighFilter"></MatChip>
-        <MatChip Label="Longest" Id="LongFilter"></MatChip>
-        <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
-    </MatChipSet>
-    <MatChipSet Id="ProvinceFilter" Choice="false" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
-        <MatChip Label="WFL" IsCheckable="true" Id="WestVlFilter"></MatChip>
-        <MatChip Label="EFL" IsCheckable="true" Id="OostVlFilter"></MatChip>
-        <MatChip Label="ANT" IsCheckable="true" Id="AntwerpenFilter"></MatChip>
-        <MatChip Label="LIM" IsCheckable="true" Id="LimburgFilter"></MatChip>
-        <MatChip Label="BRU" IsCheckable="true" Id="BrusselsFilter"></MatChip>
-        <MatChip Label="FLB" IsCheckable="true" Id="VlBrFilter"></MatChip>
-        <MatChip Label="WLB" IsCheckable="true" Id="BrabantWallonFilter"></MatChip>
-        <MatChip Label="HNT" IsCheckable="true" Id="HainautFilter"></MatChip>
-        <MatChip Label="NAM" IsCheckable="true" Id="NamurFilter"></MatChip>
-        <MatChip Label="LIE" IsCheckable="true" Id="LiegeFilter"></MatChip>
-        <MatChip Label="LUX" IsCheckable="true" Id="LuxemburgFilter"></MatChip>
-    </MatChipSet>
-    @if (!string.IsNullOrEmpty(_filterMessage))
+    @if (!HideFilters)
     {
-        <div>@_filterMessage</div>
+        <MatChipSet Choice="true" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
+            <MatChip Label="All" Id="NoFilter"></MatChip>
+            @if (UserProfile.IsAuthenticated)
+            {
+                <MatChip Label="To do" Id="TodoFilter" Style="color: #FD7D7A"></MatChip>
+                <MatChip Label="Planned" Id="PlannedFilter" Style="color: #FD7D7A"></MatChip>
+                <MatChip Label="Done" Id="DoneFilter" Style="color: #FD7D7A"></MatChip>
+                <MatChip Label="Owned" Id="OwnedFilter" Style="color: #FD7D7A"></MatChip>
+            }
+            <MatChip Label="Top 50" Id="TopFilter"></MatChip>
+            <MatChip Label="Bomb" Id="BombFilter"></MatChip>
+            <MatChip Label="Easiest" Id="EasyFilter"></MatChip>
+            <MatChip Label="Highest" Id="HighFilter"></MatChip>
+            <MatChip Label="Longest" Id="LongFilter"></MatChip>
+            <MatChip Label="Steepest" Id="SteepFilter"></MatChip>
+        </MatChipSet>
+        <MatChipSet Id="ProvinceFilter" Choice="false" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
+            <MatChip Label="WFL" IsCheckable="true" Id="WestVlFilter"></MatChip>
+            <MatChip Label="EFL" IsCheckable="true" Id="OostVlFilter"></MatChip>
+            <MatChip Label="ANT" IsCheckable="true" Id="AntwerpenFilter"></MatChip>
+            <MatChip Label="LIM" IsCheckable="true" Id="LimburgFilter"></MatChip>
+            <MatChip Label="BRU" IsCheckable="true" Id="BrusselsFilter"></MatChip>
+            <MatChip Label="FLB" IsCheckable="true" Id="VlBrFilter"></MatChip>
+            <MatChip Label="WLB" IsCheckable="true" Id="BrabantWallonFilter"></MatChip>
+            <MatChip Label="HNT" IsCheckable="true" Id="HainautFilter"></MatChip>
+            <MatChip Label="NAM" IsCheckable="true" Id="NamurFilter"></MatChip>
+            <MatChip Label="LIE" IsCheckable="true" Id="LiegeFilter"></MatChip>
+            <MatChip Label="LUX" IsCheckable="true" Id="LuxemburgFilter"></MatChip>
+        </MatChipSet>
+        @if (!string.IsNullOrEmpty(_filterMessage))
+        {
+            <div>@_filterMessage</div>
+        }
     }
     @if (Mode == ClimbViewMode.Table)
     {
@@ -78,12 +80,18 @@ else
     [Parameter]
     public ClimbViewMode Mode { get; set; }
 
+    [Parameter]
+    public List<string> CotacolIds { get; set; }
+
+    [Parameter]
+    public bool HideFilters { get; set; }
+
     private string _currentFilter = "nofilter";
     private List<string> _provinceFilters = null;
     private IEnumerable<UserClimb> _climbList;
     private IEnumerable<UserClimb> _climbs;
     private string _filterMessage;
-    
+
     protected override async Task OnInitializedAsync()
     {
         if (UserProfile.IsAuthenticated)
@@ -93,6 +101,10 @@ else
         else
         {
             _climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
+        }
+        if (CotacolIds != null)
+        {
+            _climbList = _climbList.Where(c => CotacolIds.Contains(c.Id));
         }
         _climbs = _climbList;
     }
@@ -111,8 +123,7 @@ else
         await FilterClimbsAsync();
     }
 
-    
-    
+
     private async Task ApplyFilterAsync(MatChip filter)
     {
         _currentFilter = filter.Id;
@@ -181,7 +192,7 @@ else
         }
 
 
-        // Filter on province
+    // Filter on province
         if (_provinceFilters?.Any() ?? false)
         {
             _climbs = _climbs.Where(c =>
@@ -191,7 +202,7 @@ else
         {
             _filterMessage = _filterMessage.Replace("__COUNT__", _climbs.Count().ToString());
             _filterMessage = _filterMessage.Replace("__COUNT-SUFFIX__", GetCountSuffix());
-            _filterMessage = _filterMessage.Replace("__DONE-COUNT__", _climbs.Count(c=>c.Done).ToString());
+            _filterMessage = _filterMessage.Replace("__DONE-COUNT__", _climbs.Count(c => c.Done).ToString());
         }
     }
 
@@ -201,4 +212,5 @@ else
         if (_climbs.Count() == 1) return "this one Cotacol";
         return $"these {_climbs.Count()} Cotacols";
     }
+
 }

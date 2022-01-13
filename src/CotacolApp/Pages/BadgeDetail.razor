@@ -1,0 +1,85 @@
+@page "/badge/{BadgeId}"
+@page "/badge/{BadgeId}/{UserId}"
+@using CotacolApp.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+@using MatBlazor
+
+<Title Value="Badge detail"/>
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <h1>@GetPageTitle()</h1>
+        @if (_badgeDetail == null)
+        {
+            <p>
+                <em>We're retrieving the results , please be patient...</em>
+            </p>
+        }
+        else
+        {
+            <h2>@_badgeDetail.Name</h2>
+            <div>
+                <span>
+                    <MatIconButton Icon="map" ToggleIcon="list" @bind-Toggled="@mapMode"></MatIconButton>
+                </span><span>@_badgeDetail.Description</span>
+            </div>
+            <ClimbListComponent HideFilters="true" Mode="@ViewMode" CotacolIds="@GetColIds()"></ClimbListComponent>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string BadgeId { get; set; }
+
+    private ClimbViewMode ViewMode => mapMode ? ClimbViewMode.Map : ClimbViewMode.Table;
+    private bool mapMode;
+    private UserBadgeStatus _badgeDetail;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _badgeDetail = await CotacolUserClient.GetBadgeAsync(BadgeId, UserIdToShow);
+        }
+    }
+
+    protected List<string> GetColIds()
+    {
+        var ids = new List<string>();
+        ids.AddRange(_badgeDetail.ColsAchieved);
+        ids.AddRange(_badgeDetail.ColsMissing);
+        return ids;
+    }
+
+    private string GetPageTitle()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's badges";
+    }
+
+}
