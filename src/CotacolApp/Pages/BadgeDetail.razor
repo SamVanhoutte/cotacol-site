@@ -1,6 +1,7 @@
 @page "/badge/{BadgeId}"
 @page "/badge/{BadgeId}/{UserId}"
 @using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -16,7 +17,6 @@
         }
     </NotAuthorized>
     <Authorized>
-        <h1>@GetPageTitle()</h1>
         @if (_badgeDetail == null)
         {
             <p>
@@ -25,12 +25,51 @@
         }
         else
         {
-            <h2>@_badgeDetail.Name</h2>
-            <div>
-                <span>
-                    <MatIconButton Icon="map" ToggleIcon="list" @bind-Toggled="@mapMode"></MatIconButton>
-                </span><span>@_badgeDetail.Description</span>
-            </div>
+            <h1>@_badgeDetail.Name</h1>
+            <table style="width:100vw">
+                <tr>
+                    <td style="text-align: left; width: 200px">
+                        <img style="width: 200px" src="images/badges/@(_badgeDetail.BadgeId).png" onerror="this.onerror=null; this.src='images/badges/default.png'"/>
+                    </td>
+                    <td style="text-align: left">
+                        <div>
+                            <span>@_badgeDetail.Description</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            @if (_badgeDetail.Completed)
+            {
+                <div>
+                    <b>Badge completed:</b>@_badgeDetail.AchievementDate.Date()
+                </div>
+            }
+            else
+            {
+                <MatProgressBar Progress="@_badgeDetail.Progress"></MatProgressBar>
+                <div style="text-align: center">
+                    <b>@_badgeDetail.NumberColsAchieved / @_badgeDetail.NumberColsNeeded done</b>
+                </div>
+                @if (_badgeDetail.ValidTo.HasValue)
+                {
+                    <div style="text-align: center">
+                        <b>Badge available until @_badgeDetail.ValidTo.Date()</b>
+                    </div>
+                }
+            }
+            <span>
+            </span>
+            <table>
+                <tr>
+                    <td style="text-align: left; width: 1%">
+                        <MatIconButton Icon="map" ToggleIcon="list" @bind-Toggled="@mapMode"></MatIconButton>
+                    </td>
+                    <td>
+                        <h2>Required cols</h2>
+                    </td>
+                </tr>
+            </table>
             <ClimbListComponent HideFilters="true" Mode="@ViewMode" CotacolIds="@GetColIds()"></ClimbListComponent>
         }
     </Authorized>

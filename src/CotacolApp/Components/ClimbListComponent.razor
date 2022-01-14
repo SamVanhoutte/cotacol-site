@@ -67,7 +67,7 @@ else
     }
     @if (Mode == ClimbViewMode.Table)
     {
-        <ClimbListTableComponent @bind-Climbs="@_climbs"/>
+        <ClimbListTableComponent @bind-Climbs="@_climbs" HideFilters="@HideFilters"/>
     }
     else
     {

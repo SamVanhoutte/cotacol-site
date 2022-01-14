@@ -17,7 +17,7 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("completed")] public bool Completed { get; set; }
 
-        [JsonProperty("achievementDate")] public DateTimeOffset? AchievementDate { get; set; }
+        [JsonProperty("achievementDate")] public DateTime? AchievementDate { get; set; }
 
         [JsonProperty("numberColsAchieved")] public long NumberColsAchieved { get; set; }
 
@@ -29,9 +29,9 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("remark")] public string Remark { get; set; }
 
-        [JsonProperty("validFrom")] public object ValidFrom { get; set; }
+        [JsonProperty("validFrom")] public DateTime? ValidFrom { get; set; }
 
-        [JsonProperty("validTo")] public object ValidTo { get; set; }
+        [JsonProperty("validTo")] public DateTime? ValidTo { get; set; }
 
         [JsonIgnore]
         public double Progress

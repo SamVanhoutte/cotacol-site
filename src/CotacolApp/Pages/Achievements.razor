@@ -108,16 +108,19 @@
                         }
                     </ol>
                 }
-                <h2>Completed Badges</h2>
-                <div class="mat-layout-grid">
-                    <div class="mat-layout-grid-inner">
-                        @foreach (var badge in _userBadges.Where(ub => ub.Completed).OrderBy(ub=>ub.AchievementDate))
-                        {
-                            <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
-                        }
+                @if (UserProfile.IsAdmin)
+                {
+                    <h2>Completed Badges</h2>
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            @foreach (var badge in _userBadges.Where(ub => ub.Completed).OrderBy(ub => ub.AchievementDate))
+                            {
+                                <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                            }
+                        </div>
                     </div>
-                </div>
-                <MatButtonLink Href="badges" TrailingIcon="list">View all badges</MatButtonLink>
+                    <MatButtonLink Href="badges" TrailingIcon="list">View all badges</MatButtonLink>
+                }
             }
         }
 
@@ -158,7 +161,6 @@
                     .OrderBy(c => c.AttemptsNeededToLegend)
                     .Take(10);
             }
-
         }
     }
 
@@ -170,7 +172,6 @@
         }
         return _userProfile?.FullName ?? "User's achievements";
     }
-
 
 
     private string GetLegendString(string colId)
