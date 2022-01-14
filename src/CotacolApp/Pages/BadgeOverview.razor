@@ -1,0 +1,106 @@
+@page "/badges"
+@page "/badges/{UserId}"
+@using MatBlazor
+@using CotacolApp.Components
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using Microsoft.IdentityModel.Clients.ActiveDirectory
+<Title Value="Badges"/>
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <h1>@GetPageTitle()</h1>
+        @if (_userBadges == null)
+        {
+            <p>
+                <em>We're retrieving the results , please be patient...</em>
+            </p>
+        }
+        else
+        {
+            <h3>Provinces</h3>
+            <div class="mat-layout-grid">
+                <div class="mat-layout-grid-inner">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeId.StartsWith("provinc", StringComparison.InvariantCultureIgnoreCase)).OrderBy(ub => ub.BadgeId))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </div>
+            </div>
+            <h3>Quantity badges</h3>
+            <div class="mat-layout-grid">
+                <div class="mat-layout-grid-inner">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.Amount)).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </div>
+            </div>
+            <h3>List badges</h3>
+            <div class="mat-layout-grid">
+                <div class="mat-layout-grid-inner">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.List) && !ub.BadgeId.StartsWith("prov")).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </div>
+            </div>
+            <h3>Location badges</h3>
+            <div class="mat-layout-grid">
+                <div class="mat-layout-grid-inner">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.Location) && !ub.BadgeId.StartsWith("prov")).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </div>
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    private List<UserBadgeStatus> _userBadges;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _userBadges = await CotacolUserClient.GetBadgesAsync(UserIdToShow);
+        }
+    }
+
+    private string GetPageTitle()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's badges";
+    }
+
+}

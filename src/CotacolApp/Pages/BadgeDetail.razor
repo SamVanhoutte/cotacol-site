@@ -1,0 +1,124 @@
+@page "/badge/{BadgeId}"
+@page "/badge/{BadgeId}/{UserId}"
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+@using MatBlazor
+
+<Title Value="Badge detail"/>
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (_badgeDetail == null)
+        {
+            <p>
+                <em>We're retrieving the results , please be patient...</em>
+            </p>
+        }
+        else
+        {
+            <h1>@_badgeDetail.Name</h1>
+            <table style="width:100vw">
+                <tr>
+                    <td style="text-align: left; width: 200px">
+                        <img style="width: 200px" src="images/badges/@(_badgeDetail.BadgeId).png" onerror="this.onerror=null; this.src='images/badges/default.png'"/>
+                    </td>
+                    <td style="text-align: left">
+                        <div>
+                            <span>@_badgeDetail.Description</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            @if (_badgeDetail.Completed)
+            {
+                <div>
+                    <b>Badge completed:</b>@_badgeDetail.AchievementDate.Date()
+                </div>
+            }
+            else
+            {
+                <MatProgressBar Progress="@_badgeDetail.Progress"></MatProgressBar>
+                <div style="text-align: center">
+                    <b>@_badgeDetail.NumberColsAchieved / @_badgeDetail.NumberColsNeeded done</b>
+                </div>
+                @if (_badgeDetail.ValidTo.HasValue)
+                {
+                    <div style="text-align: center">
+                        <b>Badge available until @_badgeDetail.ValidTo.Date()</b>
+                    </div>
+                }
+            }
+            <span>
+            </span>
+            <table>
+                <tr>
+                    <td style="text-align: left; width: 1%">
+                        <MatIconButton Icon="map" ToggleIcon="list" @bind-Toggled="@mapMode"></MatIconButton>
+                    </td>
+                    <td>
+                        <h2>Required cols</h2>
+                    </td>
+                </tr>
+            </table>
+            <ClimbListComponent HideFilters="true" Mode="@ViewMode" CotacolIds="@GetColIds()"></ClimbListComponent>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string BadgeId { get; set; }
+
+    private ClimbViewMode ViewMode => mapMode ? ClimbViewMode.Map : ClimbViewMode.Table;
+    private bool mapMode;
+    private UserBadgeStatus _badgeDetail;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _badgeDetail = await CotacolUserClient.GetBadgeAsync(BadgeId, UserIdToShow);
+        }
+    }
+
+    protected List<string> GetColIds()
+    {
+        var ids = new List<string>();
+        ids.AddRange(_badgeDetail.ColsAchieved);
+        ids.AddRange(_badgeDetail.ColsMissing);
+        return ids;
+    }
+
+    private string GetPageTitle()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's badges";
+    }
+
+}

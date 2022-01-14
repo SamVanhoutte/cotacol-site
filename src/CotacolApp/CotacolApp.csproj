@@ -77,6 +77,7 @@
         <EmbeddedResource Include="StaticData\cooper_black_regular.ttf" />
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="wwwroot\images\badges" />
       <Folder Include="wwwroot\images\support" />
     </ItemGroup>
 </Project>

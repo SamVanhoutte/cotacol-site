@@ -8,8 +8,8 @@
 
 <div style="overflow-y: scroll; height:100vh;">
 
-    <MatTable FilterByColumnName="Name" Items="@Climbs" class="lektonic" PageSize="2000"
-              AllowSelection="false"
+    <MatTable FilterByColumnName="@GetFilterColumn()" Items="@Climbs" class="lektonic" PageSize="2000"
+              AllowSelection="false" 
               ShowPaging="false" UseSortHeaderRow="true">
         <MatTableHeader>
             <MatSortHeaderRow SortChanged="SortClimbs">
@@ -91,7 +91,9 @@
 
 @code {
     private IEnumerable<UserClimb> _climbList;
-
+    [Parameter]
+    public bool HideFilters { get; set; }
+    
     [Parameter]
     public IEnumerable<UserClimb> Climbs
     {
@@ -196,4 +198,10 @@
         {
         }
     }
+
+    private string GetFilterColumn()
+    {
+        return HideFilters ? null : "Name";
+    }
+
 }
