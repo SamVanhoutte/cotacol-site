@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  build-and-deploy:
+  build:
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
@@ -33,7 +33,18 @@ jobs:
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
       working-directory: ${{env.working-directory}}
 
-    - name: Deploy to Azure Web App
+  deploytest:
+    needs: build
+    runs-on: windows-latest
+    env:
+      working-directory: src/CotacolApp
+      app-name: cotacol-hunting-app
+      slot-name: test  
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Deploy test site
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{env.app-name}}
@@ -42,10 +53,131 @@ jobs:
         package: ${{env.DOTNET_ROOT}}/myapp 
 
 
+  configuretst:
+    needs: deploytest
+    runs-on: windows-latest
+    env:
+      app-name: cotacol-hunting-app
+      slot-name: test
+
+    steps:
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+    - name: Configure Azure Web App
+      uses: azure/appservice-settings@v1
+      id: settings
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        app-settings-json: '[
+                              {
+                                "name": "api:sharedkeyvalue",
+                                "value": "${{ secrets.CotacolApiSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:sharedkeyheadername",
+                                "value": "x-api-subscription-key",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:apiurl",
+                                "value": "https://cotacol-hunting-test.azure-api.net/api/v1",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:redirectdomain",
+                                "value": "cotacol-hunting-app-test.azurewebsites.net",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "api:loginUrl",
+                                "value": "https://cotacol-hunting-app-tst.azurewebsites.net/achievements",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "keyvault:keyvaultname",
+                                "value": "cotacol-hunting",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeySasBlobUri2",
+                                "value": "${{ secrets.KeySasBlobUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "maps:googlemapkey",
+                                "value": "${{ secrets.GoogleMapsKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "admin:admins",
+                                "value": "${{ secrets.AdminUsers }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeyKeyvaultUri",
+                                "value": "${{ secrets.KeyKeyvaultUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "logging:ApplicationInsightsInstrumentationKey",
+                                "value": "${{ secrets.ApplicationInsightsInstrumentationKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientId",
+                                "value": "${{ secrets.StravaClientId }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientOauthSecret",
+                                "value": "${{ secrets.StravaOAuthSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:AccessTokenUrl",
+                                "value": "https://www.strava.com/api/v3/oauth/token",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "Development",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                                "value": "6.9.1",
+                                "slotSetting": false
+                              }
+                            ]'
+
+  deployprd:
+    needs: configuretst
+    runs-on: windows-latest
+    env:
+      working-directory: src/CotacolApp
+      app-name: cotacol-hunting-app
+      slot-name: test  
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        package: ${{env.DOTNET_ROOT}}/myapp 
+
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
 
-  configure:
-    needs: build-and-deploy
+  configureprd:
+    needs: deployprd
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
