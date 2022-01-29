@@ -49,7 +49,7 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        publish-profile: ${{ secrets.TEST_AZURE_PUBLISH_PROFILE }}
         package: ${{env.DOTNET_ROOT}}/myapp 
 
 
