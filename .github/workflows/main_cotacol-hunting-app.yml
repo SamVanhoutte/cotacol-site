@@ -53,6 +53,7 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: publish-artifact
+        path: ${{env.DOTNET_ROOT}}/myapp 
         
     - name: Deploy test site
       uses: azure/webapps-deploy@v2
