@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace CotacolApp.Models.CotacolApi
@@ -46,6 +47,8 @@ namespace CotacolApp.Models.CotacolApi
                 return 1;
             }
         }
+
+        [JsonIgnore] public bool ContainsCols => ColsAchieved?.Any() ?? ColsMissing?.Any() ?? false;
     }
 
     public enum BadgeType
