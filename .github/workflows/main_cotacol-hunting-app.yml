@@ -32,6 +32,12 @@ jobs:
     - name: dotnet publish
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
       working-directory: ${{env.working-directory}}
+      
+    - name: Upload published app
+      uses: actions/upload-artifact@v2
+      with:
+        name: publish-artifact
+        path: ${{env.DOTNET_ROOT}}/myapp
 
   deploytest:
     needs: build
@@ -44,6 +50,10 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
+    - uses: actions/download-artifact@v2
+      with:
+        name: publish-artifact
+        
     - name: Deploy test site
       uses: azure/webapps-deploy@v2
       with:
@@ -165,6 +175,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: publish-artifact
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
