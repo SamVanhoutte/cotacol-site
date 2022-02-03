@@ -172,7 +172,7 @@ jobs:
     env:
       working-directory: src/CotacolApp
       app-name: cotacol-hunting-app
-      slot-name: test  
+      slot-name: production  
 
     steps:
     - uses: actions/checkout@master
