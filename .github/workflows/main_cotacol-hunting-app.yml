@@ -167,7 +167,7 @@ jobs:
   #                           ]'
 
   deployprd:
-    needs: configuretst
+    needs: deploytest
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
