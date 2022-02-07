@@ -24,5 +24,6 @@ namespace CotacolApp.Interfaces
         Task<YearReview> GetYearReviewAsync(string userId, int year);
         Task<List<UserBadgeStatus>> GetBadgesAsync(string userId);
         Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId);
+        Task<List<BadgeSyncResult>> SynchronizeUserBadgesAsync(string userId);
     }
 }

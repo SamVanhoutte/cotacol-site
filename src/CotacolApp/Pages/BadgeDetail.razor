@@ -107,8 +107,10 @@
     protected List<string> GetColIds()
     {
         var ids = new List<string>();
-        ids.AddRange(_badgeDetail.ColsAchieved);
-        ids.AddRange(_badgeDetail.ColsMissing);
+        if (_badgeDetail?.ColsAchieved != null)
+            ids.AddRange(_badgeDetail.ColsAchieved);
+        if (_badgeDetail?.ColsMissing != null)
+            ids.AddRange(_badgeDetail.ColsMissing);
         return ids;
     }
 
