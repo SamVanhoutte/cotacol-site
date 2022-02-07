@@ -248,5 +248,22 @@ namespace CotacolApp.Services
                 .GetJsonAsync<UserBadgeStatus>();
             return response;
         }
+        
+        public async Task<List<BadgeSyncResult>> SynchronizeUserBadgesAsync(string userId)
+        {
+            _logger.LogInformation($"Sync request for user {userId} badges");
+            var response = await $"{_settings.ApiUrl}/user/{userId}/badges/sync"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .AllowAnyHttpStatus()
+                .PostJsonAsync(new { });
+            _logger.LogInformation($"Sync requested for badges of user {userId} with status {response.StatusCode}");
+            var result = new List<BadgeSyncResult>();
+            if (response.StatusCode >= 200 && response.StatusCode < 300)
+            {
+                result = await response.ResponseMessage.Content.ReadFromJsonAsync<List<BadgeSyncResult>>();
+            }
+
+            return result;
+        }
     }
 }
