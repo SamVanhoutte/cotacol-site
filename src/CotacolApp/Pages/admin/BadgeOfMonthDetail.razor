@@ -42,9 +42,7 @@
                     <b>Cols of the month:</b>
                     <p>
                         <MatAutocompleteList Items="@climbs" FullWidth="true" TItem="ClimbData" Label="Add climbs here" CustomStringSelector="@(i => i.Name)" ValueChanged="@(async (val) => await AddClimbAsync(val))">
-                            <ItemTemplate>
-                                <div style="display: flex; flex-direction: row; width: 100%;">#@context.Id - @context.Name : @context.CotacolPoints points</div>
-                            </ItemTemplate>
+                            <ItemTemplate><div style="display: flex; flex-direction: row; width: 100%;">#@context.Id - @context.Name : @context.CotacolPoints points</div></ItemTemplate>
                         </MatAutocompleteList>
                     </p>
                     <p>
