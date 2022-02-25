@@ -1,4 +1,4 @@
-@page "/admin/users2"
+@page "/admin/users"
 @using CotacolApp.Models.CotacolApi
 @using CotacolApp.Services.Extensions
 @using MatBlazor
@@ -7,19 +7,18 @@
 @inject IUserProfileManager UserProfile
 @inject NavigationManager NavManager
 
-<h1>User management</h1>
+<h1>User overview</h1>
 @if (UserProfile.IsAdmin)
 {
-    <MatSlideToggle TValue="bool" Label="       Check strava auth (slow)" @bind-Value="@loadTokens" Disabled="false"></MatSlideToggle>
-    <MatSlideToggle TValue="bool" Label="       Retrieve sync status (slow)" @bind-Value="@loadSync" Disabled="false"></MatSlideToggle>
     <MatIconButton Icon="@MatIconNames.Search" OnClick="async () => await LoadUserListAsync()"></MatIconButton>
     @if (queryLaunched && userList==null)
     {
         <span>Getting data</span>
     }
+    <MatButtonLink Icon="multiline_chart" Href="/admin/users2">All users</MatButtonLink>
     <hr/>
     @if (userList != null)
-    {
+    {   
         <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
         <MatTable Items="@userList" class="lektonic" PageSize="100"
                   AllowSelection="true" FilterByColumnName="FullName"
@@ -74,7 +73,7 @@ else
 }
 
 @code {
-    List<UserRecord> userList;
+    List<UserListRecord> userList;
     private bool loadTokens = false;
     private bool loadSync = false;
     private bool queryLaunched = false;
@@ -89,7 +88,7 @@ else
         {
             queryLaunched = true;
             userList = null;
-            userList = await CotacolClient.GetUsersAsync(loadTokens, loadSync);
+            userList = await CotacolClient.GetUserListAsync();
         }
     }
 
