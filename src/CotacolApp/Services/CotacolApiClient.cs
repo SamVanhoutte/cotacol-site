@@ -128,6 +128,14 @@ namespace CotacolApp.Services
                 .GetJsonAsync<List<UserRecord>>();
         }
 
+        public async Task<List<UserListRecord>> GetUserListAsync()
+        {
+            return await $"{_settings.ApiUrl}/users"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .SetQueryParam("reportedusers", true)
+                .GetJsonAsync<List<UserListRecord>>();
+        }
+
         public async Task<List<SegmentDataValidation>> GetSegmentListAsync()
         {
             return await $"{_settings.ApiUrl}/segmentdata"
