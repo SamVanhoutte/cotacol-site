@@ -60,7 +60,7 @@ namespace CotacolApp.Services.Extensions
 
         public static string Date(this DateTime? dateTime)
         {
-            return dateTime == null ? "-" : dateTime.Value.ToString("d");
+            return dateTime == null ? "-" : dateTime.Value.ToString("MMM dd, yyyy");
         }
         
         public static string DateTime(this DateTime? dateTime)
