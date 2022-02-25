@@ -31,6 +31,14 @@
             </tr>
             <tr>
                 <td style="vertical-align: top">
+                    <b>Valid period:</b>
+                </td>
+                <td>
+                    <MatDatePicker @bind-Value="@FromDate"></MatDatePicker> to <MatDatePicker @bind-Value="@ToDate"></MatDatePicker>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top">
                     <b>Description:</b>
                 </td>
                 <td>
@@ -43,7 +51,9 @@
                     <p>
                         <MatAutocompleteList Items="@climbs" FullWidth="true" TItem="ClimbData" Label="Add climbs here" CustomStringSelector="@(i => i.Name)" ValueChanged="@(async (val) => await AddClimbAsync(val))">
                             <ItemTemplate>
-                                <div style="display: flex; flex-direction: row; width: 100%;">#@context.Id - @context.Name : @context.CotacolPoints points</div>
+                                <div style="display: flex; flex-direction: row; width: 100%;">
+                                    #@context.Id - @context.Name : @context.CotacolPoints points
+                                </div>
                             </ItemTemplate>
                         </MatAutocompleteList>
                     </p>
@@ -87,6 +97,9 @@ else
     [Parameter]
     public string Month { get; set; }
 
+    public DateTime? FromDate;
+    public DateTime? ToDate;
+    
     private IEnumerable<BadgeOfMonthData> monthBadges;
     private BadgeOfMonthData currentBadge;
     private IEnumerable<ClimbData> climbs;
@@ -97,6 +110,10 @@ else
         {
             monthBadges = await CotacolClient.GetBadgeOfMonthListAsync();
             currentBadge = monthBadges.FirstOrDefault(mb => mb.Year == int.Parse(Year) && mb.Month == int.Parse(Month));
+            Console.WriteLine(currentBadge.Month);
+            Console.WriteLine(currentBadge.StartTime);
+            FromDate = currentBadge?.StartTime;
+            ToDate = currentBadge?.EndTime;
             climbs = await CotacolClient.GetClimbDataAsync();
         }
         await base.OnInitializedAsync();
@@ -122,9 +139,10 @@ else
 
     private async Task PersistMonthBadgeAsync(MouseEventArgs val)
     {
+        currentBadge.StartTime = FromDate;
+        currentBadge.EndTime = ToDate;
         await CotacolClient.UpdateBadgeOfMonthAsync(currentBadge);
         NavManager.NavigateTo($"/admin/badges/month");
-
     }
 
 }

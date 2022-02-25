@@ -201,6 +201,12 @@
                                     <MatListItemSecondaryText>@(userDetail.UserTokens.Scope ?? "not set")</MatListItemSecondaryText>
                                 </MatListItemText>
                             </MatListItem>
+                            <MatListItem>
+                                <MatListItemText>
+                                    <MatListItemPrimaryText>Key Vault</MatListItemPrimaryText>
+                                    <MatListItemSecondaryText><a target="_blank" href="https://portal.azure.com/#@@marchitec.onmicrosoft.com/asset/Microsoft_Azure_KeyVault/Secret/https://cotacol-hunting.vault.azure.net/secrets/strava-@(UserId)-bearer/">Portal</a></MatListItemSecondaryText>
+                                </MatListItemText>
+                            </MatListItem>
                         </MatList>
                     }
                     else
