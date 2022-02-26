@@ -76,50 +76,61 @@ namespace CotacolApp.Services.Imaging
                     if (summary?.HeaviestActivity != null)
                     {
                         image.Mutate(
-                            i => i.DrawText(new DrawingOptions(), $"Toughest activity: {(summary.HeaviestActivity.TotalPoints).Number()} pts - {summary.HeaviestActivity.UniqueCols.Number()} cols", smallFont, Color.Black, 
-                                new PointF( totalValuesLeftBorder, startHeightTotals + rowHeight) )
+                            i => i.DrawText(new DrawingOptions(),
+                                $"Toughest activity: {(summary.HeaviestActivity.TotalPoints).Number()} pts - {summary.HeaviestActivity.UniqueCols.Number()} cols",
+                                smallFont, Color.Black,
+                                new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight))
                         );
                     }
+
                     image.Mutate(
                         i =>
                         {
-                            i.DrawText(new DrawingOptions(), $"{summary.TotalCols.Number()} cols overall", smallFont,
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalCols.Number(belowZeroIsNull:false)} cols overall", smallFont,
                                 Color.Black,
                                 new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 2));
-                            i.DrawText(new DrawingOptions(), $"{summary.TotalPoints.Number()} points overall",
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalPoints.Number(belowZeroIsNull:false)} points overall",
                                 smallFont, Color.Black,
                                 new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 3));
-                            i.DrawText(new DrawingOptions(), $"{(summary.TotalLength / 1000).Number()} km cols overall",
+                            i.DrawText(new DrawingOptions(), $"{(summary.TotalLength / 1000).Number(belowZeroIsNull:false)} km cols overall",
                                 smallFont, Color.Black,
                                 new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 4));
-                            i.DrawText(new DrawingOptions(), $"{summary.TotalElevation.Number()} m elevation overall",
+                            i.DrawText(new DrawingOptions(), $"{summary.TotalElevation.Number(belowZeroIsNull:false)} m elevation overall",
                                 smallFont, Color.Black,
                                 new PointF(totalValuesLeftBorder, startHeightTotals + rowHeight * 5));
-                            i.DrawText(rightAlignFormat, summary.UserName, smallFont, Color.Black,
-                                new PointF(760, 990));
+                            if (!string.IsNullOrEmpty(summary.UserName))
+                            {
+                                i.DrawText(rightAlignFormat, summary.UserName, smallFont, Color.Black,
+                                    new PointF(760, 990));
+                            }
                         });
                     // Col values
                     var regularFont = boldFamily.CreateFont(32, FontStyle.Bold);
                     image.Mutate(
                         i =>
                         {
-                            i.DrawText(new DrawingOptions(),
-                                $"#{summary?.MostPopularCol.CotacolId} {summary?.MostPopularCol.CotacolName}",
-                                regularFont, Color.Black,
-                                new PointF(156, 855));
-                            i.DrawText(new DrawingOptions(), $"{summary?.MostPopularColCount} times", regularFont,
-                                Color.White,
-                                new PointF(464, 812));
-                        });                    
+                            if (summary?.MostPopularCol != null)
+                            {
+                                i.DrawText(new DrawingOptions(),
+                                    $"#{summary?.MostPopularCol.CotacolId} {summary?.MostPopularCol.CotacolName}",
+                                    regularFont, Color.Black,
+                                    new PointF(156, 855));
+
+                                i.DrawText(new DrawingOptions(), $"{summary?.MostPopularColCount} times", regularFont,
+                                    Color.White,
+                                    new PointF(464, 812));
+                            }
+                        });
                 }
                 else
                 {
                     var regularFont = boldFamily.CreateFont(32, FontStyle.Bold);
                     image.Mutate(
-                        i => i.DrawText(new DrawingOptions{TextOptions=new TextOptions{WrapTextWidth = 350}}, 
-                            "The year review generation went wrong.  Did you conquer Cotacols, this year?", regularFont, Color.Black, 
-                            new PointF( 84, 520) )
-                    ); 
+                        i => i.DrawText(new DrawingOptions {TextOptions = new TextOptions {WrapTextWidth = 350}},
+                            "The year review generation went wrong.  Did you conquer Cotacols, this year?", regularFont,
+                            Color.Black,
+                            new PointF(84, 520))
+                    );
                 }
 
                 using (var imgStream = new MemoryStream())
