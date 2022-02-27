@@ -182,5 +182,15 @@ namespace CotacolApp.Services
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .DeleteAsync();
         }
+
+        public async Task<SystemStatus> GetSystemStatusAsync()
+        {
+            var systemStatus = await $"{_settings.ApiUrl}/system/status"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<SystemStatus>();
+
+            return systemStatus;
+
+        }
     }
 }
