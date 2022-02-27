@@ -25,5 +25,6 @@ namespace CotacolApp.Interfaces
         Task<IEnumerable<BadgeOfMonthData>> GetBadgeOfMonthListAsync();
         Task UpdateBadgeOfMonthAsync(BadgeOfMonthData badgeOfMonthData);
         Task DeleteBadgeOfMonthAsync(int year, int month);
+        Task<SystemStatus> GetSystemStatusAsync();
     }
 }   
