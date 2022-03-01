@@ -21,6 +21,11 @@
     </NotAuthorized>
     <Authorized>
         <h1>@GetPageTitle()</h1>
+        @if (UserProfile.IsAdmin)
+        {
+            <UserAdminLinks UserId="@UserId"/>
+            <br/>
+        }
         @if (_userBadges == null)
         {
             <p>
@@ -34,7 +39,7 @@
                 <div class="mat-layout-grid-inner">
                     @foreach (var badge in _userBadges.Where(ub => ub.BadgeId.StartsWith("provinc", StringComparison.InvariantCultureIgnoreCase)).OrderBy(ub => ub.BadgeId))
                     {
-                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                        <UserBadgeComponent BadgeStatus="badge" UserId="@UserId"></UserBadgeComponent>
                     }
                 </div>
             </div>
@@ -43,7 +48,7 @@
                 <div class="mat-layout-grid-inner">
                     @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.Amount)).OrderBy(ub => ub.NumberColsNeeded))
                     {
-                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                        <UserBadgeComponent BadgeStatus="badge" UserId="@UserId"></UserBadgeComponent>
                     }
                 </div>
             </div>
