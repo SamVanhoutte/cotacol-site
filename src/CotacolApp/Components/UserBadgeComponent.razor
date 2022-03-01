@@ -34,6 +34,8 @@
 
     [Parameter]
     public UserBadgeStatus BadgeStatus { get; set; }
+    [Parameter]
+    public string UserId { get; set; }
 
     [Parameter]
     public string Width { get; set; } = "100%";
@@ -42,7 +44,11 @@
     {
         if ((BadgeStatus?.ValidFrom ?? DateTime.MinValue) < DateTime.Today)
         {
-            return $"badge/{BadgeStatus.BadgeId}";
+            if (string.IsNullOrEmpty(UserId))
+            {
+                return $"badge/{BadgeStatus.BadgeId}";
+            }
+            return $"badge/{BadgeStatus.BadgeId}/{UserId}";
         }
         return "javascript: void(0)";
     }
