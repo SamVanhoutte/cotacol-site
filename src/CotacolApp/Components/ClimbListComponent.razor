@@ -84,6 +84,9 @@ else
     public List<string> CotacolIds { get; set; }
 
     [Parameter]
+    public string UserId { get; set; }
+    
+    [Parameter]
     public bool HideFilters { get; set; }
 
     private string _currentFilter = "nofilter";
@@ -91,12 +94,13 @@ else
     private IEnumerable<UserClimb> _climbList;
     private IEnumerable<UserClimb> _climbs;
     private string _filterMessage;
-
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    
     protected override async Task OnInitializedAsync()
     {
         if (UserProfile.IsAuthenticated)
         {
-            _climbList = await CotacolUserClient.GetClimbDataAsync(UserProfile.UserId);
+            _climbList = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
         }
         else
         {

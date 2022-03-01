@@ -1,4 +1,5 @@
 @page "/climbs"
+@page "/climbs/{UserId}"
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
 <Title Value="Cotacol: the list" />
 
@@ -6,4 +7,11 @@
 
 <p class="lektonic">1000 Cotacol climbs for you to conquer.</p>
 
-<ClimbListComponent Mode="@ClimbViewMode.Table"></ClimbListComponent>
+<ClimbListComponent Mode="@ClimbViewMode.Table" UserId="@UserId"></ClimbListComponent>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+}
