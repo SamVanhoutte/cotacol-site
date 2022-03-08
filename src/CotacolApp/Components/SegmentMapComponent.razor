@@ -286,14 +286,13 @@ else
     {
         Console.WriteLine(segmentId);
         var segmentResponse = await CotacolClient.FetchStravaSegmentAsync(segmentId);
-        if (segmentResponse.Succeeded)
+        if (segmentResponse!=null)
         {
-            NewSegmentDetail = segmentResponse.Segment;
-            Console.WriteLine("succeeded");
+            NewSegmentDetail = segmentResponse;
         }
         else
         {
-            ErrorMessage = segmentResponse.ErrorMessage;
+            ErrorMessage = "Strava segment retrieval failed";
             Console.WriteLine(ErrorMessage);
         }
         _cotacol.Segments.Add(new Models.CotacolApi.SegmentDetail
@@ -371,7 +370,6 @@ else
     {
         try
         {
-            Console.WriteLine($"Will update {NewSegmentId}");
             var stravaSegment = _cotacol.Segments.First(s => s.Segmentid.Equals(NewSegmentId));
             var updateRequest = new UpdateSegmentRequest
             {
@@ -379,7 +377,9 @@ else
                 Distance = stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
                 StravaSegmentId = stravaSegment.Segmentid
             };
-            await CotacolClient.UpdateSegmentAsync(_cotacol.Id, updateRequest);
+            Console.WriteLine($"Will update {NewSegmentId}");
+            var status = await CotacolClient.UpdateSegmentAsync(_cotacol.Id, updateRequest);
+            Console.WriteLine($"Segment updated with Status code {status}");
             dialogIsOpen = false;
         }
         catch (Exception e)

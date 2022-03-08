@@ -95,7 +95,7 @@ namespace CotacolApp.Services
             return segmentData;
         }
 
-        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId,
+        public async Task<StravaSegment> FetchStravaSegmentAsync(string stravaSegmentId,
             bool persistMetadata = false)
         {
             if (stravaSegmentId.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
@@ -106,7 +106,7 @@ namespace CotacolApp.Services
             var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
                 .SetQueryParam("UpdateMetadata", persistMetadata)
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .GetJsonAsync<StravaSegmentResponse>();
+                .GetJsonAsync<StravaSegment>();
 
             return segmentResponse;
         }
