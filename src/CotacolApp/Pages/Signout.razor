@@ -1,0 +1,21 @@
+@page "/signout"
+@using CotacolApp.Models.Identity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CotacolUser> SignInManager
+<h3>You're signed out. See you later!</h3>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await SignInManager.SignOutAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+}

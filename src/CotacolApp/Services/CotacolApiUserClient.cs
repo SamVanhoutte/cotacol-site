@@ -138,17 +138,21 @@ namespace CotacolApp.Services
             return profile;
         }
 
-        public async Task UpdateSettingsAsync(UserSettings settings)
+        public async Task UpdateSettingsAsync(UserSettings settings, string email)
         {
-            //TODO : add private settings etc
-            await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
+            var req = new UserSetupRequest
             {
                 UserId = currentUserId,
                 UpdateActivityDescription = settings.UpdateActivityDescription,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,
-                PrivateProfile = settings.PrivateProfile
-            });
+                PrivateProfile = settings.PrivateProfile, 
+            };
+            if (!string.IsNullOrEmpty(email))
+            {
+                req.EmailAddress = email;
+            }
+            await _cotacolDataClient.SetupUserAsync(req);
         }
 
         public async Task<SyncStatus> GetSyncStatus(string userId)
