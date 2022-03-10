@@ -17,12 +17,8 @@
         <span class="lektonic">@(Stats?.Users) registered users</span>
     </div>
     <div>
-        <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
-        <span class="lektonic">conquered all 1000 climbs</span>
-    </div>
-    <div>
         <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
-        <span class="lektonic">and collected @(Stats?.TotalPoints.Number()) points</span>
+        <span class="lektonic">have collected @(Stats?.TotalPoints.Number()) Cotacol points</span>
     </div>
     <ul>
         @foreach (var recent in Stats.RecentActivities

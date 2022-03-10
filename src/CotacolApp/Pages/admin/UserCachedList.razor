@@ -37,6 +37,7 @@
                     <MatSortHeader SortId="description">Update description</MatSortHeader>
                     <MatSortHeader SortId="private">Private profile</MatSortHeader>
                     <MatSortHeader SortId="activities">Total activities</MatSortHeader>
+                    <MatSortHeader SortId="email">Email</MatSortHeader>
                     <MatSortHeader SortId="name">Edit</MatSortHeader>
                 </MatSortHeaderRow>
             </MatTableHeader>
@@ -49,6 +50,7 @@
                 <td>@context.UpdateActivityDescription</td>
                 <td>@context.PrivateProfile</td>
                 <td>@context.TotalActivities.Number()</td>
+                <td>@context.Email</td>
                 <td>
                     <a href="admin/user/@context.UserId">
                         Details
