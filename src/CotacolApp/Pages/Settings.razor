@@ -1,0 +1,86 @@
+@page "/settings"
+@using MatBlazor
+@using CotacolApp.Components
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using Microsoft.IdentityModel.Clients.ActiveDirectory
+<Title Value="Cotacol Achievements"/>
+
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (!string.IsNullOrEmpty(_notAuthorizedMessage))
+        {
+            <p>
+                <em style="color: darkred">@_notAuthorizedMessage</em>
+            </p>
+        }
+        else
+        {
+            if (_userProfile != null)
+            {
+                <h1>Update your settings</h1>
+                @if (!string.IsNullOrEmpty(StatusMessage))
+                {
+                    <p>
+                        <em style="color: darkred">@StatusMessage</em>
+                    </p>
+                }
+                <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
+                <hr/>
+                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
+                <span>Join beta features</span>
+                <hr/>
+                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.UpdateActivityDescription"></MatSlideToggle>
+                <span>Update activity descriptions</span>
+                <hr/>
+                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.PrivateProfile"></MatSlideToggle>
+                <span>Hide profile from stats</span>
+                <hr/>
+                <MatButton Unelevated="true" Icon="@MatIconNames.Save" OnClick="async () => await SaveSettingsAsync()">Save</MatButton>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string StatusMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+        }
+    }
+
+    private async Task SaveSettingsAsync()
+    {
+        await CotacolUserClient.UpdateSettingsAsync(_userProfile.UserSettings, _userProfile.EmailAddress);
+        StatusMessage = "Settings were successfully updated.";
+    }
+
+}
