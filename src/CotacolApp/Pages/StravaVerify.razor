@@ -1,0 +1,125 @@
+@page "/strava"
+@using MatBlazor
+@using MatBlazor.Components
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
+@using CotacolApp.Components
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using OneOf.Types
+<Title Value="Verify your Strava Authorization"/>
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (_userProfile == null)
+        {
+            <p>
+                <em>Fetching your strava configuration...</em>
+            </p>
+        }
+        else
+        {
+            <h1>@GetName()</h1>
+            <MatList SingleSelection="true" TwoLine="true">
+                <MatListItem>
+                    <MatListItemText>
+                        <MatListItemPrimaryText>Strava token validity</MatListItemPrimaryText>
+                        <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_userProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
+                    </MatListItemText>
+                </MatListItem>
+                <MatListItem>
+                    <MatListItemText>
+                        <MatListItemPrimaryText>Activity access</MatListItemPrimaryText>
+                        <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_userProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
+                    </MatListItemText>
+                </MatListItem>
+                @if (_userProfile.UpdateDescriptionFlag)
+                {
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                            <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_userProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                }
+                else
+                {
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                            <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_userProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                }
+                @if (UserProfile.IsAdmin)
+                {
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Strava permissions</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>"@(_userProfile.StravaPermissions ?? _userProfile.TokenScope)"</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Token last refreshed</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>@(_userProfile.TokenLastRefreshed)</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Token expiration</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>@(_userProfile.TokenExpiration)</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                }
+            </MatList>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string _notAuthorizedMessage;
+    private StravaUserProfile _userProfile;
+    private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "You are not allowed to see other user's data";
+                return;
+            }
+            if (!string.IsNullOrEmpty(SelectedUserId))
+            {
+                _userProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserId);
+            }
+        }
+    }
+
+    private string TokenValidityText => "";
+
+    private string GetName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return UserProfile?.FullName ?? "User's configuration";
+    }
+
+}
