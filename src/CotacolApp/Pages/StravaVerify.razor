@@ -20,7 +20,7 @@
         }
     </NotAuthorized>
     <Authorized>
-        @if (_userProfile == null)
+        @if (_stravaProfile == null)
         {
             <p>
                 <em>Fetching your strava configuration...</em>
@@ -33,21 +33,21 @@
                 <MatListItem>
                     <MatListItemText>
                         <MatListItemPrimaryText>Strava token validity</MatListItemPrimaryText>
-                        <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_userProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
+                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
                     </MatListItemText>
                 </MatListItem>
                 <MatListItem>
                     <MatListItemText>
                         <MatListItemPrimaryText>Activity access</MatListItemPrimaryText>
-                        <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_userProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
+                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
                     </MatListItemText>
                 </MatListItem>
-                @if (_userProfile.UpdateDescriptionFlag)
+                @if (_stravaProfile.UpdateDescriptionFlag)
                 {
                     <MatListItem>
                         <MatListItemText>
                             <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
-                            <MatListItemSecondaryText><MatIcon Icon='@(_userProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_userProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
+                            <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
                         </MatListItemText>
                     </MatListItem>
                 }
@@ -56,7 +56,7 @@
                     <MatListItem>
                         <MatListItemText>
                             <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
-                            <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_userProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
+                            <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
                         </MatListItemText>
                     </MatListItem>
                 }
@@ -65,23 +65,25 @@
                     <MatListItem>
                         <MatListItemText>
                             <MatListItemPrimaryText>Strava permissions</MatListItemPrimaryText>
-                            <MatListItemSecondaryText>"@(_userProfile.StravaPermissions ?? _userProfile.TokenScope)"</MatListItemSecondaryText>
+                            <MatListItemSecondaryText>"@(_stravaProfile.StravaPermissions ?? _stravaProfile.TokenScope)"</MatListItemSecondaryText>
                         </MatListItemText>
                     </MatListItem>
                     <MatListItem>
                         <MatListItemText>
                             <MatListItemPrimaryText>Token last refreshed</MatListItemPrimaryText>
-                            <MatListItemSecondaryText>@(_userProfile.TokenLastRefreshed)</MatListItemSecondaryText>
+                            <MatListItemSecondaryText>@(_stravaProfile.TokenLastRefreshed)</MatListItemSecondaryText>
                         </MatListItemText>
                     </MatListItem>
                     <MatListItem>
                         <MatListItemText>
                             <MatListItemPrimaryText>Token expiration</MatListItemPrimaryText>
-                            <MatListItemSecondaryText>@(_userProfile.TokenExpiration)</MatListItemSecondaryText>
+                            <MatListItemSecondaryText>@(_stravaProfile.TokenExpiration)</MatListItemSecondaryText>
                         </MatListItemText>
                     </MatListItem>
                 }
             </MatList>
+            <p>If you want to update and re-authorize Strava, using the right permissions, click the button below.  You will be redirected to a new tab that you can easily close afterwards.</p>
+            <MatButtonLink Icon="@MatIconNames.Link" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-authorize Strava</MatButtonLink>
         }
     </Authorized>
 </AuthorizeView>
@@ -92,7 +94,7 @@
     public string UserId { get; set; }
 
     private string _notAuthorizedMessage;
-    private StravaUserProfile _userProfile;
+    private StravaUserProfile _stravaProfile;
     private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
 
     protected override async Task OnInitializedAsync()
@@ -106,7 +108,7 @@
             }
             if (!string.IsNullOrEmpty(SelectedUserId))
             {
-                _userProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserId);
+                _stravaProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserId);
             }
         }
     }
