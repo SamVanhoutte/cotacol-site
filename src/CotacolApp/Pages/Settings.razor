@@ -156,11 +156,18 @@
     {
         if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
         {
-            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
-            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
             {
-                _notAuthorizedMessage = "The user profile is not public";
-                return;
+                _notAuthorizedMessage = "You are not allowed to see other user's settings";
+            }
+            else
+            {
+                _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+                if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                {
+                    _notAuthorizedMessage = "The user profile is not public";
+                    _userProfile = null;
+                }
             }
         }
         if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
@@ -168,11 +175,13 @@
             if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
             {
                 _stravaNotAuthorizedMessage = "You are not allowed to see other user's Strava permissions";
-                return;
             }
-            if (!string.IsNullOrEmpty(UserIdToShow))
+            else
             {
-                _stravaProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserIdToShow);
+                if (!string.IsNullOrEmpty(UserIdToShow))
+                {
+                    _stravaProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserIdToShow);
+                }
             }
         }
     }
