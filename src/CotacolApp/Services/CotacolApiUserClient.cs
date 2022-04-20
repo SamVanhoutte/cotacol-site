@@ -149,11 +149,11 @@ namespace CotacolApp.Services
 
         }
 
-        public async Task UpdateSettingsAsync(UserSettings settings, string email)
+        public async Task UpdateSettingsAsync(string userId, UserSettings settings, string email)
         {
             var req = new UserSetupRequest
             {
-                UserId = currentUserId,
+                UserId = userId,
                 UpdateActivityDescription = settings.UpdateActivityDescription,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,

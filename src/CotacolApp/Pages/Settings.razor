@@ -21,7 +21,7 @@
         }
     </NotAuthorized>
     <Authorized>
-        <h1>Update your settings</h1>
+        <h1>Settings @(GetName())</h1>
 
         <div class="mat-layout-grid">
             <div class="mat-layout-grid-inner">
@@ -137,9 +137,6 @@
                 </div>
             </div>
         </div>
-
-
-        }
     </Authorized>
 </AuthorizeView>
 
@@ -182,8 +179,17 @@
 
     private async Task SaveSettingsAsync()
     {
-        await CotacolUserClient.UpdateSettingsAsync(_userProfile.UserSettings, _userProfile.EmailAddress);
+        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, _userProfile.UserSettings, _userProfile.EmailAddress);
         StatusMessage = "Settings were successfully updated.";
+    }
+
+    private string GetName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return $"({UserProfile.FullName})";
+        }
+        return string.IsNullOrEmpty(_userProfile?.FullName) ? "" : $"({_userProfile?.FullName})";
     }
 
 }
