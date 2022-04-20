@@ -1,4 +1,5 @@
 @page "/settings"
+@page "/settings/{UserId}"
 @using MatBlazor
 @using CotacolApp.Components
 @using CotacolApp.Models.CotacolApi
@@ -10,7 +11,7 @@
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
 @using Microsoft.IdentityModel.Clients.ActiveDirectory
-<Title Value="Cotacol Achievements"/>
+<Title Value="Cotacol settings"/>
 
 <AuthorizeView>
     <NotAuthorized>
@@ -20,36 +21,124 @@
         }
     </NotAuthorized>
     <Authorized>
-        @if (!string.IsNullOrEmpty(_notAuthorizedMessage))
-        {
-            <p>
-                <em style="color: darkred">@_notAuthorizedMessage</em>
-            </p>
-        }
-        else
-        {
-            if (_userProfile != null)
-            {
-                <h1>Update your settings</h1>
-                @if (!string.IsNullOrEmpty(StatusMessage))
-                {
-                    <p>
-                        <em style="color: darkred">@StatusMessage</em>
-                    </p>
-                }
-                <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
-                <hr/>
-                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
-                <span>Join beta features</span>
-                <hr/>
-                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.UpdateActivityDescription"></MatSlideToggle>
-                <span>Update activity descriptions</span>
-                <hr/>
-                <MatSlideToggle @bind-Value="@_userProfile.UserSettings.PrivateProfile"></MatSlideToggle>
-                <span>Hide profile from stats</span>
-                <hr/>
-                <MatButton Unelevated="true" Icon="@MatIconNames.Save" OnClick="async () => await SaveSettingsAsync()">Save</MatButton>
-            }
+        <h1>Update your settings</h1>
+
+        <div class="mat-layout-grid">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    @if (!string.IsNullOrEmpty(_notAuthorizedMessage))
+                    {
+                        <p>
+                            <em style="color: darkred">@_notAuthorizedMessage</em>
+                        </p>
+                    }
+                    else
+                    {
+                        if (_userProfile != null)
+                        {
+                            <h2>Your settings</h2>
+                            @if (!string.IsNullOrEmpty(StatusMessage))
+                            {
+                                <p>
+                                    <em style="color: darkred">@StatusMessage</em>
+                                </p>
+                            }
+                            <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
+                            <hr/>
+                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
+                            <span>Join beta features</span>
+                            <hr/>
+                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.UpdateActivityDescription"></MatSlideToggle>
+                            <span>Update activity descriptions</span>
+                            <hr/>
+                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.PrivateProfile"></MatSlideToggle>
+                            <span>Hide profile from stats</span>
+                            <hr/>
+                            <MatButton Unelevated="true" Icon="@MatIconNames.Save" OnClick="async () => await SaveSettingsAsync()">Save</MatButton>
+                        }
+                    }
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    @if (!string.IsNullOrEmpty(_stravaNotAuthorizedMessage))
+                    {
+                        <p>
+                            <em style="color: darkred">@_notAuthorizedMessage</em>
+                        </p>
+                    }
+                    else
+                    {
+                        @if (_stravaProfile == null)
+                        {
+                            <p>
+                                <em>Fetching your strava configuration...</em>
+                            </p>
+                        }
+                        else
+                        {
+                            <h2>Strava permission review</h2>
+                            <MatList SingleSelection="true" TwoLine="true">
+                                <MatListItem>
+                                    <MatListItemText>
+                                        <MatListItemPrimaryText>Strava token validity</MatListItemPrimaryText>
+                                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
+                                    </MatListItemText>
+                                </MatListItem>
+                                <MatListItem>
+                                    <MatListItemText>
+                                        <MatListItemPrimaryText>Activity access</MatListItemPrimaryText>
+                                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
+                                    </MatListItemText>
+                                </MatListItem>
+                                @if (_stravaProfile.UpdateDescriptionFlag)
+                                {
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                }
+                                else
+                                {
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                }
+                                @if (UserProfile.IsAdmin)
+                                {
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>Strava permissions</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText>"@(_stravaProfile.StravaPermissions ?? _stravaProfile.TokenScope)"</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>Token last refreshed</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText>@(_stravaProfile.TokenLastRefreshed)</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                    <MatListItem>
+                                        <MatListItemText>
+                                            <MatListItemPrimaryText>Token expiration</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText>@(_stravaProfile.TokenExpiration)</MatListItemSecondaryText>
+                                        </MatListItemText>
+                                    </MatListItem>
+                                }
+                            </MatList>
+                            <hr/>
+                            <p>If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</p>
+                            <MatButton Unelevated="true" Target="_blank" href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write" Icon="@MatIconNames.Link">Re-Authorize Strava</MatButton>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+
         }
     </Authorized>
 </AuthorizeView>
@@ -63,6 +152,8 @@
     internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
     private UserProfile _userProfile;
     private string _notAuthorizedMessage;
+    private string _stravaNotAuthorizedMessage;
+    private StravaUserProfile _stravaProfile;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +164,18 @@
             {
                 _notAuthorizedMessage = "The user profile is not public";
                 return;
+            }
+        }
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _stravaNotAuthorizedMessage = "You are not allowed to see other user's Strava permissions";
+                return;
+            }
+            if (!string.IsNullOrEmpty(UserIdToShow))
+            {
+                _stravaProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserIdToShow);
             }
         }
     }

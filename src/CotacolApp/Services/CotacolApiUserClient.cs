@@ -138,6 +138,17 @@ namespace CotacolApp.Services
             return profile;
         }
 
+        public async Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId = null)
+        {
+            userId ??= currentUserId;
+            var profile = await $"{_settings.ApiUrl}/user/strava/{userId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<StravaUserProfile>();
+
+            return profile;
+
+        }
+
         public async Task UpdateSettingsAsync(UserSettings settings, string email)
         {
             var req = new UserSetupRequest

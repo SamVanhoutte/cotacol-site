@@ -15,6 +15,7 @@ namespace CotacolApp.Interfaces
         Task<bool> UnbookmarkClimbAsync(string climbId, string userId = null);
         Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false);
         Task<UserProfile> GetProfileAsync(string userId=null);
+        Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId=null);
         Task UpdateSettingsAsync(UserSettings settings, string emailAddress);
         Task<SyncStatus> GetSyncStatus(string userId);
         Task<AsyncWorkflowResult> SynchronizeAsync(string userId, bool fullSync = false);
