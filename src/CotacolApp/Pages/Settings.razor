@@ -22,6 +22,11 @@
     </NotAuthorized>
     <Authorized>
         <h1>Settings @(GetName())</h1>
+        @if (UserProfile.IsAdmin)
+        {
+            <UserAdminLinks UserId="@UserIdToShow"/>
+            <br/>
+        }
 
         <div class="mat-layout-grid">
             <div class="mat-layout-grid-inner">
@@ -37,11 +42,6 @@
                         if (_userProfile != null)
                         {
                             <h2>Your settings</h2>
-                            @if (UserProfile.IsAdmin)
-                            {
-                                <UserAdminLinks UserId="@UserIdToShow" />
-                                <br/>
-                            }
                             @if (!string.IsNullOrEmpty(StatusMessage))
                             {
                                 <p>
