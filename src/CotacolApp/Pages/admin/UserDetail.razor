@@ -223,7 +223,7 @@
                 <table style="width: 100%">
                     <tr>
                         <td style="text-align: left">
-                            <MatButton Href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacoluserentity@@@UserId" Target="_blank">Entity monitor</MatButton>
+                            <MatButton Href="@EntityMonitorLink" Target="_blank">Entity monitor</MatButton>
                         </td>
                         <td style="text-align: right">
                             @if (CanConvertToSql)
@@ -270,6 +270,7 @@ else
         await RefreshDataAsync();
     }
 
+    private string EntityMonitorLink => $"https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacoluserentity@@{UserId}";
     private async Task ConvertDataAsync()
     {
         if (UserProfile.IsAdmin && !string.IsNullOrEmpty(UserId))
