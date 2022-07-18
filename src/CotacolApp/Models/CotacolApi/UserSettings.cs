@@ -8,5 +8,6 @@ namespace CotacolApp.Models.CotacolApi
         public bool EnableRouteMatching { get; set; }
         public bool PrivateProfile { get; set; }
         public bool EnableBetaFeatures { get; set; }
+        public string PersistenceService { get; set; }
     }
 }

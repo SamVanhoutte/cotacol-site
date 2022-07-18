@@ -16,6 +16,20 @@
                 </MatListItemPrimaryText>
             </MatListItemText>
         </MatListItem>
+        <MatListItem>
+            <MatListItemText>
+                <MatListItemPrimaryText>
+                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@strava@@RateLimitStateEntity" target="_blank">Strava Rate limit Entity</a>
+                </MatListItemPrimaryText>
+            </MatListItemText>
+        </MatListItem>
+        <MatListItem>
+            <MatListItemText>
+                <MatListItemPrimaryText>
+                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/?orderByDirection=asc&timeFrom=2022-05-26T12%3A00%3A00.000Z&filteredColumn=instanceId&filterOperator=Contains&filterValue=UserHistorySyncWorkflow&showStatuses=%5B%22Running%22%2C%22Pending%22%5D">Running sync workflows</a>
+                </MatListItemPrimaryText>
+            </MatListItemText>
+        </MatListItem>
         @if (_systemStatus == null)
         {
             <p>
@@ -24,6 +38,8 @@
         }
         else
         {
+            <br/>
+            <hr/>
             <table>
                 <tr>
                     <td colspan="2">
@@ -60,6 +76,11 @@
                 <tr>
                     <td colspan="2">
                         <hr/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Purge job</b>
                     </td>
                 </tr>
                 <tr>

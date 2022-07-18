@@ -25,11 +25,11 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("purgeOffset")]
         public DateTimeOffset PurgeOffset { get; set; }
-        
+
         [JsonProperty("lastStatsUpdate")]
         public DateTimeOffset LastStatsUpdate { get; set; }
         [JsonProperty("listedUserCount")]
         public long ListedUserCount { get; set; }
-        
+
     }
 }

@@ -132,7 +132,6 @@ namespace CotacolApp.Services
         {
             return await $"{_settings.ApiUrl}/users"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .SetQueryParam("reportedusers", true)
                 .GetJsonAsync<List<UserListRecord>>();
         }
 

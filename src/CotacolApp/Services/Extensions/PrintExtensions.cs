@@ -45,9 +45,19 @@ namespace CotacolApp.Services.Extensions
             return numberValue;
         }
 
+        
+        public static string Number(this int? value)
+        {
+            return value==null?"-": value.Value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+        }
+        public static string Number(this long value)
+        {
+            return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+        }
+        
         public static string Percentage(this double value, bool fractional = false)
         {
-            if (fractional) value = value * 100D;   
+            if (fractional) value = value * 100D;
             return $"{value:#.0}%";
         }
 
