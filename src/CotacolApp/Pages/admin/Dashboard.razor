@@ -1,20 +1,123 @@
 @page "/admin/dashboard"
 @using MatBlazor
+@using CotacolApp.Models.CotacolApi
+@using CotacolApp.Services.Extensions
 @inject IUserProfileManager UserProfile
+@inject ICotacolClient CotacolClient
 @attribute [Authorize]
 <h3>Admin dashboard</h3>
 @if (UserProfile.IsAdmin)
 {
-<MatList>
-    <MatListItem>
-        <MatListItemText>
-            <MatListItemPrimaryText>
-                <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacolmetadataentity@@CotacolMetadataEntity" target="_blank">Col metadata</a>
-            </MatListItemPrimaryText>
-        </MatListItemText>
-    </MatListItem>
-</MatList>
+    <MatList>
+        <MatListItem>
+            <MatListItemText>
+                <MatListItemPrimaryText>
+                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacolmetadataentity@@CotacolMetadataEntity" target="_blank">Col metadata</a>
+                </MatListItemPrimaryText>
+            </MatListItemText>
+        </MatListItem>
+        <MatListItem>
+            <MatListItemText>
+                <MatListItemPrimaryText>
+                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@strava@@RateLimitStateEntity" target="_blank">Strava Rate limit Entity</a>
+                </MatListItemPrimaryText>
+            </MatListItemText>
+        </MatListItem>
+        <MatListItem>
+            <MatListItemText>
+                <MatListItemPrimaryText>
+                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/?orderByDirection=asc&timeFrom=2022-05-26T12%3A00%3A00.000Z&filteredColumn=instanceId&filterOperator=Contains&filterValue=UserHistorySyncWorkflow&showStatuses=%5B%22Running%22%2C%22Pending%22%5D">Running sync workflows</a>
+                </MatListItemPrimaryText>
+            </MatListItemText>
+        </MatListItem>
+        @if (_systemStatus == null)
+        {
+            <p>
+                <em>Fetching the backend status...</em>
+            </p>
+        }
+        else
+        {
+            <br/>
+            <hr/>
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <b>Strava API Throttling status</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Current Interval:</td>
+                    <td style="text-align: center">
+                        <MatProgressBar Progress="@ProgressOfInterval"></MatProgressBar>
+                        @CallsOfInterval / @IntervalLimits (@ProgressOfInterval.Percentage(true))<br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Today:</td>
+                    <td style="text-align: center">
+                        <MatProgressBar Progress="@ProgressOfDay"></MatProgressBar>
+                        @CallsOfDay / @DayLimits (@ProgressOfDay.Percentage(true))<br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <hr/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Strava throttling interval:</td>
+                    <td>@_systemStatus.ThrottlingInterval</td>
+                </tr>
+                <tr>
+                    <td>Server Time:</td>
+                    <td>@_systemStatus.ServerTime</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <hr/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Purge job</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Purge offset:</td>
+                    <td>@_systemStatus.PurgeOffset.ToString("s")</td>
+                </tr>
+                <tr>
+                    <td>Last stats update:</td>
+                    <td>@_systemStatus.LastStatsUpdate.ToString("s")</td>
+                </tr>
+                <tr>
+                    <td>Reported users:</td>
+                    <td>@_systemStatus.ListedUserCount.Number()</td>
+                </tr>
+                <tr>
+                    <td>Activity Queue Depth:</td>
+                    <td>@_systemStatus.ActivityQueueDepth</td>
+                </tr>
+            </table>
+        }
+    </MatList>
 }
 @code {
+    private SystemStatus _systemStatus;
+        private const int IntervalLimits = 600;
+        private const int DayLimits = 30000;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            _systemStatus = await CotacolClient.GetSystemStatusAsync();
+        }
+    }
+
+    public double CallsOfInterval => double.Parse(_systemStatus.StravaThrottlingValue.Split(",").First());
+    public double ProgressOfInterval => (CallsOfInterval / IntervalLimits);
+    public double CallsOfDay => double.Parse(_systemStatus.StravaThrottlingValue.Split(",").Last());
+    public double ProgressOfDay => (CallsOfDay / DayLimits);
 }
