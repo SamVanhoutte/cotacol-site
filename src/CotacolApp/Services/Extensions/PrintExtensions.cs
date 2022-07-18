@@ -41,8 +41,9 @@ namespace CotacolApp.Services.Extensions
             return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
         }
         
-        public static string Percentage(this double value)
+        public static string Percentage(this double value, bool fractional = false)
         {
+            if (fractional) value = value * 100D;
             return $"{value:#.0}%";
         }
         

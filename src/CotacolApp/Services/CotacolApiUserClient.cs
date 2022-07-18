@@ -157,8 +157,12 @@ namespace CotacolApp.Services
                 UpdateActivityDescription = settings.UpdateActivityDescription,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,
-                PrivateProfile = settings.PrivateProfile, 
+                PrivateProfile = settings.PrivateProfile
             };
+            if (!string.IsNullOrEmpty(settings?.PersistenceService))
+            {
+                req.PersistenceService = settings.PersistenceService;
+            }
             if (!string.IsNullOrEmpty(email))
             {
                 req.EmailAddress = email;

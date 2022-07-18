@@ -10,16 +10,23 @@
 <h1>User overview</h1>
 @if (UserProfile.IsAdmin)
 {
-    <MatIconButton Icon="@MatIconNames.Search" OnClick="async () => await LoadUserListAsync()"></MatIconButton>
-    @if (queryLaunched && userList==null)
+    <MatButton Icon="@MatIconNames.Search" OnClick="async () => await LoadUserListAsync()" Label="Load all users"></MatButton>
+    @if (userList != null)
+    {
+        <div class="lektonic">@userList.Count users // @SqlUsers sql users // @ExpiredUsers expired users // @TestUsers test users </div>
+    }
+    else
+    {
+        <hr/>
+        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
+    }
+    @if (queryLaunched && userList == null)
     {
         <span>Getting data</span>
     }
-    <MatButtonLink Icon="multiline_chart" Href="/admin/users2">All users</MatButtonLink>
     <hr/>
     @if (userList != null)
-    {   
-        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
+    {
         <MatTable Items="@userList" class="lektonic" PageSize="100"
                   AllowSelection="true" FilterByColumnName="FullName"
                   ShowPaging="true" UseSortHeaderRow="true">
@@ -29,6 +36,7 @@
                     <MatSortHeader SortId="name">
                         <span style="width:250px">Name</span>
                     </MatSortHeader>
+                    <MatSortHeader SortId="persistence">Persistence</MatSortHeader>
                     <MatSortHeader SortId="expired">Expired</MatSortHeader>
                     <MatSortHeader SortId="valid">
                         <span style="width:120px">Valid until</span>
@@ -38,12 +46,12 @@
                     <MatSortHeader SortId="private">Private profile</MatSortHeader>
                     <MatSortHeader SortId="activities">Total activities</MatSortHeader>
                     <MatSortHeader SortId="email">Email</MatSortHeader>
-                    <MatSortHeader SortId="name">Edit</MatSortHeader>
                 </MatSortHeaderRow>
             </MatTableHeader>
             <MatTableRow>
-                <td>@context.UserId</td>
+                <td><a href="admin/user/@context.UserId">@context.UserId</a></td>
                 <td style="max-width: 200px">@context.FullName</td>
+                <td>@(context.PersistenceService ?? "")</td>
                 <td>@(context.TokenExpired)</td>
                 <td>@context.LastSynced.DateTime()</td>
                 <td>@context.SyncStatus</td>
@@ -51,20 +59,8 @@
                 <td>@context.PrivateProfile</td>
                 <td>@context.TotalActivities.Number()</td>
                 <td>@context.Email</td>
-                <td>
-                    <a href="admin/user/@context.UserId">
-                        Details
-                    </a>
-                </td>
             </MatTableRow>
         </MatTable>
-    }
-    else
-    {
-        <p>
-            <em>Loading the users is a long-during operation, please be patient, or navigate directly to the user, by entering the user id in the box below</em>
-        </p>
-        <MatTextField TValue="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user" HelperTextPersistent="true"></MatTextField>
     }
 }
 else
@@ -79,7 +75,7 @@ else
     private bool loadTokens = false;
     private bool loadSync = false;
     private bool queryLaunched = false;
-    
+
     protected override async Task OnInitializedAsync()
     {
     }
@@ -98,6 +94,10 @@ else
     {
         NavManager.NavigateTo($"admin/user/{userId}");
     }
+
+    private int SqlUsers => userList.Count(u => u.PersistenceService?.Equals("sql", StringComparison.InvariantCultureIgnoreCase) ?? false);
+    private int TestUsers => userList.Count(u => u.TestUser);
+    private int ExpiredUsers => userList.Count(u => u.TokenExpired ?? false);
 
     private void SortUsers(MatSortChangedEvent sort)
     {
@@ -129,6 +129,11 @@ else
                     userList = sort.Direction == MatSortDirection.Asc ?
                         userList.OrderBy(c => c.UpdateActivityDescription).ToList() :
                         userList.OrderByDescending(c => c.UpdateActivityDescription).ToList();
+                    break;
+                case "persistence":
+                    userList = sort.Direction == MatSortDirection.Asc ?
+                        userList.OrderBy(c => c.PersistenceService).ToList() :
+                        userList.OrderByDescending(c => c.PersistenceService).ToList();
                     break;
                 case "private":
                     userList = sort.Direction == MatSortDirection.Asc ?

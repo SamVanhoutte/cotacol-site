@@ -12,5 +12,6 @@ namespace CotacolApp.Models.CotacolApi
             public bool CotacolHunter { get; set; }
             public bool PrivateProfile { get; set; }
             public bool EnableBetaFeatures { get; set; }
+            public string PersistenceService { get; set; }
     }
 }
