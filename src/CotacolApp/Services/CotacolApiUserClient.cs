@@ -106,7 +106,7 @@ namespace CotacolApp.Services
                     .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                     .AllowAnyHttpStatus()
                     .GetJsonAsync<UserAchievements>();
-
+                achievements ??= new UserAchievements();
                 if (includeLocalLegends)
                 {
                     achievements.LocalLegends = new Dictionary<string, int>();
