@@ -20,10 +20,8 @@
             <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>
             <span class="lekton">@totalPoints.Number() pts</span>
         }
-        <a href="settings">
-            <img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/>
-        </a>
-        <a href="signout" class="nav-link btn btn-link">Log out</a>
+        <a href="settings">Settings</a>
+        <a href="signout">Log out</a>
     </Authorized>
     <NotAuthorized>
         <a href="@UserProfile.GetLoginLink()">Log in</a>
