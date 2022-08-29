@@ -29,7 +29,7 @@
                 <h3>Trigger full sync</h3>
                 <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Resync all activities</span>
                 <MatIconButton Icon="refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MatIconButton>
-                @if (fullSyncResponse != null)
+                @if (!string.IsNullOrEmpty( fullSyncResponse?.StatusQueryGetUri))
                 {
                     <MatButtonLink Icon="favorite" Target="_blank" Href="@fullSyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
                 }
@@ -38,7 +38,7 @@
                 <h3>Trigger activity sync</h3>
                 <MatTextField @bind-Value="@activityId" TValue="string" Label="Activity ID"></MatTextField>
                 <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync())"></MatIconButton>
-                @if (activitySyncResponse != null)
+                @if (!string.IsNullOrEmpty( activitySyncResponse?.StatusQueryGetUri))
                 {
                     <MatButtonLink Icon="favorite" Target="_blank" Href="@activitySyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
                 }
