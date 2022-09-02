@@ -12,7 +12,10 @@
 <h2>
     Migration status
 </h2>
-<p class="lektonic" style="font-weight: bold">@MigrationTitle</p>
+@if (UserProfile.IsAuthenticated)
+{
+    <p class="lektonic" style="font-weight: bold">@MigrationTitle</p>
+}
 <p class="lektonic">Users are gradually being migrated to the new runtime. This should solve previous synchronization problems.</p>
 <ul>
     <li class="lektonic">Most importantly: keep on cycling. If it's on strava, it will eventually be in your cotacol account.</li>
@@ -72,9 +75,9 @@
     }
 
     public string MigrationTitle => UserSettings?.CompletedMigration.HasValue ?? false ?
-        (UserSettings.CompletedMigration.Value ? 
-            "You are on the new runtime" : 
-            "Your data still needs to be migrated") : 
+        (UserSettings.CompletedMigration.Value ?
+            "You are on the new runtime" :
+            "Your data still needs to be migrated") :
         "Unknown status";
 
     private string PrintTime(DateTime recentActivityDate)
