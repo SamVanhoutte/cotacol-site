@@ -2,13 +2,28 @@
 @page "/support"
 @inject ICotacolUserClient CotacolClient
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol Help" />
+<Title Value="Cotacol Help"/>
 <h1>Support</h1>
 
 
 <h2>Strava integration</h2>
 
 <MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Sync not working?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>My strava sync does not seem to work.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>In order for Cotacol to be able to read your activities and efforts, we need our users to authorize access to the Strava data</p>
+            <p>The only person able to give us the right permissions (or rights) to do so, is you, the user and the owner of your data</p>
+            <p>Sometimes, the permissions we have received from you, might not be enough. And for that, it will be needed to 're-authorize' Cotacol</p>
+            <p>That can happen by navigating to the <a href="settings">settings</a> page in your Strava profile.</p>
+            <p>(You need to be logged in, at the cotacol website)</p>
+            <p>Here you can see a checklist of our access to your strava account.</p>
+            <p>If our permissions are not good enough, please click the 'Re-Authorize Strava' button at the bottom of the page</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
     <MatExpansionPanel>
         <MatExpansionPanelSummary Class="lektonic">
             <MatExpansionPanelHeader>Missing Cotacol?</MatExpansionPanelHeader>
@@ -24,15 +39,15 @@
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
     <MatExpansionPanel>
-            <MatExpansionPanelSummary Class="lektonic">
-                <MatExpansionPanelHeader>Points are not increasing</MatExpansionPanelHeader>
-                <MatExpansionPanelSubHeader>My points are not increasing, when riding Cotacols</MatExpansionPanelSubHeader>
-            </MatExpansionPanelSummary>
-            <MatExpansionPanelDetails>
-                <p>It is important to understand that the total points you see in the different apps or site are the points for the unique (distinct) Cotacols you rode.</p>
-                <p>So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride it, you'll only get the 81 points once.</p>
-            </MatExpansionPanelDetails>
-        </MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Points are not increasing</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>My points are not increasing, when riding Cotacols</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>It is important to understand that the total points you see in the different apps or site are the points for the unique (distinct) Cotacols you rode.</p>
+            <p>So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride it, you'll only get the 81 points once.</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
     <MatExpansionPanel>
         <MatExpansionPanelSummary Class="lektonic">
             <MatExpansionPanelHeader>Multiple efforts per activity?</MatExpansionPanelHeader>
@@ -62,7 +77,7 @@
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
 </MatAccordion>
-<hr />
+<hr/>
 <h2>Data and privacy</h2>
 <MatAccordion Multi="true">
     <MatExpansionPanel>
@@ -84,6 +99,20 @@
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
 </MatAccordion>
+
+<h2>Incidents history</h2>
+
+<MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Support issues?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>Is there a list of releases and incidents?.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>Yes.  You can find this <a href="releases">here</a></p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+</MatAccordion>>
 
 @code {
     private string MissingActivityId;
@@ -111,7 +140,6 @@
         {
             _missingDataMessage = e.Message;
         }
-
     }
 
 }
