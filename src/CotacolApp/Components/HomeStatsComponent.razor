@@ -12,12 +12,9 @@
 <h2>
     Migration status
 </h2>
-<p class="lektonic" style="font-weight: bold">@MigrationTitle</p>
-<p class="lektonic">Users are gradually being migrated to the new runtime. This should solve previous synchronization problems.</p>
+<p class="lektonic">Users have been migrated to the new runtime. This should solve previous synchronization problems.</p>
 <ul>
-    <li class="lektonic">Most importantly: keep on cycling. If it's on strava, it will eventually be in your cotacol account.</li>
-    <li class="lektonic">When you access your achievements page, your account will be migrated automagically in the next hour.</li>
-    <li class="lektonic">Leader boards will be visible again, but only for the migrated users.</li>
+    <li class="lektonic">Badges still require to be migrated and contains some flaws.  They will be recalculated after that migration.</li>
 </ul>
 @if (Stats?.RecentActivities != null)
 {
@@ -55,14 +52,12 @@
 
 @code {
     private HomeStats Stats;
-    private UserProfile UserSettings;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Stats ??= await CotacolClient.GetHomeStatsAsync();
-            UserSettings = await CotacolUserClient.GetProfileAsync();
         }
         catch (Exception e)
         {
@@ -70,12 +65,6 @@
 
         await base.OnInitializedAsync();
     }
-
-    public string MigrationTitle => UserSettings?.CompletedMigration.HasValue ?? false ?
-        (UserSettings.CompletedMigration.Value ? 
-            "You are on the new runtime" : 
-            "Your data still needs to be migrated") : 
-        "Unknown status";
 
     private string PrintTime(DateTime recentActivityDate)
     {
