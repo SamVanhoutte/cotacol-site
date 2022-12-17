@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
 using Serilog;
 using Serilog.Events;
 using Serilog.Configuration;
@@ -210,6 +211,7 @@ namespace CotacolApp
             services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
             services.AddSingleton<ISecretReader, KeyVaultReader>();
             services.AddMatBlazor();
+            services.AddMudServices();
             services
                 .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
                 .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))

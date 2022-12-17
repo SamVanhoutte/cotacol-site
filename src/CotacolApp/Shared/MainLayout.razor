@@ -1,19 +1,56 @@
 ﻿@inherits LayoutComponentBase
 @using MatBlazor
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
-
-    <div class="main">
-        <div class="top-row px-4 auth">
-            <LoginDisplay/>
-            <a href="about">About</a>
-            <MatIconButton Link="/support" Icon="contact_support"></MatIconButton>
+@using MudBlazor.Utilities
+<CascadingValue Value="this">
+    <PageTitle>@Title</PageTitle>
+    <MudThemeProvider Theme="@CotacolTheme" DefaultScrollbar="true" IsDarkMode="false"/>
+    <MudDialogProvider/>
+    <MudSnackbarProvider/>
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu/>
         </div>
 
-        <div class="content px-4">
-            @Body
+        <div class="main">
+            <div class="top-row px-4 auth">
+                <LoginDisplay/>
+                <a href="about">About</a>
+                <MatIconButton Link="/support" Icon="contact_support"></MatIconButton>
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
         </div>
     </div>
-</div>
+</CascadingValue>
+
+@code{
+    private string title = "Cotacol";
+
+    public string Title
+    {
+        get => title;
+        set
+        {
+            title = value;
+            InvokeAsync(() => StateHasChanged());
+        }
+    }
+
+    public MudTheme CotacolTheme = new MudTheme
+    {
+        Palette = new Palette()
+        {
+            Primary = new MudColor("#132040"), Secondary = new MudColor("#2DD497"), Tertiary = new MudColor("#7A87A7"), Info = new MudColor("#8995B2")
+        },
+        Typography = new Typography()
+        {
+            H1 = new H1() {FontSize = "32px", FontFamily = new[] {"Avenir", "sans-serif"}, LineHeight = 1, FontWeight = 900, LetterSpacing = "1px",},
+            Body1 = new Body1() {FontSize = "16px", FontFamily = new[] {"Avenir", "sans-serif"}, LineHeight = 2, FontWeight = 400},
+            Subtitle1 = new Subtitle1() {FontSize = "20px", FontFamily = new[] {"Avenir", "sans-serif"}, LineHeight = 2, FontWeight = 800, LetterSpacing = "1px"},
+            Caption = new Caption() {FontSize = "10px", FontFamily = new[] {"Avenir", "sans-serif"}, TextTransform = "uppercase", LineHeight = 1, FontWeight = 800, LetterSpacing = "1px",}
+        }
+    };
+
+}
