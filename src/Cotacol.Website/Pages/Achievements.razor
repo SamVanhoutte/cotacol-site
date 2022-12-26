@@ -1,0 +1,181 @@
+@page "/achievements"
+@page "/achievements/{UserId}"
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Achievements> Logger
+@inject NavigationManager NavManager
+@using Microsoft.IdentityModel.Clients.ActiveDirectory
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Models
+@using Cotacol.Website.Models.CotacolApi
+<Title Value="Cotacol Achievements"/>
+
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (!string.IsNullOrEmpty(_notAuthorizedMessage))
+        {
+            <p>
+                <em style="color: darkred">@_notAuthorizedMessage</em>
+            </p>
+        }
+        else
+        {
+            @if (_achievements == null)
+            {
+                <p>
+                    <em>We're retrieving the results , please be patient...</em>
+                </p>
+            }
+            else
+            {
+                <h1>@GetUserName()</h1>
+                @if (UserProfile.IsAdmin)
+                {
+                    <UserAdminLinks UserId="@UserId"/>
+                }
+                <br/>
+                <h2>Your year in a Pic</h2>
+                <span style="text-align: left; display: block; ">
+                    <a href="img/year/@UserIdToShow" target="_blank">
+                        <img src="img/year/@UserIdToShow" style="width: 350px"/>
+                    </a>
+                </span>
+                <p class="lektonic">Share you achievements with your friends on social media!</p>
+                <br/>
+                <h2>Score</h2>
+                <div class="lektonic">Total points: @_achievements.TotalScore.Number()</div>
+                <div class="lektonic">Unique cols: @_achievements.UniqueCols.Number()</div>
+                <AchievementChartComponent Achievements="@_achievements"/>
+
+                @if (_achievements.LocalLegends?.Any() ?? false)
+                {
+                    <h2>Local legend at the following climbs</h2>
+                    <p>
+                        <em class="lektonic">You are local legend if you did a col more than 5 times and no other user did more than you</em>
+                    </p>
+                    @foreach (var legend in _achievements.LocalLegends.OrderByDescending(cr => cr.Value))
+                    {
+                        <div class="lektonic">
+                            <span class="oi oi-star" aria-hidden="true"></span> <a href="cotacol/@legend.Key">@GetLegendString(legend.Key)</a>
+                        </div>
+                    }
+                }
+
+                <h2>Most popular climbs</h2>
+                <p>
+                    @if (string.IsNullOrEmpty(UserId))
+                    {
+                        <em class="lektonic">These climbs are the climbs you ride the most, the stars indicate you're local legend.</em>
+                    }
+                    else
+                    {
+                        <em class="lektonic">These climbs are the climbs the user rode the most, the stars indicate the user is a local legend.</em>
+                    }
+                </p>
+                <ol>
+                    @if (_achievements?.ColResults != null)
+                    {
+                        @foreach (var climb in _achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
+                        {
+                            <li class="lektonic">
+                                <a href="cotacol/@climb.CotacolId">@climb.CotacolName</a> (@climb.Achievements.Count() attempts)
+                                @if (_achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
+                                {
+                                    <span class="oi oi-star" title="Local Legend" aria-hidden="true"></span>
+                                }
+                            </li>
+                        }
+                    }
+                </ol>
+                @if (_nearLegendClimbs.Any())
+                {
+                    <h2>These cols require few attempts for you to become Local Legend</h2>
+                    <ol>
+                        @foreach (var climb in _nearLegendClimbs)
+                        {
+                            <li class="lektonic">
+                                <a href="cotacol/@climb.Id">@climb.Name</a> (@climb.AttemptsNeededToLegend attempts needed for @climb.CurrentLegendLimit)
+                            </li>
+                        }
+                    </ol>
+                }
+                @if (UserProfile.IsAdmin)
+                {
+                    <h2>Completed Badges</h2>
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            @foreach (var badge in _userBadges.Where(ub => ub.Completed).OrderBy(ub => ub.AchievementDate))
+                            {
+                                <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                            }
+                        </div>
+                    </div>
+                    <MatButtonLink Href="badges" TrailingIcon="list">View all badges</MatButtonLink>
+                }
+            }
+        }
+
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    private UserAchievements _achievements;
+    private IEnumerable<UserClimb> _climbs;
+    private IEnumerable<UserClimb> _nearLegendClimbs;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    private List<UserBadgeStatus> _userBadges;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _achievements = await CotacolUserClient.GetAchievementsAsync(UserIdToShow, true);
+            _climbs = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
+            _userBadges = await CotacolUserClient.GetBadgesAsync(UserIdToShow);
+            _nearLegendClimbs = _climbs.Where(c => c.AttemptsNeededToLegend == 1);
+            if (!_nearLegendClimbs.Any())
+            {
+                _nearLegendClimbs = _climbs
+                    .Where(c => c.AttemptsNeededToLegend is >0 and <= 3)
+                    .OrderBy(c => c.AttemptsNeededToLegend)
+                    .Take(10);
+            }
+        }
+    }
+
+    private string GetUserName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's achievements";
+    }
+
+
+    private string GetLegendString(string colId)
+    {
+        var col = _achievements.ColResults.FirstOrDefault(cr => cr.CotacolId.Equals(colId));
+        return $" {col.CotacolId} {col.CotacolName} - {col.Achievements.Count} attempts";
+    }
+
+}
