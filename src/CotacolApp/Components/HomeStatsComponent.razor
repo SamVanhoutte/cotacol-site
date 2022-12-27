@@ -4,11 +4,19 @@
 @using System.Text
 @using System.ComponentModel
 @inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
 @inject ILogger<HomeStatsComponent> Logger
 @inject IUserProfileManager UserProfile
 
 
-@if (Stats != null)
+<h2>
+    Migration status
+</h2>
+<p class="lektonic">Users have been migrated to the new runtime. This should solve previous synchronization problems.</p>
+<ul>
+    <li class="lektonic">Badges still require to be migrated and contains some flaws.  They will be recalculated after that migration.</li>
+</ul>
+@if (Stats?.RecentActivities != null)
 {
     <h2>Combined achievements</h2>
 
@@ -17,12 +25,8 @@
         <span class="lektonic">@(Stats?.Users) registered users</span>
     </div>
     <div>
-        <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>&nbsp;
-        <span class="lektonic">conquered all 1000 climbs</span>
-    </div>
-    <div>
         <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>&nbsp;
-        <span class="lektonic">and collected @(Stats?.TotalPoints.Number()) points</span>
+        <span class="lektonic">have collected @(Stats?.TotalPoints.Number()) Cotacol points</span>
     </div>
     <ul>
         @foreach (var recent in Stats.RecentActivities
@@ -39,7 +43,7 @@
             else
             {
                 // 
-                <li class="lektonicgrey">@(act.FullName.Split(" ").FirstOrDefault()) did @GetCotacolsFromActivity(recent,false) @(PrintTime(act.ActivityDate))</li>
+                <li class="lektonicgrey">@(act.FullName.Split(" ").FirstOrDefault()) did @GetCotacolsFromActivity(recent, false) @(PrintTime(act.ActivityDate))</li>
             }
         }
     </ul>
@@ -106,7 +110,7 @@
             }
             else
             {
-                // 
+    // 
                 builder.Append($"{col.CotacolName}");
             }
         }

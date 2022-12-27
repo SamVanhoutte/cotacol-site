@@ -8,21 +8,6 @@
 <table class="table">
     <tbody>
     <tr>
-        <td class="lektonic">Synchronization status <em>(@_syncStatusRefreshDate.ToLocalTime().ToString("hh:mm:ss"))</em></td>
-        <td>
-            @if (_syncStatus == null)
-            {
-                <p class="lektonic">
-                    <em>Loading...</em>
-                </p>
-            }
-            else
-            {
-                <p class="lektonic">@_syncStatus.Processed / @_syncStatus.Total (@_syncStatus.Status)&nbsp;<MatIconButton OnClick="@(async () => await RefreshSyncStatusAsync())" Icon="refresh"></MatIconButton></p>
-            }
-        </td>
-    </tr>
-    <tr>
         <td class="lektonic">
             Full synchronization
             @if (_syncRequestedTime != default)

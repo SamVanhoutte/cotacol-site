@@ -2,10 +2,12 @@
 @inject IUserProfileManager UserProfile
 
 <MatButtonLink Icon="person_pin" Href="@($"admin/user/{SelectedUserId}")">Admin access</MatButtonLink>
+<MatButtonLink Icon="change_history" Href="@($"climbs/{SelectedUserId}")">Climbs</MatButtonLink>
 <MatButtonLink Icon="multiline_chart" Href="@($"achievements/{SelectedUserId}")">Achievements page</MatButtonLink>
 <MatButtonLink Icon="map" Href="@($"activities/{SelectedUserId}")">Activities page</MatButtonLink>
 <MatButtonLink Icon="motorcycle" Target="_blank" Href="@($"https://www.strava.com/athletes/{SelectedUserId}")">Strava page</MatButtonLink>
 <MatButtonLink Icon="bookmarks" Href="@($"badges/{SelectedUserId}")">Badges</MatButtonLink>
+<MatButtonLink Icon="settings" Href="@($"settings/{SelectedUserId}")">Settings</MatButtonLink>
 
 @code {
     [Parameter]

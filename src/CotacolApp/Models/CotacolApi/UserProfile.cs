@@ -12,5 +12,7 @@ namespace CotacolApp.Models.CotacolApi
         public bool TestUser { get; set; }
         [JsonProperty("settings")] public UserSettings UserSettings { get; set; }
         public DateTime? LastSyncUtc { get; set; }
+        public bool? CompletedMigration { get; set; }
+
     }
 }

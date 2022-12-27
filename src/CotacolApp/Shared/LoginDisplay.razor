@@ -20,15 +20,8 @@
             <span class="iconify" data-icon="codicon:activate-breakpoints" data-inline="false"></span>
             <span class="lekton">@totalPoints.Number() pts</span>
         }
-        <a href="Identity/Account/Manage">
-            <img src="@UserProfile.ProfilePicture" width="32" alt="Edit profile"/>
-        </a>
-        <a href="Identity/Account/Manage/Settings">
-            <span class="iconify" data-icon="whh:settingsandroid" data-inline="false" style="color:black" data-width="24px" data-height="24px"></span>
-        </a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <a href="settings">Settings</a>
+        <a href="signout">Log out</a>
     </Authorized>
     <NotAuthorized>
         <a href="@UserProfile.GetLoginLink()">Log in</a>

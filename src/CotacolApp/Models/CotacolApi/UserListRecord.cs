@@ -27,7 +27,7 @@ namespace CotacolApp.Models.CotacolApi
         public bool BetaFeatures { get; set; }
 
         [JsonProperty("email")]
-        public object Email { get; set; }
+        public string Email { get; set; }
 
         [JsonProperty("totalActivities")]
         public long TotalActivities { get; set; }
@@ -39,19 +39,19 @@ namespace CotacolApp.Models.CotacolApi
         public bool SyncActive { get; set; }
 
         [JsonProperty("syncStatus")]
-        public object SyncStatus { get; set; }
+        public string SyncStatus { get; set; }
 
         [JsonProperty("tokenExpired")]
-        public bool TokenExpired { get; set; }
+        public bool? TokenExpired { get; set; }
 
         [JsonProperty("tokenExpiration")]
-        public DateTimeOffset TokenExpiration { get; set; }
+        public string TokenExpiration { get; set; }
 
         [JsonProperty("tokenScope")]
-        public object TokenScope { get; set; }
+        public string TokenScope { get; set; }
 
         [JsonProperty("tokenRefresh")]
-        public DateTimeOffset TokenRefresh { get; set; }
+        public string TokenRefresh { get; set; }
 
         [JsonProperty("achievedBadges")]
         public long AchievedBadges { get; set; }
@@ -61,5 +61,11 @@ namespace CotacolApp.Models.CotacolApi
 
         [JsonProperty("totalPoints")]
         public long TotalPoints { get; set; }
+
+        [JsonProperty("persistenceService")]
+        public string PersistenceService { get; set; }
+        
+        [JsonProperty("testUser")]
+        public bool TestUser { get; set; }
     }
 }

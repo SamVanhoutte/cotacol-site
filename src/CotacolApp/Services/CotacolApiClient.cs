@@ -95,7 +95,7 @@ namespace CotacolApp.Services
             return segmentData;
         }
 
-        public async Task<StravaSegmentResponse> FetchStravaSegmentAsync(string stravaSegmentId,
+        public async Task<StravaSegment> FetchStravaSegmentAsync(string stravaSegmentId,
             bool persistMetadata = false)
         {
             if (stravaSegmentId.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
@@ -106,7 +106,7 @@ namespace CotacolApp.Services
             var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
                 .SetQueryParam("UpdateMetadata", persistMetadata)
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .GetJsonAsync<StravaSegmentResponse>();
+                .GetJsonAsync<StravaSegment>();
 
             return segmentResponse;
         }
@@ -132,7 +132,6 @@ namespace CotacolApp.Services
         {
             return await $"{_settings.ApiUrl}/users"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-                .SetQueryParam("reportedusers", true)
                 .GetJsonAsync<List<UserListRecord>>();
         }
 
@@ -181,6 +180,16 @@ namespace CotacolApp.Services
             var response = await $"{_settings.ApiUrl}/system/badges/month/{year}/{month}"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .DeleteAsync();
+        }
+
+        public async Task<SystemStatus> GetSystemStatusAsync()
+        {
+            var systemStatus = await $"{_settings.ApiUrl}/system/status"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<SystemStatus>();
+
+            return systemStatus;
+
         }
     }
 }

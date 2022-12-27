@@ -2,7 +2,7 @@
 @using MatBlazor
 @inject IUserProfileManager UserProfile
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol.eu"/>
+<Title Value="Cotacol.cc"/>
 
 <h1>Your Cotacol Bucket list</h1>
 
@@ -18,14 +18,6 @@ else
 <div class="mat-layout-grid">
     <div class="mat-layout-grid-inner">
         <div class="mat-layout-grid-cell mat-layout-grid-cell-align-top mat-layout-grid-cell-span-4">
-            @if (UserProfile.IsAuthenticated)
-            {
-                <h2>Your year in a Pic</h2>
-                <span style="text-align: center; display: block; ">
-                    <a href="img/year/@UserProfile.UserId" target="_blank"><img src="img/year/@UserProfile.UserId" style="width: 90%"/></a>
-                </span>
-                <p class="lektonic">Share you achievements with your friends on social media!</p>
-            }
             <h2>How it all started</h2>
             <p class="lektonic">The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.</p>
             <p class="lektonic">Each climb is described by several facts: name, a short description, height, grade, length, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.</p>

@@ -1,0 +1,42 @@
+<h3>@Timestamp.ToString("D"): @Title</h3>
+<p class="lektonic" style="width: 70%">
+    <table>
+        <tr>
+            <td>Type</td>
+            <td>Incident (@Severity)</td>
+        </tr>
+        <tr>
+            <td>Users impacted</td>
+            <td>@UsersImpacted</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>@Description</td>
+        </tr>
+        <tr>
+            <td>Resolution when impacted</td>
+            <td>@Resolution</td>
+        </tr>
+    </table>
+</p>
+
+@code {
+
+    [Parameter]
+    public string UsersImpacted { get; set; }
+
+    [Parameter]
+    public string Severity { get; set; }
+
+    [Parameter]
+    public DateTime Timestamp { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Resolution { get; set; }
+
+}

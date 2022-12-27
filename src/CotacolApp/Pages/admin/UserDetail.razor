@@ -10,7 +10,7 @@
 
 @if (UserProfile.IsAdmin)
 {
-    <UserAdminLinks UserId="@UserId" />
+    <UserAdminLinks UserId="@UserId"/>
     @if (userProfile != null)
     {
         <h1>@userProfile.FullName</h1>
@@ -24,203 +24,222 @@
     @if (userDetail != null)
     {
         <div class="mat-layout-grid">
-            <div class="mat-layout-grid-inner">
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                    <h3>Trigger full sync</h3>
-                    <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Resync all activities</span>
-                    <MatIconButton Icon="refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MatIconButton>
-                    @if (fullSyncResponse != null)
-                    {
-                        <MatButtonLink Icon="favorite" Target="_blank" Href="@fullSyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
-                    }
-                </div>
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                    <h3>Trigger activity sync</h3>
-                    <MatTextField @bind-Value="@activityId" TValue="string" Label="Activity ID"></MatTextField>
-                    <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync())"></MatIconButton>
-                    @if (activitySyncResponse != null)
-                    {
-                        <MatButtonLink Icon="favorite" Target="_blank" Href="@activitySyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
-                    }
-                </div>
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                <h3>Trigger full sync</h3>
+                <MatSlideToggle @bind-Value="@fullSync"></MatSlideToggle>&nbsp;<span>Resync all activities</span>
+                <MatIconButton Icon="refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MatIconButton>
+                @if (!string.IsNullOrEmpty( fullSyncResponse?.StatusQueryGetUri))
+                {
+                    <MatButtonLink Icon="favorite" Target="_blank" Href="@fullSyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
+                }
             </div>
-            <hr/>
-            <table style="width: 100%">
-                <tr>
-                    <td style="text-align: left">
-                        <MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton>
-                    </td>
-                    <td style="text-align: right">
-                        <MatButton Style="color: darkred" Icon="delete" OnClick="@(async () => await DeleteUserAsync())" Label="Delete User"></MatButton>
-                    </td>
-                </tr>
-            </table>
-            <hr/>
-            <div class="mat-layout-grid-inner">
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
-                    <h2>Sync status</h2>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                <h3>Trigger activity sync</h3>
+                <MatTextField @bind-Value="@activityId" TValue="string" Label="Activity ID"></MatTextField>
+                <MatIconButton Icon="refresh" OnClick="@(async () => await PerformActivitySyncAsync())"></MatIconButton>
+                @if (!string.IsNullOrEmpty( activitySyncResponse?.StatusQueryGetUri))
+                {
+                    <MatButtonLink Icon="favorite" Target="_blank" Href="@activitySyncResponse.StatusQueryGetUri">Check technical details</MatButtonLink>
+                }
+            </div>
+        </div>
+        <hr/>
+        <table style="width: 100%">
+            <tr>
+                <td style="text-align: left">
+                    <MatButton Icon="refresh" OnClick="@(async () => await RefreshDataAsync())" Label="Refresh all"></MatButton>
+                </td>
+                <td style="text-align: right">
+                    <MatButton Style="color: darkred" Icon="delete" OnClick="@(async () => await DeleteUserAsync())" Label="Delete User"></MatButton>
+                </td>
+            </tr>
+        </table>
+        <hr/>
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                <h2>Sync status</h2>
+                <MatList SingleSelection="true" TwoLine="true">
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Synchronization Status</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>@(syncStatus.Status)</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Active sync</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>@syncStatus.SyncActive</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>Activity count</MatListItemPrimaryText>
+                            <MatListItemSecondaryText>@syncStatus.Processed.Number() / @syncStatus.Total.Number()</MatListItemSecondaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                    @if (userDetail?.SyncStatus != null)
+                    {
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Full sync succeeded</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.SyncStatus.Succeeded)</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Full sync trigger</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.SyncStatus.Trigger)</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Full sync time</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.SyncStatus.SyncTime)</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Full sync error code</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorCode)</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Full sync error</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorDescription)</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    }
+                    <MatListItem>
+                        <MatListItemText>
+                            <MatListItemPrimaryText>
+                                <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/UserHistorySyncWorkflow-@UserId" target="_blank">Fx Monitor</a>
+                            </MatListItemPrimaryText>
+                        </MatListItemText>
+                    </MatListItem>
+                </MatList>
+            </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                @if (userDetail.Audit != null)
+                {
+                    <h2>Audit history</h2>
                     <MatList SingleSelection="true" TwoLine="true">
                         <MatListItem>
                             <MatListItemText>
-                                <MatListItemPrimaryText>Synchronization Status</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@(syncStatus.Status)</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Active sync</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@syncStatus.SyncActive</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>Activity count</MatListItemPrimaryText>
-                                <MatListItemSecondaryText>@syncStatus.Processed.Number() / @syncStatus.Total.Number()</MatListItemSecondaryText>
-                            </MatListItemText>
-                        </MatListItem>
-                        @if (userDetail?.SyncStatus != null)
-                        {
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Full sync succeeded</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.Succeeded)</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Full sync trigger</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.Trigger)</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Full sync time</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.SyncTime)</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Full sync error code</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorCode)</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Full sync error</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.SyncStatus.ErrorDescription)</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        }
-                        <MatListItem>
-                            <MatListItemText>
-                                <MatListItemPrimaryText>
-                                    <a href="https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/UserHistorySyncWorkflow-@UserId" target="_blank">Fx Monitor</a>
-                                </MatListItemPrimaryText>
+                                <MatListItemPrimaryText>Web site login</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.Audit?.WebLogin.DateTime()</MatListItemSecondaryText>
                             </MatListItemText>
                         </MatListItem>
                     </MatList>
-                </div>
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
-                    @if (userDetail.Audit != null)
-                    {
-                        <h2>Audit history</h2>
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Web site login</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.Audit?.WebLogin.DateTime()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>iOS login</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.Audit?.IOSLogin.DateTime()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Android login</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.Audit?.AndroidLogin.DateTime()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Last full sync</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.Audit?.FullSync.DateTime()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Last activity pushed</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.Audit?.ActivityWebhookSync.DateTime()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                    }
-                    <h2>Strava token</h2>
-                    @if (userDetail.UserTokens != null)
-                    {
-                        <MatList SingleSelection="true" TwoLine="true">
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>User Id</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>
-                                        <a href="https://www.strava.com/athletes/@userDetail.UserTokens.UserId" target="_blank">@userDetail.UserTokens.UserId</a>
-                                    </MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Is Expired</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.UserTokens.IsExpired.ToString()</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Token Expiration</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.UserTokens.Expiration</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Last refresh</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@userDetail.UserTokens.LastRefreshTime</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Scope</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText>@(userDetail.UserTokens.Scope ?? "not set")</MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                            <MatListItem>
-                                <MatListItemText>
-                                    <MatListItemPrimaryText>Key Vault</MatListItemPrimaryText>
-                                    <MatListItemSecondaryText><a target="_blank" href="https://portal.azure.com/#@@marchitec.onmicrosoft.com/asset/Microsoft_Azure_KeyVault/Secret/https://cotacol-hunting.vault.azure.net/secrets/strava-@(UserId)-bearer/">Portal</a></MatListItemSecondaryText>
-                                </MatListItemText>
-                            </MatListItem>
-                        </MatList>
-                    }
-                    else
-                    {
-                        <p>
-                            <em>The Strava authentication of the user is no longer valid. User should re-authenticate to enable sync.</em>
-                        </p>
-                    }
-                </div>
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-8">
-                    <h2>User state</h2>
-                    <textarea name="jsonstate" cols="80" rows="100" style="width: 100%">@userStateJson</textarea>
-                </div>
+                    <MatList SingleSelection="true" TwoLine="true">
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>iOS login</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.Audit?.IOSLogin.DateTime()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    </MatList>
+                    <MatList SingleSelection="true" TwoLine="true">
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Android login</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.Audit?.AndroidLogin.DateTime()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    </MatList>
+                    <MatList SingleSelection="true" TwoLine="true">
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Last full sync</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.Audit?.FullSync.DateTime()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    </MatList>
+                    <MatList SingleSelection="true" TwoLine="true">
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Last activity pushed</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.Audit?.ActivityWebhookSync.DateTime()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    </MatList>
+                }
+                <h2>Strava token</h2>
+                @if (userDetail.UserTokens != null)
+                {
+                    <MatList SingleSelection="true" TwoLine="true">
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>User Id</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>
+                                    <a href="https://www.strava.com/athletes/@userDetail.UserTokens.UserId" target="_blank">@userDetail.UserTokens.UserId</a>
+                                </MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Is Expired</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.UserTokens.IsExpired.ToString()</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Token Expiration</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.UserTokens.Expiration</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Last refresh</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@userDetail.UserTokens.LastRefreshTime</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Scope</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>@(userDetail.UserTokens.Scope ?? "not set")</MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                        <MatListItem>
+                            <MatListItemText>
+                                <MatListItemPrimaryText>Key Vault</MatListItemPrimaryText>
+                                <MatListItemSecondaryText>
+                                    <a target="_blank" href="https://portal.azure.com/#@@marchitec.onmicrosoft.com/asset/Microsoft_Azure_KeyVault/Secret/https://cotacol-hunting.vault.azure.net/secrets/strava-@(UserId)-bearer/">Portal</a>
+                                </MatListItemSecondaryText>
+                            </MatListItemText>
+                        </MatListItem>
+                    </MatList>
+                }
+                else
+                {
+                    <p>
+                        <em>The Strava authentication of the user is no longer valid. User should re-authenticate to enable sync.</em>
+                    </p>
+                }
             </div>
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-8">
+                <h2>User state</h2>
+                <table style="width: 100%">
+                    <tr>
+                        <td style="text-align: left">
+                            <MatButton Href="@EntityMonitorLink" Target="_blank">Entity monitor</MatButton>
+                        </td>
+                        <td style="text-align: right">
+                            @if (CanConvertToSql)
+                            {
+                                <MatButton Icon="refresh" Style="text-align: right" OnClick="@(async () => await ConvertDataAsync())" Label="Convert to 'SQL'"></MatButton>
+                            }
+                            else
+                            {
+                                <span>SQL Persistence</span>
+                            }
+                        </td>
+                    </tr>
+                </table>
+                <textarea name="jsonstate" cols="80" rows="100" style="width: 100%">@userStateJson</textarea>
+            </div>
+        </div>
         </div>
     }
 }
@@ -244,10 +263,22 @@ else
     private UserProfile userProfile;
     private AsyncWorkflowResult fullSyncResponse;
     private AsyncWorkflowResult activitySyncResponse;
-
+    private string persistenceService = "entity";
+    
     protected override async Task OnInitializedAsync()
     {
         await RefreshDataAsync();
+    }
+
+    private string EntityMonitorLink => $"https://dfm-cotacol-hunting.azurewebsites.net/cotacolprd/orchestrations/@@cotacoluserentity@@{UserId}";
+    private async Task ConvertDataAsync()
+    {
+        if (UserProfile.IsAdmin && !string.IsNullOrEmpty(UserId))
+        {
+            var settings = await CotacolUserClient.GetProfileAsync(UserId);
+            settings.UserSettings.PersistenceService = "sql";
+            await CotacolUserClient.UpdateSettingsAsync(UserId, settings.UserSettings, settings.EmailAddress);
+        }
     }
 
     private async Task RefreshDataAsync()
@@ -257,6 +288,7 @@ else
             userDetail = await CotacolClient.GetUserAdminInfoAsync(UserId);
             if (userDetail.State != null)
             {
+                persistenceService = userDetail.State["persistenceServiceName"]?.ToString()??"entity";
                 userStateJson = userDetail.State.ToString(Formatting.Indented);
             }
             syncStatus = await CotacolUserClient.GetSyncStatus(UserId);
@@ -270,6 +302,18 @@ else
         if (result.Equals("Yes", StringComparison.InvariantCultureIgnoreCase))
         {
             await CotacolUserClient.RemoveUserAsync(UserId);
+        }
+    }
+
+    private bool CanConvertToSql
+    {
+        get
+        {
+            if (userDetail != null)
+            {
+                return !persistenceService.Equals("sql", StringComparison.InvariantCultureIgnoreCase);
+            }
+            return false;
         }
     }
 

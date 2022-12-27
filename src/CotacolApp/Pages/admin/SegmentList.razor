@@ -144,10 +144,9 @@ else
     private async Task FetchSegmentAsync(string cotacolId, string segmentId)
     {
         Console.WriteLine("Calling " + segmentId);
-        var status = await CotacolClient.FetchStravaSegmentAsync(segmentId, true);
-        if (status.Succeeded)
+        var segmentDetail = await CotacolClient.FetchStravaSegmentAsync(segmentId, true);
+        if (segmentDetail!=null)
         {
-            segmentDetail = status.Segment;
             var segment = segmentList.First(s => s.CotacolId.Equals(cotacolId));
             segment.SegmentName = segmentDetail.Name;
             segment.SegmentLength = segmentDetail.Distance;

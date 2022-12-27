@@ -2,13 +2,28 @@
 @page "/support"
 @inject ICotacolUserClient CotacolClient
 @using Microsoft.AspNetCore.Components.Web.Extensions.Head
-<Title Value="Cotacol Help" />
+<Title Value="Cotacol Help"/>
 <h1>Support</h1>
 
 
 <h2>Strava integration</h2>
 
 <MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Sync not working?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>My strava sync does not seem to work.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>In order for Cotacol to be able to read your activities and efforts, we need our users to authorize access to the Strava data</p>
+            <p>The only person able to give us the right permissions (or rights) to do so, is you, the user and the owner of your data</p>
+            <p>Sometimes, the permissions we have received from you, might not be enough. And for that, it will be needed to 're-authorize' Cotacol</p>
+            <p>That can happen by navigating to the <a href="settings">settings</a> page in your Strava profile.</p>
+            <p>(You need to be logged in, at the cotacol website)</p>
+            <p>Here you can see a checklist of our access to your strava account.</p>
+            <p>If our permissions are not good enough, please click the 'Re-Authorize Strava' button at the bottom of the page</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
     <MatExpansionPanel>
         <MatExpansionPanelSummary Class="lektonic">
             <MatExpansionPanelHeader>Missing Cotacol?</MatExpansionPanelHeader>
@@ -25,11 +40,21 @@
     </MatExpansionPanel>
     <MatExpansionPanel>
         <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Points are not increasing</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>My points are not increasing, when riding Cotacols</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>It is important to understand that the total points you see in the different apps or site are the points for the unique (distinct) Cotacols you rode.</p>
+            <p>So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride it, you'll only get the 81 points once.</p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
             <MatExpansionPanelHeader>Multiple efforts per activity?</MatExpansionPanelHeader>
             <MatExpansionPanelSubHeader>Multiple efforts of the same Cotacol in 1 activity only count for one.</MatExpansionPanelSubHeader>
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
-            <p>This is because of the current implementation in the synchronization backend. It is planned to update this soon, but this will require a resync for those activities, normally. Please follow this article for the latest news.</p>
+            <p>This is because of the current implementation in the synchronization backend. It is planned to update this in the future, but this will require a resync for those activities, normally. Please follow this article for the latest news.</p>
             <p>When implemented, this will finally turn your Everesting activities into become a Cotacol Local Legend</p>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
@@ -39,24 +64,20 @@
             <MatExpansionPanelSubHeader>How can I show the cols in my strava ride descriptions.</MatExpansionPanelSubHeader>
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
-            <p>We can update the activity description of an activity on strava, to show and indicate the different cotacols you conquored.</p>
-            <p>This is not only nice to show off your exploring &nbsp; climbing skills, but it also can drive other users to our community.</p>
+            <p>We can update the activity description of an activity on strava, to show and indicate the different cotacols and badges you conquered.</p>
+            <p>This is not only nice to show off your climbing skills, but it also can drive other users to our community.</p>
             <p>In order to achieve this, two things are needed:</p>
             <ol>
                 <li>
                     Strava needs your permission to update the activity descriptions. For that, it is important that you enable the checkbox <b>Upload your activities from Cotacol Hunting to Strava</b> when logging on to Strava
                     <img src="images/support/strava-permissions.png" style="width: 200px"/>
                 </li>
-                <li>If you want to review or update your Strava permissions, you can navigate to our <a href="/Identity/Account/Login">login page</a> and enable the checkbox <b>Review permissions at log on</b> before logging on to Strava</li>
-                <li>After that, it's also important to enable this feature, named <b>Add cotacols to Activity description</b> in your <a href="/Identity/Account/Manage/Settings">profile page</a>.</li>
+                <li>If you want to review or update your Strava permissions, you can navigate to our <a href="settings">settings page</a></li>
             </ol>
-            <b>Your current settings:</b>
-            <p><b>Permission: </b></p>
-            <p><b>Setting: </b></p>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
 </MatAccordion>
-<hr />
+<hr/>
 <h2>Data and privacy</h2>
 <MatAccordion Multi="true">
     <MatExpansionPanel>
@@ -72,12 +93,26 @@
             <MatExpansionPanelSubHeader>I don't want to show up in public pages.</MatExpansionPanelSubHeader>
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
-            <p>When joining Cotacol.eu, you automatically will be joined to the Cotacol leader boards, where your Full Name will be visible.</p>
+            <p>When joining Cotacol.cc, you automatically will be joined to the Cotacol leader boards, where your Full Name will be visible.</p>
             <p>Your name will only be visible for users that are registered and logged in. For anonymous users, only the initials will be shown in leader boards</p>
             <p>A new feature is coming, where you can opt out of leader boards and stats. There is already a check box in your profile where you can indicate you don't want to be part of the leader boards. For that, you can navigate to your <a href="/Identity/Account/Manage/Settings">profile page</a> and check the <b>Private profile</b> checkbox</p>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
 </MatAccordion>
+
+<h2>Incidents history</h2>
+
+<MatAccordion Multi="true">
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary Class="lektonic">
+            <MatExpansionPanelHeader>Support issues?</MatExpansionPanelHeader>
+            <MatExpansionPanelSubHeader>Is there a list of releases and incidents?.</MatExpansionPanelSubHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <p>Yes.  You can find this <a href="releases">here</a></p>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+</MatAccordion>>
 
 @code {
     private string MissingActivityId;
@@ -105,7 +140,6 @@
         {
             _missingDataMessage = e.Message;
         }
-
     }
 
 }

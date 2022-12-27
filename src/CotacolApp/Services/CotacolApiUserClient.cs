@@ -106,7 +106,7 @@ namespace CotacolApp.Services
                     .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                     .AllowAnyHttpStatus()
                     .GetJsonAsync<UserAchievements>();
-
+                achievements ??= new UserAchievements();
                 if (includeLocalLegends)
                 {
                     achievements.LocalLegends = new Dictionary<string, int>();
@@ -138,17 +138,36 @@ namespace CotacolApp.Services
             return profile;
         }
 
-        public async Task UpdateSettingsAsync(UserSettings settings)
+        public async Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId = null)
         {
-            //TODO : add private settings etc
-            await _cotacolDataClient.SetupUserAsync(new UserSetupRequest
+            userId ??= currentUserId;
+            var profile = await $"{_settings.ApiUrl}/user/strava/{userId}"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<StravaUserProfile>();
+
+            return profile;
+
+        }
+
+        public async Task UpdateSettingsAsync(string userId, UserSettings settings, string email)
+        {
+            var req = new UserSetupRequest
             {
-                UserId = currentUserId,
+                UserId = userId,
                 UpdateActivityDescription = settings.UpdateActivityDescription,
                 CotacolHunter = settings.CotacolHunter,
                 EnableBetaFeatures = settings.EnableBetaFeatures,
                 PrivateProfile = settings.PrivateProfile
-            });
+            };
+            if (!string.IsNullOrEmpty(settings?.PersistenceService))
+            {
+                req.PersistenceService = settings.PersistenceService;
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                req.EmailAddress = email;
+            }
+            await _cotacolDataClient.SetupUserAsync(req);
         }
 
         public async Task<SyncStatus> GetSyncStatus(string userId)
