@@ -14,12 +14,24 @@ namespace Cotacol.Website
 {
     public class Program
     {
-        public async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
+            var cfgBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json", true, true)
+                .AddJsonFile($"appsettings.dev.json", true, true)
+                .AddJsonFile($"local.settings.json", true, true)
+                .AddEnvironmentVariables();
+
+            var configuration = cfgBuilder.Build();
+
+            var stravaSettings = new StravaSettings();
+            configuration.GetSection("strava").Bind(stravaSettings);
+
+            
             var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-            var stravaSettings = new StravaSettings();
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddAuthentication(options =>
@@ -28,7 +40,7 @@ namespace Cotacol.Website
                     //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = "Strava";
                 })
-                .AddCookie()
+                .AddCookie("Identity.External")
                 .AddOAuth("Strava", "Strava",
                     options =>
                     {
