@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Cotacol.Website.Models.Identity
+namespace CotacolApp.Models.Identity
 {
     public class CotacolUser : IdentityUser
     {

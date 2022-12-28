@@ -1,4 +1,4 @@
-using Cotacol.Website.Models.Identity;
+using CotacolApp.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace Cotacol.Website.Services.Extensions

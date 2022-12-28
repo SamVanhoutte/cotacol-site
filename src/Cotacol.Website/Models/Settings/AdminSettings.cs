@@ -1,4 +1,6 @@
-namespace Cotacol.Website.Models.Settings
+using System.Linq;
+
+namespace CotacolApp.Models.Settings
 {
     public class AdminSettings
     {

@@ -1,4 +1,4 @@
-namespace Cotacol.Website.Models.Settings
+namespace CotacolApp.Models.Settings
 {
     public class MapSettings
     {

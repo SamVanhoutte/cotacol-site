@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Cotacol.Website.Models.CotacolApi;
 using Newtonsoft.Json;
 
-namespace Cotacol.Website.Models
+namespace CotacolApp.Models
 {
     public class ClimbData
     {

@@ -1,4 +1,4 @@
-namespace Cotacol.Website.Models.Settings
+namespace CotacolApp.Settings
 {
     public class LogSettings
     {

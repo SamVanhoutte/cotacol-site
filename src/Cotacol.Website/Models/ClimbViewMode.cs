@@ -1,4 +1,4 @@
-namespace Cotacol.Website.Models
+namespace CotacolApp.Models
 {
     public enum ClimbViewMode
     {

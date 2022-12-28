@@ -1,4 +1,4 @@
-namespace Cotacol.Website.Models.Identity
+namespace CotacolApp.Models.Identity
 {
     public class StravaClaimSettings
     {
