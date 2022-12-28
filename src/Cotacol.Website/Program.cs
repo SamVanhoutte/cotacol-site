@@ -1,0 +1,129 @@
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using Cotacol.Website.Services.Extensions;
+using CotacolApp.Models.Identity;
+using CotacolApp.Models.Settings;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Identity;
+
+
+namespace Cotacol.Website
+{
+    public class Program
+    {
+        public async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+            var stravaSettings = new StravaSettings();
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
+            builder.Services.AddAuthentication(options =>
+                {
+                    //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = "Strava";
+                })
+                .AddCookie()
+                .AddOAuth("Strava", "Strava",
+                    options =>
+                    {
+                        options.ClientId = stravaSettings.ClientId;
+                        options.ClientSecret = stravaSettings.ClientOauthSecret;
+                        options.CallbackPath = "/signin-strava"; //"/stravalogin"; //
+
+                        options.SaveTokens = true; // Save the auth/refresh token for later retrieval
+
+                        options.SignInScheme = IdentityConstants.ExternalScheme;
+                        options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
+                        options.TokenEndpoint = stravaSettings.AccessTokenUrl;
+                        options.UserInformationEndpoint = "https://www.strava.com/api/v3/athlete";
+
+                        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "athlete:id");
+
+                        options.Scope.Clear();
+                        options.Scope.Add(
+                            "read,read_all,activity:read_all,activity:read,activity:write,profile:write");
+
+                        options.Events = new OAuthEvents
+                        {
+                            OnCreatingTicket = async context =>
+                            {
+                                try
+                                {
+                                    var x = context.TokenResponse.Response.RootElement.GetProperty("athlete");
+                                    var request = new HttpRequestMessage(HttpMethod.Get,
+                                        context.Options.UserInformationEndpoint);
+                                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                    request.Headers.Authorization =
+                                        new AuthenticationHeaderValue("Bearer", context.AccessToken);
+
+                                    var tokens = context.Properties.GetTokens().ToList();
+
+                                    var userSettings = context.AddClaims(x.ToString());
+                                    tokens.AddRange(
+                                        userSettings.Select(userSetting => new AuthenticationToken()
+                                            {Name = userSetting.Key, Value = userSetting.Value}));
+                                    context.Properties.StoreTokens(tokens);
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            },
+                            OnRedirectToAuthorizationEndpoint = ctx =>
+                            {
+                                if (ctx.Properties.Items.ContainsKey(StravaAuthenticationProperties.ApprovalPrompt))
+                                {
+                                    ctx.HttpContext.Response.Redirect(ctx.RedirectUri + "&approval_prompt=force");
+                                }
+                                else
+                                {
+                                    ctx.HttpContext.Response.Redirect(ctx.RedirectUri);
+                                }
+
+                                return Task.FromResult(0);
+                            },
+                            OnTicketReceived = async context =>
+                            {
+                                if (context.Request.Query.TryGetValue("scope", out var scope))
+                                {
+                                    context.Properties.Items.Add("Scope", scope);
+                                }
+                            }
+                        };
+                        options.Validate();
+                    });
+
+            builder.Services.AddHttpContextAccessor();
+
+
+            var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseCookiePolicy(new CookiePolicyOptions
+                {MinimumSameSitePolicy = SameSiteMode.None, Secure = CookieSecurePolicy.None});
+            app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseRouting();
+
+            app.MapBlazorHub();
+            app.MapFallbackToPage("/_Host");
+
+            app.Run();
+        }
+    }
+}
