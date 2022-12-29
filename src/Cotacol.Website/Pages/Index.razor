@@ -16,7 +16,7 @@ Welcome to your new app.
     <ul>
         @foreach (var claim in user.Claims)
         {
-            <li>@claim.Value</li>
+            <li>@claim.Subject - @claim.Type - @claim.Value</li>
         }
     </ul>
 }
