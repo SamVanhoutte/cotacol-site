@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using Cotacol.Website.Interfaces;
+using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
 using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
@@ -112,7 +114,7 @@ namespace Cotacol.Website
                     });
 
             builder.Services.AddHttpContextAccessor();
-
+            builder.Services.AddTransient<IUserProfileManager, CotacolProfileManager>();
 
             var app = builder.Build();
             app.UseAuthentication();

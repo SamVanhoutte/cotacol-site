@@ -8,11 +8,33 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Components" />
       <Folder Include="Data" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Components\ClimbDetailComponent.razor.css" />
+      <Content Include="Components\HomeStatsComponent.razor.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\AchievementChartComponent.razor" />
+      <AdditionalFiles Include="Components\ClimbDetailComponent.razor" />
+      <AdditionalFiles Include="Components\ClimbListComponent.razor" />
+      <AdditionalFiles Include="Components\ClimbListMapComponent.razor" />
+      <AdditionalFiles Include="Components\ClimbListTableComponent.razor" />
+      <AdditionalFiles Include="Components\ClimbMapComponent.razor" />
+      <AdditionalFiles Include="Components\CotacolSyncComponent.razor" />
+      <AdditionalFiles Include="Components\HomeStatsComponent.razor" />
+      <AdditionalFiles Include="Components\IncidentReport.razor" />
+      <AdditionalFiles Include="Components\SegmentMapComponent.razor" />
+      <AdditionalFiles Include="Components\UserAdminLinks.razor" />
+      <AdditionalFiles Include="Components\UserBadgeComponent.razor" />
+      <AdditionalFiles Include="Components\YearReviewPictureComponent.razor" />
     </ItemGroup>
 
 </Project>

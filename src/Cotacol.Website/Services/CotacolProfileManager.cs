@@ -26,7 +26,7 @@ namespace Cotacol.Website.Services
 
         private ClaimsPrincipal? CurrentUser => _contextAccessor.HttpContext?.User;
 
-        private IEnumerable<Claim> GetCurrentClaims()
+        public IEnumerable<Claim> GetCurrentClaims()
         {
             return CurrentUser?.Claims.ToList() ?? new List<Claim> { };
         }

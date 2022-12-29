@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CotacolApp.Models.Identity;
 
 namespace Cotacol.Website.Interfaces
@@ -5,6 +6,7 @@ namespace Cotacol.Website.Interfaces
     public interface IUserProfileManager
     {
         // Task<StravaClaimSettings> AddStravaClaims(bool canUpdateActivity, bool canUpdateProfile, string refreshToken, string userId);
+        IEnumerable<Claim> GetCurrentClaims();
         Task<string> GetRefreshTokenAsync();
         string ProfilePicture { get; }
         string Email { get; }

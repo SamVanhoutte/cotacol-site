@@ -2,7 +2,8 @@
 @using Microsoft.AspNetCore.Authentication;
 @using Microsoft.AspNetCore.Mvc.RazorPages;
 @using System.Security.Claims
-
+@using Cotacol.Website.Interfaces
+@inject IUserProfileManager ProfileManager
 
 <PageTitle>Index</PageTitle>
 
@@ -11,12 +12,13 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="@displayMessage"/>
-@if (user?.Claims != null)
+
+@if (ProfileManager.IsAuthenticated )
 {
     <ul>
-        @foreach (var claim in user.Claims)
+        @foreach (var claim in ProfileManager.GetCurrentClaims())
         {
-            <li>@claim.Subject - @claim.Type - @claim.Value</li>
+            <li>@claim.Type - @claim.Value</li>
         }
     </ul>
 }
@@ -25,20 +27,15 @@ Welcome to your new app.
 {
     string displayMessage = "loading";
 
-    [CascadingParameter]
-    Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    private ClaimsPrincipal user;
+    
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await authenticationStateTask;
-        user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (ProfileManager.IsAuthenticated)
         {
-    // Since the user is a ClaimsPrincipal, you can also enumerate claims,
-    // evaluate membership in roles, etc.
-            displayMessage = user.Identity.Name;
+            // Since the user is a ClaimsPrincipal, you can also enumerate claims,
+            // evaluate membership in roles, etc.
+            displayMessage = ProfileManager.FullName;
         }
         else
         {
