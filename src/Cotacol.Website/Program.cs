@@ -112,7 +112,6 @@ namespace Cotacol.Website
                     });
 
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddControllersWithViews();
 
 
             var app = builder.Build();
@@ -133,6 +132,7 @@ namespace Cotacol.Website
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.MapControllers();
 
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
