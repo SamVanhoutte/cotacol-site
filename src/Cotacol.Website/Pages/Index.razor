@@ -1,4 +1,8 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authentication;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using System.Security.Claims
+
 
 <PageTitle>Index</PageTitle>
 
@@ -6,4 +10,39 @@
 
 Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+<SurveyPrompt Title="@displayMessage"/>
+@if (user?.Claims != null)
+{
+    <ul>
+        @foreach (var claim in user.Claims)
+        {
+            <li>@claim.Value</li>
+        }
+    </ul>
+}
+
+@code
+{
+    string displayMessage = "loading";
+
+    [CascadingParameter]
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private ClaimsPrincipal user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+    // Since the user is a ClaimsPrincipal, you can also enumerate claims,
+    // evaluate membership in roles, etc.
+            displayMessage = user.Identity.Name;
+        }
+        else
+        {
+            displayMessage = "You're not logged in.";
+        }
+    }
+}

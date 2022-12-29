@@ -17,7 +17,7 @@ namespace Cotacol.Website
                 IsPersistent = true
             };
 
-            await HttpContext.SignOutAsync("Strava", authenticationProperties);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }

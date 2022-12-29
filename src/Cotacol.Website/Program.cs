@@ -4,6 +4,7 @@ using Cotacol.Website.Services.Extensions;
 using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -36,12 +37,12 @@ namespace Cotacol.Website
             builder.Services.AddServerSideBlazor();
             builder.Services.AddAuthentication(options =>
                 {
-                    //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    //options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = "Strava";
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;  
                 })
                 .AddCookie("Identity.External")
-                .AddOAuth("Strava", "Strava",
+                .AddOAuth(CookieAuthenticationDefaults.AuthenticationScheme, "Strava",
                     options =>
                     {
                         options.ClientId = stravaSettings.ClientId;
@@ -111,9 +112,12 @@ namespace Cotacol.Website
                     });
 
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddControllersWithViews();
 
 
             var app = builder.Build();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -128,8 +132,6 @@ namespace Cotacol.Website
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
-            app.UseAuthentication();
-            app.UseAuthorization();
             app.UseRouting();
 
             app.MapBlazorHub();
