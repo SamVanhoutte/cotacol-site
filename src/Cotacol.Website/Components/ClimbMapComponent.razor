@@ -1,0 +1,82 @@
+@using CotacolApp.Models
+@using GoogleMapsComponents
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Services.Maps
+@using GoogleMapsComponents.Maps
+@inject IJSRuntime JsRuntime
+@inject IMapService MapService
+
+@if (_cotacol != null)
+{
+    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()" Height="@Height"></GoogleMap>
+}
+else
+{
+    <span>
+        <em>Loading map...</em>
+    </span>
+}
+
+
+@code {
+    private UserClimb _cotacol { get; set; }
+
+    private GoogleMap _googleMap;
+    private MapOptions _mapOptions;
+    private bool _dataChanged = false;
+
+    [Parameter]
+    public string Height { get; set; } = "100%";
+
+    [Parameter]
+    public UserClimb Cotacol
+    {
+        get => _cotacol;
+        set
+        {
+            if (value == null || (_cotacol?.Equals(value) ?? false)) return;
+    // _map1 = null;
+            _dataChanged = true;
+            _cotacol = value;
+            CotacolChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<UserClimb> CotacolChanged { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _mapOptions = await MapService.GetLayoutAsync(true);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_googleMap != null && _cotacol != null && JsRuntime != null)
+        {
+            await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task OnAfterMapInit()
+    {
+        if (_googleMap != null)
+        {
+            await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
+            {
+                CenterMap = true, RedrawNeeded = true,
+                ShowStartFinish = true, ShowPolylines = true,
+                SingleClimb = true
+            }); //true, true, true);
+        }
+    }
+
+}

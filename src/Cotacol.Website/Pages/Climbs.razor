@@ -1,0 +1,31 @@
+@page "/climbs"
+@page "/climbs/{UserId}"
+@using CotacolApp.Models
+@using Cotacol.Website.Interfaces
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject ICotacolUserClient CotacolUserClient
+<Title Value="Cotacol: the list"/>
+
+<h1>Climbs</h1>
+
+<p class="lektonic">1000 Cotacol climbs for you to conquer.</p>
+
+@if (_climbList != null)
+{
+    <ClimbListTableComponent Climbs="_climbList"></ClimbListTableComponent>
+}
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _climbList = (await CotacolUserClient.GetClimbDataAsync(UserProfile.UserId)).Select(climb => new UserClimb(climb));
+    }
+
+    private IEnumerable<UserClimb>? _climbList;
+}
+

@@ -1,0 +1,185 @@
+@using Cotacol.Website.Interfaces
+@using CotacolApp.Models
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<ClimbListTableComponent> Logger
+
+
+<div style="overflow-y: scroll; height:100vh;">
+
+    <MudTable T="UserClimb" Items="@Climbs" Hover="true" SortLabel="Sort By" RowsPerPage="1000">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => int.Parse(x.Id))">#</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.Name)">
+                    <span style="width:250px">Name</span>
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.Province)">Province</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.Surface)">Surface</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.CotacolPoints)">Points</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.Distance)">Length</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.ElevationDiff)">Elevation</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.AvgGrade)">Grade</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => x.BomScore)">
+                    <span style="width:60px">Bomb#</span>
+                </MudTableSortLabel>
+            </MudTh>
+            @if (UserProfile.IsAuthenticated)
+            {
+                <MudTh>Plan</MudTh>
+            }
+            <MudTh>Segment</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            @if (context.Done)
+            {
+                <MudTd style="background-color: #FD7D7A; color: white" DataLabel="Id">
+                    <MudText Typo="Typo.body1" Align="Align.End">@context.Id</MudText>
+                </MudTd>
+            }
+            else
+            {
+                <MudTd DataLabel="Id">
+                    <MudText Typo="Typo.body1" Align="Align.End">@context.Id</MudText>
+                </MudTd>
+            }
+            <MudTd DataLabel="Name">
+                <MudLink Href="@GetColLink(context)">@context.Name</MudLink>
+            </MudTd>
+            <MudTd DataLabel="Province">
+                <MudText Typo="Typo.body1">@context.Province</MudText>
+            </MudTd>
+            <MudTd DataLabel="Surface">
+                <MudText Typo="Typo.body1">@context.Surface</MudText>
+            </MudTd>
+            <MudTd DataLabel="CotacolPoints">
+                <MudText Typo="Typo.body1" Align="Align.End">@context.CotacolPoints</MudText>
+            </MudTd>
+            <MudTd DataLabel="Distance">
+                <MudText Typo="Typo.body1" Align="Align.End">@context.Distance.Number()</MudText>
+            </MudTd>
+            <MudTd DataLabel="ElevationDiff">
+                <MudText Typo="Typo.body1" Align="Align.End">@context.ElevationDiff</MudText>
+            </MudTd>
+            <MudTd DataLabel="AvgGrade">
+                <MudText Typo="Typo.body1" Align="Align.End">@context.AvgGrade.Percentage()</MudText>
+            </MudTd>
+            <MudTd DataLabel="BomScore">
+                <MudText Typo="Typo.body1" Align="Align.End">@context.BomScore.Number(belowZeroIsNull: true)</MudText>
+            </MudTd>
+            @if (UserProfile.IsAuthenticated)
+            {
+                <MudTd DataLabel="Plan">
+                    @if (context.Bookmarked)
+                    {
+                        <MudIconButton Icon="@Icons.Filled.Favorite" OnClick="async () => await UnbookMarkClimb(context.Id)"></MudIconButton>
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Outlined.Favorite" OnClick="async () => await BookMarkClimb(context.Id)"></MudIconButton>
+                    }
+                </MudTd>
+            }
+            <MudTd DataLabel="Segment">
+                <a href="https://www.strava.com/segments/@context.StravaSegment" target="_blank">
+                    <img src="images/strava-logo-small.png" asp-append-version="true"/>
+                </a>
+                @if (UserProfile.IsAdmin)
+                {
+                    <MudLink Typo="Typo.body1" Href="@GetAdminLink(context)">Edit</MudLink>
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</div>
+
+@code {
+    private IEnumerable<UserClimb> _climbList;
+
+    [Parameter]
+    public bool HideFilters { get; set; }
+
+    [Parameter]
+    public IEnumerable<UserClimb> Climbs
+    {
+        get => _climbList;
+        set
+        {
+            if (_climbList != null && _climbList.Equals(value)) return;
+
+            _climbList = value;
+            ClimbsChanged.InvokeAsync(value);
+        }
+    }
+
+
+    [Parameter]
+    public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
+
+
+    private async Task BookMarkClimb(string colId)
+    {
+        try
+        {
+            var succeeded = await CotacolUserClient.BookmarkClimbAsync(colId);
+            if (succeeded)
+            {
+                Climbs.First(c => c.Id.Equals(colId)).Bookmarked = true;
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    private async Task UnbookMarkClimb(string colId)
+    {
+        try
+        {
+            var succeeded = await CotacolUserClient.UnbookmarkClimbAsync(colId);
+            if (succeeded)
+            {
+                Climbs.First(c => c.Id.Equals(colId)).Bookmarked = false;
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    private string GetFilterColumn()
+    {
+        return HideFilters ? null : "Name";
+    }
+
+    private string GetColLink(UserClimb c)
+    {
+        return $"cotacol/{c.Id}";
+        
+    }
+
+    private string GetAdminLink(UserClimb context)
+    {
+        return $"/admin/segments/{context.Id}";
+    }
+
+}
