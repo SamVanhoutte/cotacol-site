@@ -5,12 +5,14 @@ using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
 using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
+using CotacolApp.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
+using MudBlazor.Services;
 
 
 namespace Cotacol.Website
@@ -112,9 +114,16 @@ namespace Cotacol.Website
                         };
                         options.Validate();
                     });
-
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddTransient<IUserProfileManager, CotacolProfileManager>();
+            InjectServices(builder);
+            builder.Services.AddMudServices();
+            builder.Services
+                .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
+                .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))
+                .Configure<MapSettings>(options => configuration.GetSection("maps").Bind(options))
+                .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options))
+                .Configure<KeyVaultSettings>(options => configuration.GetSection("keyvault").Bind(options));
+
 
             var app = builder.Build();
             app.UseAuthentication();
@@ -140,6 +149,13 @@ namespace Cotacol.Website
             app.MapFallbackToPage("/_Host");
 
             app.Run();
+        }
+
+        private static void InjectServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddTransient<IUserProfileManager, CotacolProfileManager>();
+            builder.Services.AddTransient<ICotacolUserClient, CotacolApiUserClient>();
+            builder.Services.AddTransient<ICotacolClient, CotacolApiClient>();
         }
     }
 }

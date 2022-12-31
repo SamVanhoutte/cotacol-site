@@ -1,0 +1,57 @@
+﻿@using Microsoft.AspNetCore.Http
+@using CotacolApp.Settings
+@using Microsoft.Extensions.Options
+@using Cotacol.Website.Interfaces
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject IOptions<CotacolApiSettings> ApiSettings
+@inject IHttpContextAccessor HttpContextAccessor
+<AuthorizeView>
+    <Authorized>
+        @if (uniqueCols > 0)
+        {
+            <span>
+                <MudIcon Icon="@Icons.Filled.BarChart"></MudIcon>
+            </span>
+            <span>
+                <MudText Typo="Typo.body1">@uniqueCols cols</MudText>
+            </span>
+            <span>
+                <MudIcon Icon="@Icons.Filled.Numbers"></MudIcon>
+            </span>
+            <span>
+                <MudText Typo="Typo.body1">@totalPoints.Number() pts</MudText>
+            </span>
+        }
+        <MudLink Href="settings" Color="Color.Secondary" Typo="Typo.body1">Settings</MudLink>
+        <MudLink Href="signout" Color="Color.Secondary" Typo="Typo.body1">Log out</MudLink>
+    </Authorized>
+    <NotAuthorized>
+        <MudLink Color="Color.Secondary" Href="@UserProfile.GetLoginLink()" Typo="Typo.body1">Log in</MudLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private int uniqueCols = -1;
+    private int totalPoints = -1;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (uniqueCols < 0)
+        {
+            try
+            {
+                var stats = await CotacolUserClient.GetAchievementsAsync(UserProfile.UserId);
+                uniqueCols = stats.UniqueCols;
+                totalPoints = stats.TotalScore;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+        await base.OnInitializedAsync();
+    }
+
+}

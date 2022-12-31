@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using Cotacol.Website.Interfaces;
 using Cotacol.Website.Services.Extensions;
-using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
 using CotacolApp.Settings;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
 namespace Cotacol.Website.Services

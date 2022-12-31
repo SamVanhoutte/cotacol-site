@@ -1,5 +1,8 @@
-﻿@inherits LayoutComponentBase
-
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
+<MudThemeProvider DefaultScrollbar="true" IsDarkMode="false" Theme="@CotacolTheme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 <PageTitle>Cotacol.Website</PageTitle>
 
 <div class="page">
@@ -9,7 +12,9 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <LoginDisplay/>
+            <MudIconButton Href="/about" Icon="@Icons.Filled.Info"></MudIconButton>
+            <MudIconButton Href="/support" Icon="@Icons.Filled.SupportAgent"></MudIconButton>
         </div>
 
         <article class="content px-4">
@@ -17,3 +22,25 @@
         </article>
     </main>
 </div>
+
+@code{
+
+    public MudTheme CotacolTheme = new MudTheme
+    {
+        Palette = new Palette()
+        {
+            Primary = new MudColor("#100C08"),
+            Secondary = new MudColor("#FD7D7A"),
+            Tertiary = new MudColor("#999999"),
+            Info = new MudColor("#0366D6"),
+            Background = new MudColor("F9F1E6"),
+        },
+        Typography = new Typography()
+        {
+            H1 = new H1() {FontSize = "32px", FontFamily = new[] {"Cooper", "serif"}, LineHeight = 1, FontWeight = 900, LetterSpacing = "1px",},
+            Body1 = new Body1() {FontSize = "16px", FontFamily = new[] {"Lekton", "sans-serif"}, LineHeight = 2, FontWeight = 400},
+            Subtitle1 = new Subtitle1() {FontSize = "20px", FontFamily = new[] {"Merkury", "serif"}, LineHeight = 2, FontWeight = 800, LetterSpacing = "1px"},
+        }
+    };
+
+}
