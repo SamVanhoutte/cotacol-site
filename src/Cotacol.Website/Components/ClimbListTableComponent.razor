@@ -147,6 +147,7 @@
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
         }
     }
 
@@ -163,6 +164,7 @@
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
         }
     }
 
@@ -174,12 +176,10 @@
     private string GetColLink(UserClimb c)
     {
         return $"cotacol/{c.Id}";
-        
     }
 
     private string GetAdminLink(UserClimb context)
     {
         return $"/admin/segments/{context.Id}";
     }
-
 }
