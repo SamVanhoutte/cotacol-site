@@ -16,7 +16,7 @@ namespace Cotacol.Website.Services.Maps
             return new()
             {
                 Zoom = (int)zoom,
-                Center = new LatLngLiteral(4.52, 50.28),
+                Center = new LatLngLiteral( 50.28, 4.52),
                 MapTypeId = MapTypeId.Roadmap,
                 ZoomControl = !miniView,
                 Scrollwheel = true,
@@ -38,7 +38,7 @@ namespace Cotacol.Website.Services.Maps
         {
             var style = new GoogleMapStyleBuilder();
             var assembly = Assembly.GetAssembly(typeof(MapService));
-            var resourceName = "CotacolApp.StaticData.cotacolmapstyle.json";
+            var resourceName = "Cotacol.Website.StaticData.cotacolmapstyle.json";
             await using (var stream = assembly.GetManifestResourceStream(resourceName))
             {
                 using (var reader = new StreamReader(stream))
@@ -57,7 +57,7 @@ namespace Cotacol.Website.Services.Maps
             var start = Columbae.Polyline.ParsePolyline(climb.Polyline).Vertices.First();
             var options = new MarkerOptions()
             {
-                Position = new LatLngLiteral(start.Longitude, start.Latitude),
+                Position = new LatLngLiteral(start.Latitude, start.Longitude),
                 Map = map,
                 Icon = new Icon {Url = climb.Done ? "images/climb-icon-map-green.png": "images/climb-icon-map-pink.png"},
                 Clickable = true,
@@ -75,8 +75,8 @@ namespace Cotacol.Website.Services.Maps
             {
                 var box = polyline.BoundingBox;
                 var bounds = new LatLngBoundsLiteral(
-                    new LatLngLiteral(box.Vertices.First().Longitude, box.Vertices.First().Latitude),
-                    new LatLngLiteral(box.Vertices[2].Longitude, box.Vertices[2].Latitude));
+                    new LatLngLiteral(box.Vertices.First().Latitude, box.Vertices.First().Longitude),
+                    new LatLngLiteral(box.Vertices[2].Latitude, box.Vertices[2].Longitude));
                 await map1.FitBounds(bounds);
             }
         }
@@ -110,7 +110,7 @@ namespace Cotacol.Website.Services.Maps
                         </table>";
             var infoWindow = await InfoWindow.CreateAsync(jsRuntime, new InfoWindowOptions()
             {
-                Position = new LatLngLiteral(position.Longitude, position.Latitude)
+                Position = new LatLngLiteral(position.Latitude, position.Longitude)
             });
             await infoWindow.SetContent(infoWindowContent);
             //await infoWindow.SetPosition(new LatLngLiteral(position.Longitude, position.Latitude));

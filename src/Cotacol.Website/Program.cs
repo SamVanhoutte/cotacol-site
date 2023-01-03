@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Cotacol.Website.Interfaces;
 using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
+using Cotacol.Website.Services.Maps;
 using CotacolApp.Models.Identity;
 using CotacolApp.Models.Settings;
 using CotacolApp.Settings;
@@ -33,17 +34,18 @@ namespace Cotacol.Website
             var stravaSettings = new StravaSettings();
             configuration.GetSection("strava").Bind(stravaSettings);
 
-            
+
             var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
+            builder.Services.AddServerSideBlazor()
+                .AddHubOptions(cfg => cfg.MaximumReceiveMessageSize = 1048576); // For Blazor Google Maps
             builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;  
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddCookie("Identity.External")
                 .AddOAuth(CookieAuthenticationDefaults.AuthenticationScheme, "Strava",
@@ -153,9 +155,11 @@ namespace Cotacol.Website
 
         private static void InjectServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddTransient<IUserProfileManager, CotacolProfileManager>();
-            builder.Services.AddTransient<ICotacolUserClient, CotacolApiUserClient>();
-            builder.Services.AddTransient<ICotacolClient, CotacolApiClient>();
+            builder.Services.AddScoped<IUserProfileManager, CotacolProfileManager>();
+            builder.Services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
+            builder.Services.AddSingleton<ICotacolClient, CotacolApiClient>();
+            builder.Services.AddScoped<IMapService, MapListService>();
+            ;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Cotacol.Website.Services.Maps
         {
             var color = "green";
             RouteToPlot = route;
-            var path = route.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
+            var path = route.Vertices.Select(v => new LatLngLiteral(v.Latitude, v.Longitude));
             var options = new PolylineOptions()
             {
                 StrokeColor = color,
@@ -166,7 +166,7 @@ namespace Cotacol.Website.Services.Maps
         private PolylineOptions GetClimbLine(UserClimb climb, bool showArrow, Map map1)
         {
             var polyline = Columbae.Polyline.ParsePolyline(climb.Polyline);
-            var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Longitude, v.Latitude));
+            var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Latitude, v.Longitude));
             var options = new PolylineOptions()
             {
                 StrokeColor = climb.Done ? "#C1E1C1" : "#FD7D7A",

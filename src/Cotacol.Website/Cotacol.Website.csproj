@@ -21,6 +21,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="StaticData\cooper_black_regular.ttf" />
+      <EmbeddedResource Include="StaticData\cotacolmapstyle.json">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="StaticData\year-a.png" />
       <EmbeddedResource Include="wwwroot\fonts\cooper_black_regular.ttf" />
     </ItemGroup>
 
