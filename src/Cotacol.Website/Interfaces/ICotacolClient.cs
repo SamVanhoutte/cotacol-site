@@ -1,5 +1,5 @@
+using Cotacol.Website.Models;
 using Cotacol.Website.Models.CotacolApi;
-using CotacolApp.Models;
 
 namespace Cotacol.Website.Interfaces
 {

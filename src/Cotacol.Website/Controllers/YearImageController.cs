@@ -7,12 +7,12 @@ namespace Cotacol.Website.Controllers
     [ApiController]
     public class YearImageController : ControllerBase
     {
-        private IEnumerable<IYearImageGenerator> _imageGenerators;
+        private IYearImageGenerator _imageGenerator;
         private ICotacolUserClient _userClient;
 
-        public YearImageController(IEnumerable<IYearImageGenerator> imageGenerators, ICotacolUserClient userClient)
+        public YearImageController(IYearImageGenerator imageGenerator, ICotacolUserClient userClient)
         {
-            _imageGenerators = imageGenerators;
+            _imageGenerator = imageGenerator;
             _userClient = userClient;
         }
         
@@ -33,8 +33,7 @@ namespace Cotacol.Website.Controllers
             try
             {
                 var experimental = Request.Query.ContainsKey("experimental");
-                var imageGenerator = _imageGenerators.FirstOrDefault(ig=>ig.IsExperimental==experimental);
-                var imageContent = await imageGenerator.CreateImageAsync(summary);
+                var imageContent = await _imageGenerator.CreateImageAsync(summary);
                 return File(imageContent, "image/png");
             }
             catch (Exception e)

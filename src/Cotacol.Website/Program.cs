@@ -1,17 +1,15 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Cotacol.Website.Interfaces;
+using Cotacol.Website.Models.Identity;
+using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
+using Cotacol.Website.Services.Imaging;
 using Cotacol.Website.Services.Maps;
-using CotacolApp.Models.Identity;
-using CotacolApp.Models.Settings;
-using CotacolApp.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
 
@@ -159,7 +157,7 @@ namespace Cotacol.Website
             builder.Services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
             builder.Services.AddSingleton<ICotacolClient, CotacolApiClient>();
             builder.Services.AddScoped<IMapService, MapListService>();
-            ;
+            builder.Services.AddScoped<IYearImageGenerator, ImgSharpYearImageGenerator>();
         }
     }
 }

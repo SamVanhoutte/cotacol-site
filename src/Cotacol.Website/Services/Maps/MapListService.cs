@@ -1,10 +1,10 @@
 using Cotacol.Website.Interfaces;
-using CotacolApp.Models;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
 using Microsoft.JSInterop;
 using Columbae;
 using Columbae.World;
+using Cotacol.Website.Models;
 using Route = Columbae.World.Route;
     
 namespace Cotacol.Website.Services.Maps

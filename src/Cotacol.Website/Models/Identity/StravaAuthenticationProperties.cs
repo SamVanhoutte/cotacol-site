@@ -1,4 +1,4 @@
-namespace CotacolApp.Models.Identity
+namespace Cotacol.Website.Models.Identity
 {
     public class StravaAuthenticationProperties
     {

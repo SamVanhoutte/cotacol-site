@@ -1,10 +1,6 @@
 @using Cotacol.Website.Interfaces
-@using CotacolApp.Models
-@inject ICotacolClient CotacolClient
-@inject ICotacolUserClient CotacolUserClient
-@inject IUserProfileManager UserProfile
+@using Cotacol.Website.Models
 @inject ILogger<ClimbListComponent> Logger
-
 @if (_climbs == null)
 {
     <LoadingPatienceComponent WaitingMessage="We're getting the climbs , please be patient..." />

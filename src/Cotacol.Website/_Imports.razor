@@ -8,6 +8,11 @@
 @using Microsoft.JSInterop
 @using Cotacol.Website
 @using Cotacol.Website.Shared
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Services.Extensions
 @using Cotacol.Website.Components
 @using MudBlazor
-@using Cotacol.Website.Services.Extensions
+@inject ISnackbar AlertProvider
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject ICotacolUserClient CotacolUserClient

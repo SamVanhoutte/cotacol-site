@@ -1,4 +1,4 @@
-namespace CotacolApp.Settings
+namespace Cotacol.Website.Models.Settings
 {
     public class KeyVaultSettings
     {

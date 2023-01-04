@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using CotacolApp.Models.Identity;
 
 namespace Cotacol.Website.Interfaces
 {

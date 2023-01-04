@@ -1,7 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Http
-@using CotacolApp.Settings
 @using Microsoft.Extensions.Options
 @using Cotacol.Website.Interfaces
+@using Cotacol.Website.Models.Settings
+@using Cotacol.Website.Services.Extensions
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 @inject IOptions<CotacolApiSettings> ApiSettings

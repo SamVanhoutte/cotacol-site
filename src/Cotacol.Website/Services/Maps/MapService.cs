@@ -1,7 +1,7 @@
 using System.Reflection;
 using Columbae;
+using Cotacol.Website.Models;
 using Cotacol.Website.Services.Extensions;
-using CotacolApp.Models;
 using GoogleMapsComponents.Maps;
 using Microsoft.JSInterop;
 

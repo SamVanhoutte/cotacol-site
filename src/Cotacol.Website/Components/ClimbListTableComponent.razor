@@ -1,13 +1,8 @@
 @using Cotacol.Website.Interfaces
-@using CotacolApp.Models
-@inject ICotacolClient CotacolClient
-@inject ICotacolUserClient CotacolUserClient
-@inject IUserProfileManager UserProfile
+@using Cotacol.Website.Models
 @inject ILogger<ClimbListTableComponent> Logger
 
-
 <div style="overflow-y: scroll; height:100vh;">
-
     <MudTable T="UserClimb" FixedHeader="true" Items="@Climbs" Hover="true" SortLabel="Sort By" RowsPerPage="1000">
         <HeaderContent>
             <MudTh>

@@ -1,6 +1,6 @@
 using Columbae;
+using Cotacol.Website.Models;
 using Cotacol.Website.Services.Maps;
-using CotacolApp.Models;
 using GoogleMapsComponents.Maps;
 using Microsoft.JSInterop;
 using Route = Columbae.World.Route;

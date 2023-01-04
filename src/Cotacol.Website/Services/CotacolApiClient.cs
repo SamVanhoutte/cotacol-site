@@ -1,7 +1,7 @@
 using Cotacol.Website.Interfaces;
+using Cotacol.Website.Models;
 using Cotacol.Website.Models.CotacolApi;
-using CotacolApp.Models;
-using CotacolApp.Settings;
+using Cotacol.Website.Models.Settings;
 using Flurl;
 using Flurl.Http;
 using GuardNet;
