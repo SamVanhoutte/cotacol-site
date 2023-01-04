@@ -1,0 +1,20 @@
+@page "/map"
+@page "/map/{UserId}"
+@using CotacolApp.Models
+<Title Value="Cotacol: the map"/>
+
+<MudGrid Spacing="2">
+    <MudItem xs="12">
+        <MudText Typo="Typo.h1" Color="Color.Tertiary">The big map</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <ClimbListComponent Mode="@ClimbViewMode.Map" UserId="@UserId"></ClimbListComponent>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+}

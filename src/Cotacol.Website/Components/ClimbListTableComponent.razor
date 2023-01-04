@@ -8,7 +8,7 @@
 
 <div style="overflow-y: scroll; height:100vh;">
 
-    <MudTable T="UserClimb" Items="@Climbs" Hover="true" SortLabel="Sort By" RowsPerPage="1000">
+    <MudTable T="UserClimb" FixedHeader="true" Items="@Climbs" Hover="true" SortLabel="Sort By" RowsPerPage="1000">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<UserClimb, object>(x => int.Parse(x.Id))">#</MudTableSortLabel>

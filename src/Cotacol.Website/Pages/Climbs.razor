@@ -7,14 +7,15 @@
 @inject ICotacolUserClient CotacolUserClient
 <Title Value="Cotacol: the list"/>
 
-<h1>Climbs</h1>
-
-<p class="lektonic">1000 Cotacol climbs for you to conquer.</p>
-
-@if (_climbList != null)
-{
-    <ClimbListMapComponent Climbs="_climbList"></ClimbListMapComponent>
-}
+<MudGrid Spacing="0">
+    <MudItem xs="12">
+        <MudText Typo="Typo.h1" Color="Color.Tertiary">Climbs</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Tertiary">1000 cotacols for you to conquer</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <ClimbListComponent Mode="@ClimbViewMode.Table" UserId="@UserId"></ClimbListComponent>
+    </MudItem>
+</MudGrid>
 
 @code {
 
@@ -23,9 +24,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _climbList = (await CotacolUserClient.GetClimbDataAsync(UserProfile.UserId)).Select(climb => new UserClimb(climb));
     }
 
-    private IEnumerable<UserClimb>? _climbList;
 }
-

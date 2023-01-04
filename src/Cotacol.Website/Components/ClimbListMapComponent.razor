@@ -15,20 +15,13 @@
     <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await PlotGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
                    @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
         <ButtonTemplate>
-            <MudPaper Height="300px" Outlined="true" Class="@DragClass">
-                <MudText Typo="Typo.h6">Show route on map</MudText>
+            <MudPaper Height="50px" Outlined="true" Class="@DragClass">
+                <MudText Typo="Typo.body1">Show route on map (click or drag your gpx here)</MudText>
             </MudPaper>
         </ButtonTemplate>
     </MudFileUpload>
     <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
 }
-else
-{
-    <span>
-        <em>Loading map...</em>
-    </span>
-}
-
 
 @code {
     private MapOptions _mapOptions;
@@ -169,7 +162,8 @@ else
         Console.WriteLine("File upload");
         try
         {
-            var stream = files.File.OpenReadStream();
+            var stream = new MemoryStream();
+            await files.File.OpenReadStream().CopyToAsync(stream);
             if (stream.CanSeek)
             {
                 stream.Position = 0;
