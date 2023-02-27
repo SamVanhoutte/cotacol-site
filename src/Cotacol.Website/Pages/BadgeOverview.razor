@@ -1,0 +1,111 @@
+@page "/badges"
+@page "/badges/{UserId}"
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+<Title Value="Badges"/>
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <MudGrid Spacing="0">
+            <MudItem xs="12">
+                <MudText Typo="Typo.h1" Color="Color.Tertiary">@GetPageTitle()</MudText>
+            </MudItem>
+            @if (UserProfile.IsAdmin)
+            {
+                <MudItem xs="12">
+                    <UserAdminLinks UserId="@UserId"/>
+                </MudItem>
+            }
+            @if (_userBadges == null)
+            {
+                <MudItem xs="12">
+                    <LoadingPatienceComponent WaitingMessage="We're retrieving your badges, please be patient..."/>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2" Color="Color.Tertiary">Provinces</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeId.StartsWith("provinc", StringComparison.InvariantCultureIgnoreCase)).OrderBy(ub => ub.BadgeId))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge" UserId="@UserId"></UserBadgeComponent>
+                    }
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2" Color="Color.Tertiary">Quantity badges</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.Amount)).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge" UserId="@UserId"></UserBadgeComponent>
+                    }
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2" Color="Color.Tertiary">List badges</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.List) && !ub.BadgeId.StartsWith("prov")).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2" Color="Color.Tertiary">Location badges</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    @foreach (var badge in _userBadges.Where(ub => ub.BadgeType.Equals(BadgeType.Location) && !ub.BadgeId.StartsWith("prov")).OrderBy(ub => ub.NumberColsNeeded))
+                    {
+                        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    private List<UserBadgeStatus> _userBadges;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _userBadges = await CotacolUserClient.GetBadgesAsync(UserIdToShow);
+        }
+    }
+
+    private string GetPageTitle()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's badges";
+    }
+
+}

@@ -8,7 +8,7 @@ namespace Cotacol.Website.Controllers;
 [AllowAnonymous]
 public class AccountController : Controller
 {
-    [Route("Account/SignIn")]
+    [Route("account/signin")]
     public IActionResult SignIn()
     {
         var returnUrlQuery = Request.Query["ReturnUrl"];

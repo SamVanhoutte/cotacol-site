@@ -18,23 +18,22 @@
     }
     else
     {
+        <MudItem xs="12">
+            <MudText Typo="Typo.h1" Color="Color.Tertiary">@GetUserName()</MudText>
+        </MudItem>
+        @if(UserProfile.IsAdmin){
+            <MudItem xs="12">
+                <UserAdminLinks UserId="@UserId"/>
+            </MudItem>
+        }
         @if (_achievements == null)
         {
-            <MudItem xs="12">
-                <MudText Typo="Typo.h1" Color="Color.Tertiary">Achievements</MudText>
-            </MudItem>
             <MudItem xs="12">
                 <LoadingPatienceComponent WaitingMessage="We're retrieving the results , please be patient..."/>
             </MudItem>
         }
         else
         {
-            <MudItem xs="12">
-                <MudText Typo="Typo.h1" Color="Color.Tertiary">@GetUserName()</MudText>
-            </MudItem>
-            <MudItem xs="12">
-                <UserAdminLinks UserId="@UserId"/>
-            </MudItem>
             <MudItem xs="6">
                 <MudText Typo="Typo.h2" Color="Color.Tertiary">Your year in a Pic</MudText>
                 <MudLink Href='@($"img/year/{UserIdToShow}")' Target="_blank">
