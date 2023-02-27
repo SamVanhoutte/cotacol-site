@@ -225,16 +225,6 @@
                         <td style="text-align: left">
                             <MatButton Href="@EntityMonitorLink" Target="_blank">Entity monitor</MatButton>
                         </td>
-                        <td style="text-align: right">
-                            @if (CanConvertToSql)
-                            {
-                                <MatButton Icon="refresh" Style="text-align: right" OnClick="@(async () => await ConvertDataAsync())" Label="Convert to 'SQL'"></MatButton>
-                            }
-                            else
-                            {
-                                <span>SQL Persistence</span>
-                            }
-                        </td>
                     </tr>
                 </table>
                 <textarea name="jsonstate" cols="80" rows="100" style="width: 100%">@userStateJson</textarea>
@@ -286,13 +276,13 @@ else
         if (UserProfile.IsAdmin && !string.IsNullOrEmpty(UserId))
         {
             userDetail = await CotacolClient.GetUserAdminInfoAsync(UserId);
-            if (userDetail.State != null)
-            {
-                persistenceService = userDetail.State["persistenceServiceName"]?.ToString()??"entity";
-                userStateJson = userDetail.State.ToString(Formatting.Indented);
-            }
+            
             syncStatus = await CotacolUserClient.GetSyncStatus(UserId);
             userProfile = await CotacolUserClient.GetProfileAsync(UserId);
+            if (userProfile != null)
+            {
+                userStateJson = JsonConvert.SerializeObject(userProfile, Formatting.Indented);
+            }
         }
     }
 
