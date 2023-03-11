@@ -1,0 +1,186 @@
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+@using System.IO
+@using Columbae.World
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Models
+@using Cotacol.Website.Services.Maps
+@using Microsoft.AspNetCore.Builder.Extensions
+@using MapOptions = GoogleMapsComponents.Maps.MapOptions
+@inject ILogger<ClimbListMapComponent> Logger
+@inject IJSRuntime JsRuntime
+@inject IMapService MapService
+@if (Climbs != null)
+{
+    <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await PlotGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
+                   @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
+        <ButtonTemplate>
+            <MudPaper Height="50px" Outlined="true" Class="@DragClass">
+                <MudText Typo="Typo.body1">Show route on map (click or drag your gpx here)</MudText>
+            </MudPaper>
+        </ButtonTemplate>
+    </MudFileUpload>
+    <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
+}
+
+@code {
+    private MapOptions _mapOptions;
+    private InfoWindow _existingWindow = null;
+    private IEnumerable<UserClimb>? _climbList;
+    private ElementReference _mapElementRef;
+    private Map _map1;
+    private MapLayout _previousLayout = new MapLayout();
+    private double _previousZoom = 9;
+    private int _polylineTreshold = 12;
+    private int _arrowTreshold = 14;
+    private bool _dataChanged = false;
+    private Route _routeToPlot;
+
+    private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+    private string DragClass = DefaultDragClass;
+
+    [Parameter]
+    public IEnumerable<UserClimb>? Climbs
+    {
+        get => _climbList;
+        set
+        {
+            if (value == null || (_climbList?.Equals(value) ?? false)) return;
+            _map1 = null;
+            _dataChanged = true;
+            _climbList = value;
+            ClimbsChanged.InvokeAsync(value);
+        }
+    }
+
+
+    [Parameter]
+    public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_climbList == null) Logger.LogWarning("[Initialize] climbList is null");
+
+        _mapOptions = await MapService.GetLayoutAsync(false, _previousZoom);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_map1 == null)
+        {
+            await InitializeMap();
+        }
+
+        var currentzoom = await _map1.GetZoom();
+        var layout = CheckMapRequirements(firstRender, currentzoom);
+        if (layout.RedrawNeeded)
+        {
+            try
+            {
+                _dataChanged = false;
+                if (_climbList != null && _map1 != null)
+                {
+                    await MapService.ShowClimbsAsync(_map1, JsRuntime, _climbList.ToList(), layout, HandleMarkerClick);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"An error occurred while rendering the map: {e.Message}");
+            }
+        }
+
+        _previousZoom = currentzoom;
+        _previousLayout = layout;
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async void HandleMarkerClick<MouseEvent>(MouseEvent e, string colId)
+    {
+        if (_existingWindow != null)
+        {
+            await _existingWindow.Close();
+        }
+        _existingWindow = await MapService.CreateInfoWindowAsync(Climbs.First(c => c.Id.Equals(colId)), JsRuntime);
+        await _existingWindow.Open(_map1);
+    }
+
+    private void SetDragClass()
+    {
+        DragClass = $"{DefaultDragClass} mud-border-primary";
+    }
+
+    private void ClearDragClass()
+    {
+        DragClass = DefaultDragClass;
+    }
+
+    private MapLayout CheckMapRequirements(bool firstRender, double currentzoom)
+    {
+        var layout = new MapLayout();
+    // Redraw map, on first render, when map1 was reset or when data was changed
+        layout.ShowStartFinish = currentzoom > _arrowTreshold;
+        layout.ShowPolylines = currentzoom >= _polylineTreshold;
+        layout.ShowMarkers = currentzoom <= _polylineTreshold;
+
+        if (firstRender || _map1 == null || _dataChanged) layout.RedrawNeeded = true;
+        if (layout.ShowStartFinish != _previousLayout.ShowStartFinish) layout.RedrawNeeded = true;
+        if (layout.ShowPolylines != _previousLayout.ShowPolylines) layout.RedrawNeeded = true;
+        if (layout.ShowMarkers != _previousLayout.ShowMarkers) layout.RedrawNeeded = true;
+
+        Logger.LogInformation($"Map zoom input: current {currentzoom} - previous {_previousZoom} - Data changed: {_dataChanged} - Map empty: {_map1 == null}");
+        Logger.LogInformation($"Map settings: redraw: {layout.RedrawNeeded} - lines: {layout.ShowPolylines} - arrows: {layout.ShowStartFinish}");
+
+        return layout;
+    }
+
+    private async Task InitializeMap()
+    {
+        _mapOptions = await MapService.GetLayoutAsync(false, _previousZoom);
+        _map1 = await Map.CreateAsync(JsRuntime, _mapElementRef, _mapOptions);
+        await _map1.AddListener("zoom_changed", OnZoomChanged);
+    }
+
+
+    private async Task OnAfterInitAsync()
+    {
+        if (_map1 != null)
+        {
+            await _map1.AddListener("zoom_changed", OnZoomChanged);
+        }
+    }
+
+    private void OnZoomChanged()
+    {
+        Logger.LogInformation("Zoom");
+        StateHasChanged();
+    }
+
+    private async Task PlotGpxAsync(InputFileChangeEventArgs files)
+    {
+        Console.WriteLine("File upload");
+        try
+        {
+            var stream = new MemoryStream();
+            await files.File.OpenReadStream().CopyToAsync(stream);
+            if (stream.CanSeek)
+            {
+                stream.Position = 0;
+            }
+            var routes = Route.ImportGpx(new StreamReader(stream));
+            if (routes.Any())
+            {
+                Console.WriteLine("Route found");
+                _routeToPlot = routes.First();
+                await MapService.PlotRoute(_map1, JsRuntime, _routeToPlot);
+                Console.WriteLine("Route plotted");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+}

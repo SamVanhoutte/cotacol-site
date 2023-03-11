@@ -1,0 +1,33 @@
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public string? ErrorMessage;
+
+    public void ProcessError(Exception e, string? errorMessage = null, Severity severity = Severity.Error)
+    {
+        ErrorMessage = $"{e.Message}";
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            ErrorMessage = ErrorMessage + "\r\n" + errorMessage;
+        }
+        Console.WriteLine(ErrorMessage);
+        AlertProvider.Add(ErrorMessage, severity);
+        StateHasChanged();
+    }
+
+
+    public void ProcessError(Exception e, Severity severity = Severity.Error)
+    {
+        ErrorMessage = $"{e.Message}";
+        Console.WriteLine(ErrorMessage);
+        AlertProvider.Add(ErrorMessage, severity);
+        StateHasChanged();
+    }
+
+}

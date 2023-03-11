@@ -5,7 +5,7 @@ namespace Cotacol.Website.Models.CotacolApi
         public int TotalPoints { get; set; } 
         public int UniqueCols { get; set; } 
         public List<UserStatistics> Users { get; set; } 
-        public List<Cotacol> Cotacols { get; set; } 
+        public List<CotacolClimb> Cotacols { get; set; } 
         public List<Activity> Activities { get; set; }
 
         public void SortUsers(bool byPoints)

@@ -1,0 +1,59 @@
+@using Cotacol.Website.Models.CotacolApi
+<MudLink Href="@GetHref()">
+    <MudTooltip Text="@GetDescription()">
+        <MudImage Alt="@BadgeStatus.Description" Src='@($"images/badges/{BadgeStatus.BadgeId}.png")' onerror="this.onerror=null; this.src='images/badges/default.png'" Style="@GetBadgeStyle()"></MudImage>
+        <br/>
+        <MudText Typo="Typo.caption">@BadgeStatus.Name</MudText>
+        <MudProgressLinear Value="@BadgeStatus.Progress"></MudProgressLinear>
+        @if (BadgeStatus.Completed)
+        {
+            <MudText Typo="Typo.body1">Completed @(BadgeStatus.AchievementDate?.Date.ToString("dd MMM yy"))</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.body1">@(BadgeStatus.NumberColsNeeded - BadgeStatus.NumberColsAchieved) cols missing</MudText>
+        }
+    </MudTooltip>
+</MudLink>
+@code {
+
+    [Parameter]
+    public UserBadgeStatus BadgeStatus { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string Width { get; set; } = "80px";
+
+
+    private string GetHref()
+    {
+        if ((BadgeStatus?.ValidFrom ?? DateTime.MinValue) < DateTime.Today)
+        {
+            if (string.IsNullOrEmpty(UserId))
+            {
+                return $"badge/{BadgeStatus.BadgeId}";
+            }
+            return $"badge/{BadgeStatus.BadgeId}/{UserId}";
+        }
+        return "javascript: void(0)";
+    }
+
+    private string GetDescription()
+    {
+        if ((BadgeStatus?.ValidFrom ?? DateTime.MinValue) < DateTime.Today)
+        {
+            return BadgeStatus.Description;
+        }
+        return $"Badge only active as from {BadgeStatus.ValidFrom:MMM dd}";
+    }
+
+    private string GetBadgeStyle()
+    {
+        return BadgeStatus.Completed ?
+            $"width: {Width};" :
+            $"z-index: 0; width: {Width};-webkit-filter: grayscale(100%); filter: grayscale(100%);";
+    }
+
+}

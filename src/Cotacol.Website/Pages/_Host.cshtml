@@ -1,8 +1,21 @@
 ﻿@page "/"
+@using Cotacol.Website.Models.Settings
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
 @namespace Cotacol.Website.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IOptions<MapSettings> MapSettings
+
 @{
     Layout = "_Layout";
 }
-
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cotacol Hunting</title>
+    <base href="~/"/>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@(MapSettings.Value.GoogleMapKey)&v=3"></script>
+    <script src="_content/BlazorGoogleMaps/js/objectManager.js"></script>
+    <script src="https://unpkg.com/@@googlemaps/markerclusterer/dist/index.min.js"></script>
+</head>
 <component type="typeof(App)" render-mode="ServerPrerendered"/>

@@ -1,0 +1,265 @@
+@page "/cotacol/{CotacolId}"
+@using Columbae.World
+@using System.Text
+@using Cotacol.Website.Models
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+
+<MudGrid Spacing="0">
+    @if (climbDetail == null)
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.h1" Color="Color.Tertiary">Cotacol details</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Loading details..."/>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.h1" Color="Color.Tertiary">#@climbDetail.Id - @climbDetail.Name</MudText>
+        </MudItem>
+        @if (UserProfile.IsAdmin)
+        {
+            <MudItem xs="12">
+                <MudButton StartIcon="@Icons.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
+            </MudItem>
+        }
+        <MudItem xs="4">
+            <MudText Typo="Typo.h2" Color="Color.Secondary">Info</MudText>
+            <MudText Typo="Typo.body1">@climbDetail.City, @climbDetail.Province</MudText>
+            <MudGrid Spacing="1">
+                <MudItem xs="2">
+                    <MudIcon Icon="@Icons.Filled.Numbers"></MudIcon>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTooltip Text="Cotacol points">
+                        <MudText Typo="Typo.body1">@(climbDetail?.CotacolPoints.Number()) pts</MudText>
+                    </MudTooltip>
+                </MudItem>
+                @if (climbDetail?.BomScore > 0)
+                {
+                    <MudItem xs="2">
+                        <img src="images/bomb.png"/>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTooltip Text="Bomb score climbs are intense">
+                            <MudText Typo="Typo.body1">@(climbDetail?.BomScore.Number())</MudText>
+                        </MudTooltip>
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem xs="6"/>
+                }
+                <MudItem xs="2">
+                    <MudIcon Icon="@Icons.Filled.Height"></MudIcon>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTooltip Text="Elevation">
+                        <MudText Typo="Typo.body1">@(climbDetail?.ElevationDiff.Number()) m</MudText>
+                    </MudTooltip>
+                </MudItem>
+                <MudItem xs="2">
+                    <MudIcon Icon="@Icons.Outlined.StackedLineChart"></MudIcon>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTooltip Text="Average grade">
+                        <MudText Typo="Typo.body1">@(climbDetail?.AvgGrade.Percentage())</MudText>
+                    </MudTooltip>
+                </MudItem>
+                <MudItem xs="2">
+                    <MudIcon Icon="@Icons.Filled.HorizontalRule"></MudIcon>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTooltip Text="Length of the climb">
+                        <MudText Typo="Typo.body1">@(climbDetail?.Distance.Number()) m</MudText>
+                    </MudTooltip>
+                </MudItem>
+                <MudItem xs="2">
+                    <MudIcon Icon="@Icons.Outlined.AddRoad"></MudIcon>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTooltip Text="Surface of the road">
+                        <MudText Typo="Typo.body1">@(climbDetail?.Surface)</MudText>
+                    </MudTooltip>
+                </MudItem>
+                @if (UserProfile.IsAuthenticated)
+                {
+                    <MudItem xs="12">
+                        <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSwitch @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
+                        <MudSwitch T="bool" Label="Planned" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="false"/>
+                    </MudItem>
+                }
+                @if (CotacolDone)
+                {
+                    <MudItem xs="2">
+                        <MudIcon Icon="@Icons.Outlined.CalendarMonth"></MudIcon>
+                    </MudItem>
+                    <MudItem xs="10">
+                        <MudTooltip Text="First time you attempted this climb">
+                            <MudText Typo="Typo.body1">@(FirstAchievement)</MudText>
+                        </MudTooltip>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudIcon Icon="@Icons.Outlined.FlashOn"></MudIcon>
+                    </MudItem>
+                    <MudItem xs="10">
+                        <MudTooltip Text="Your personal best">
+                            <MudText Typo="Typo.body1">@(BestTime)</MudText>
+                        </MudTooltip>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudIcon Icon="@Icons.Outlined.Countertops"></MudIcon>
+                    </MudItem>
+                    <MudItem xs="10">
+                        <MudTooltip Text="Amount of your attempts">
+                            <MudText Typo="Typo.body1">@(TotalAttempts) attempts</MudText>
+                        </MudTooltip>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
+                    </MudItem>
+                }
+                @if (climbDetail.Stats?.LocalLegends?.Any() ?? false)
+                {
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.h2" Color="Color.Secondary">Local legends</MudText>
+                    </MudItem>
+                    foreach (var legend in climbDetail.Stats.LocalLegends)
+                    {
+                        <MudItem xs="2">
+                            <MudIcon Icon="@Icons.Filled.Star"></MudIcon>
+                        </MudItem>
+                        <MudItem xs="10">
+                            <MudLink Href='@($"achievements/{legend.UserId}")'>@legend.UserName</MudLink>
+                        </MudItem>
+                    }
+                }
+
+            </MudGrid>
+        </MudItem>
+        @if (UserProfile.IsAuthenticated)
+        {
+            <MudItem xs="3">
+                <MudText Typo="Typo.h2" Color="Color.Secondary">Your attempts</MudText>
+                @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
+                {
+                    <MudList>
+                        @foreach (var activity in climbDetail.UserColDetail.Activities)
+                        {
+                            <MudListItem Dense="true">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@(TimeSpan.FromSeconds(activity.Duration).ToString("g")) - @(activity.StartTime.ToString("D"))</MudText>
+                            </MudListItem>
+                            <MudListItem Dense="true">
+                                <MudLink Href='@($"https://www.strava.com/activities/{activity.Id}")' Typo="Typo.body1">@PrintActivityTitle(activity)</MudLink>
+                            </MudListItem>
+                            <MudDivider DividerType="DividerType.FullWidth" Light="false"/>
+                        }
+                    </MudList>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1" Color="Color.Warning">No attempts have been made</MudText>
+                }
+            </MudItem>
+        }
+        <MudItem xs="@(UserProfile.IsAuthenticated ? 5 : 8)">
+            <ClimbMapComponent Cotacol="@GetClimbData()" Height="360px"></ClimbMapComponent>
+        </MudItem>
+        <MudItem xs="6">
+        @if (climbDetail.Stats?.UserList != null) {
+            <MudText Typo="Typo.h2" Color="Color.Secondary">Leader board</MudText>
+            <MudTable Items="@climbDetail.Stats.UserList" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>User</MudTh>
+                    <MudTh>Attempts</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="UserName">
+                        <MudLink Href='@($"achievements/{context.UserId}")'>@context.UserName</MudLink>
+                    </MudTd>
+                    <MudTd DataLabel="Attempts">@context.Attempts.Number()</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        </MudItem>
+        <MudItem xs="6"></MudItem>
+    }
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public string CotacolId { get; set; }
+
+    private ClimbUserDetail? climbDetail;
+
+    private bool CotacolDone
+    {
+        get => climbDetail?.UserColDetail?.Activities?.Any() ?? false;
+        set { }
+    }
+
+    private bool CotacolPlanned
+    {
+        get => climbDetail?.UserColDetail?.Bookmarked ?? false;
+        set => SetBookmarkAsync(value).Wait();
+    }
+
+    private string FirstAchievement => climbDetail.UserColDetail.Activities.Min(a => a.StartTime).ToShortDateString();
+    private string BestTime => TimeSpan.FromSeconds(climbDetail.UserColDetail.Activities.Min(a => a.Duration)).ToString("g");
+    private string TotalAttempts => climbDetail.UserColDetail.Activities.Count().ToString();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = UserProfile.IsAuthenticated ? UserProfile.UserId : null;
+        climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId, userId);
+    }
+
+    private string PrintActivityTitle(ColActivity activity)
+    {
+        if (!string.IsNullOrEmpty(activity.Description)) return activity.Description;
+        return activity.StartTime.ToString("D");
+    }
+
+    private UserClimb GetClimbData()
+    {
+        var climb =
+            new UserClimb
+            {
+                UserAttempts = climbDetail.Stats?.TotalAttempts ?? 0, City = climbDetail.City, Distance = climbDetail.Distance,
+                Polyline = climbDetail.Polyline,
+                AvgGrade = climbDetail.AvgGrade, Province = climbDetail.Province, Surface = climbDetail.Surface, Url = climbDetail.Url,
+                CotacolPoints = climbDetail.CotacolPoints, Id = climbDetail.Id, ElevationDiff = climbDetail.ElevationDiff,
+                Name = climbDetail.Name, StravaSegment = climbDetail.StravaSegment
+            };
+        if (CotacolDone)
+        {
+            climb.BestTime = climbDetail.UserColDetail.Activities.Min(a => a.Duration);
+            climb.FirstAchievement = climbDetail.UserColDetail.Activities.Min(a => a.StartTime);
+            climb.Done = climbDetail.UserColDetail.Activities.Any();
+        }
+        return climb;
+    }
+
+
+    private async Task SetBookmarkAsync(bool bookmark)
+    {
+        if (bookmark)
+        {
+            await CotacolUserClient.BookmarkClimbAsync(CotacolId);
+        }
+        else
+        {
+            await CotacolUserClient.UnbookmarkClimbAsync(CotacolId);
+        }
+    }
+
+}

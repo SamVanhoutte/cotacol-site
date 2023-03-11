@@ -1,6 +1,6 @@
 namespace Cotacol.Website.Models.CotacolApi
 {
-    public class Cotacol
+    public class CotacolClimb
     {
         public string CotacolId { get; set; }
         public string CotacolName { get; set; }

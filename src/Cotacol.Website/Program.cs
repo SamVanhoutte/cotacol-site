@@ -5,11 +5,11 @@ using Cotacol.Website.Models.Identity;
 using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
+using Cotacol.Website.Services.Imaging;
+using Cotacol.Website.Services.Maps;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
 
@@ -32,17 +32,18 @@ namespace Cotacol.Website
             var stravaSettings = new StravaSettings();
             configuration.GetSection("strava").Bind(stravaSettings);
 
-            
+
             var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
+            builder.Services.AddServerSideBlazor()
+                .AddHubOptions(cfg => cfg.MaximumReceiveMessageSize = 1048576); // For Blazor Google Maps
             builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme       = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;  
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddCookie("Identity.External")
                 .AddOAuth(CookieAuthenticationDefaults.AuthenticationScheme, "Strava",
@@ -152,9 +153,11 @@ namespace Cotacol.Website
 
         private static void InjectServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddTransient<IUserProfileManager, CotacolProfileManager>();
-            builder.Services.AddTransient<ICotacolUserClient, CotacolApiUserClient>();
-            builder.Services.AddTransient<ICotacolClient, CotacolApiClient>();
+            builder.Services.AddScoped<IUserProfileManager, CotacolProfileManager>();
+            builder.Services.AddSingleton<ICotacolUserClient, CotacolApiUserClient>();
+            builder.Services.AddSingleton<ICotacolClient, CotacolApiClient>();
+            builder.Services.AddScoped<IMapService, MapListService>();
+            builder.Services.AddScoped<IYearImageGenerator, ImgSharpYearImageGenerator>();
         }
     }
 }
