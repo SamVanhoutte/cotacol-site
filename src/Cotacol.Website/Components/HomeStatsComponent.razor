@@ -10,7 +10,7 @@
 
 <MudGrid Spacing="0">
     <MudItem xs="12">
-        <MudText Typo="Typo.h1" Color="Color.Tertiary">Migration status</MudText>
+        <MudText Typo="Typo.h2" Color="Color.Tertiary">Migration status</MudText>
     </MudItem>
     <MudItem xs="12">
         <MudText Typo="Typo.body1">
@@ -21,7 +21,7 @@
     @if (Stats?.RecentActivities != null)
     {
         <MudItem xs="12">
-            <MudText Typo="Typo.h1" Color="Color.Tertiary">Combined achievements</MudText>
+            <MudText Typo="Typo.h2" Color="Color.Tertiary">Combined achievements</MudText>
         </MudItem>
         <MudItem xs="12" Class="d-flex">
             <MudIcon Icon="@Icons.Filled.PersonAdd"></MudIcon>
@@ -42,11 +42,10 @@
                     var act = recent.First();
                     @if (UserProfile.IsAuthenticated)
                     {
-                        <li class="lektonicgrey"><a href="achievements/@(recent.Key)">@(act.FullName.Split(" ").FirstOrDefault())</a> did @GetCotacolsFromActivity(recent, true) <a href="https://www.strava.com/activities/@act.ActivityId">@(PrintTime(act.ActivityDate))</a></li>
+                        <li class="lektonicgrey"><a href="achievements/@(recent.Key)" class="mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1">@(act.FullName.Split(" ").FirstOrDefault())</a> did @GetCotacolsFromActivity(recent, true) <a href="https://www.strava.com/activities/@act.ActivityId" class="mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1">@(PrintTime(act.ActivityDate))</a></li>
                     }
                     else
                     {
-                        // 
                         <li class="lektonicgrey">@(act.FullName.Split(" ").FirstOrDefault()) did @GetCotacolsFromActivity(recent, false) @(PrintTime(act.ActivityDate))</li>
                     }
                 }
@@ -102,7 +101,7 @@
             if (builder.Length > 0 && iteration == totalCols) builder.Append(" and ");
             if (includeLinks)
             {
-                builder.Append($"<a href='cotacol/{col.CotacolId}'>{col.CotacolName}</a>");
+                builder.Append($"<a href='cotacol/{col.CotacolId}' class='mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1'>{col.CotacolName}</a>");
             }
             else
             {

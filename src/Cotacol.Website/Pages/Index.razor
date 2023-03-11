@@ -5,10 +5,16 @@
 
 
 <MudGrid Spacing="1" Style="height: 100%;">
+    @if (!UserProfile.IsAuthenticated)
+    {
+        <MudItem xs="12">
+            <a class="nav-link text-dark" href="@UserProfile.GetLoginLink()">Enable strava integration for the full experience !</a>
+        </MudItem>
+    }
     <MudItem xs="4" lg="4" md="4" sm="4">
         <MudGrid Spacing="0">
             <MudItem xs="12">
-                <MudText Typo="Typo.h1" Color="Color.Tertiary">How it all started</MudText>
+                <MudText Typo="Typo.h2" Color="Color.Tertiary">How it all started</MudText>
             </MudItem>
             <MudItem xs="12">
                 <MudText Typo="Typo.body1">
@@ -24,7 +30,7 @@
         <HomeStatsComponent/>
     </MudItem>
     <MudItem xs="2" lg="2" md="2" sm="2">
-        <MudText Typo="Typo.h1" Color="Color.Tertiary">Apps</MudText>
+        <MudText Typo="Typo.h2" Color="Color.Tertiary">Apps</MudText>
         <MudLink Href="https://apps.apple.com/be/app/cotacol/id1526464862" Target="_blank">
             <MudImage Src="images/apple-store.png" Width="80" ObjectPosition="ObjectPosition.Center"></MudImage>
         </MudLink>
