@@ -3,7 +3,23 @@ using Newtonsoft.Json;
 
 namespace CotacolApp.Models.CotacolApi
 {
+    
     public class UserListRecord
+    {
+        [JsonProperty("profile")] public UserProfile Profile { get; set; }
+        [JsonProperty("health")] public UserHealth Health { get; set; }
+        [JsonProperty("stats")] public UserStats Stats { get; set; }
+
+    }
+
+    public class UserStats
+    {
+        public int AchievedBadges { get; set; }
+        public int ColsDone { get; set; }
+        public int TotalPoints { get; set; }
+        public string Remark { get; set; }
+    }
+    public class UserHealth
     {
         [JsonProperty("userId")]
         public long UserId { get; set; }

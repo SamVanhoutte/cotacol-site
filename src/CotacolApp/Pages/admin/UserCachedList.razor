@@ -13,7 +13,7 @@
     <MatButton Icon="@MatIconNames.Search" OnClick="async () => await LoadUserListAsync()" Label="Load all users"></MatButton>
     @if (userList != null)
     {
-        <div class="lektonic">@userList.Count users // @SqlUsers sql users // @ExpiredUsers expired users // @TestUsers test users </div>
+        <div class="lektonic">@userList.Count users // @ExpiredUsers expired users // @TestUsers test users </div>
     }
     else
     {
@@ -36,7 +36,6 @@
                     <MatSortHeader SortId="name">
                         <span style="width:250px">Name</span>
                     </MatSortHeader>
-                    <MatSortHeader SortId="persistence">Persistence</MatSortHeader>
                     <MatSortHeader SortId="expired">Expired</MatSortHeader>
                     <MatSortHeader SortId="valid">
                         <span style="width:120px">Valid until</span>
@@ -49,16 +48,17 @@
                 </MatSortHeaderRow>
             </MatTableHeader>
             <MatTableRow>
-                <td><a href="admin/user/@context.UserId">@context.UserId</a></td>
-                <td style="max-width: 200px">@context.FullName</td>
-                <td>@(context.PersistenceService ?? "")</td>
-                <td>@(context.TokenExpired)</td>
-                <td>@context.LastSynced.DateTime()</td>
-                <td>@context.SyncStatus</td>
-                <td>@context.UpdateActivityDescription</td>
-                <td>@context.PrivateProfile</td>
-                <td>@context.TotalActivities.Number()</td>
-                <td>@context.Email</td>
+                <td>
+                    <a href="admin/user/@context.Profile.UserId">@context.Profile.UserId</a>
+                </td>
+                <td style="max-width: 200px">@context.Profile.FullName</td>
+                <td>@(context.Health.TokenExpired)</td>
+                <td>@context.Health.LastSynced.DateTime()</td>
+                <td>@context.Health.SyncStatus</td>
+                <td>@context.Profile.UserSettings.UpdateActivityDescription</td>
+                <td>@context.Profile.UserSettings.PrivateProfile</td>
+                <td>@context.Health.TotalActivities.Number()</td>
+                <td>@context.Profile.EmailAddress</td>
             </MatTableRow>
         </MatTable>
     }
@@ -95,9 +95,8 @@ else
         NavManager.NavigateTo($"admin/user/{userId}");
     }
 
-    private int SqlUsers => userList.Count(u => u.PersistenceService?.Equals("sql", StringComparison.InvariantCultureIgnoreCase) ?? false);
-    private int TestUsers => userList.Count(u => u.TestUser);
-    private int ExpiredUsers => userList.Count(u => u.TokenExpired ?? false);
+    private int TestUsers => userList.Count(u => u.Profile?.TestUser ?? false);
+    private int ExpiredUsers => userList.Count(u => u.Health?.TokenExpired ?? false);
 
     private void SortUsers(MatSortChangedEvent sort)
     {
@@ -107,49 +106,44 @@ else
             {
                 case "id":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.UserId).ToList() :
-                        userList.OrderByDescending(c => c.UserId).ToList();
+                        userList.OrderBy(c => c.Profile.UserId).ToList() :
+                        userList.OrderByDescending(c => c.Profile.UserId).ToList();
                     break;
                 case "name":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.FullName).ToList() :
-                        userList.OrderByDescending(c => c.FullName).ToList();
+                        userList.OrderBy(c => c.Profile.FullName).ToList() :
+                        userList.OrderByDescending(c => c.Profile.FullName).ToList();
                     break;
                 case "expired":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.TokenExpired).ToList() :
-                        userList.OrderByDescending(c => c.TokenExpired).ToList();
+                        userList.OrderBy(c => c.Health.TokenExpired).ToList() :
+                        userList.OrderByDescending(c => c.Health.TokenExpired).ToList();
                     break;
                 case "valid":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.LastSynced).ToList() :
-                        userList.OrderByDescending(c => c.LastSynced).ToList();
+                        userList.OrderBy(c => c.Health.LastSynced).ToList() :
+                        userList.OrderByDescending(c => c.Health.LastSynced).ToList();
                     break;
                 case "description":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.UpdateActivityDescription).ToList() :
-                        userList.OrderByDescending(c => c.UpdateActivityDescription).ToList();
-                    break;
-                case "persistence":
-                    userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.PersistenceService).ToList() :
-                        userList.OrderByDescending(c => c.PersistenceService).ToList();
+                        userList.OrderBy(c => c.Profile.UserSettings.UpdateActivityDescription).ToList() :
+                        userList.OrderByDescending(c => c.Profile.UserSettings.UpdateActivityDescription).ToList();
                     break;
                 case "private":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.PrivateProfile).ToList() :
-                        userList.OrderByDescending(c => c.PrivateProfile).ToList();
+                        userList.OrderBy(c => c.Health.PrivateProfile).ToList() :
+                        userList.OrderByDescending(c => c.Health.PrivateProfile).ToList();
 
                     break;
                 case "syncstatus":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.SyncStatus).ToList() :
-                        userList.OrderByDescending(c => c.SyncStatus).ToList();
+                        userList.OrderBy(c => c.Health.SyncStatus).ToList() :
+                        userList.OrderByDescending(c => c.Health.SyncStatus).ToList();
                     break;
                 case "activities":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.TotalActivities).ToList() :
-                        userList.OrderByDescending(c => c.TotalActivities).ToList();
+                        userList.OrderBy(c => c.Health.TotalActivities).ToList() :
+                        userList.OrderByDescending(c => c.Health.TotalActivities).ToList();
                     break;
             }
         }

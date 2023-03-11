@@ -102,6 +102,10 @@ namespace CotacolApp.Services
         {
             try
             {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return null;
+                }
                 var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
                     .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                     .AllowAnyHttpStatus()

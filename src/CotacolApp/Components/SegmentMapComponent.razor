@@ -11,10 +11,11 @@
 @using Columbae.World
 @using System.IO
 @using MouseEvent = GoogleMapsComponents.Maps.MouseEvent
+@using Microsoft.AspNetCore.Http
 @inject IJSRuntime JsRuntime
 @inject IMapService MapService
 @inject ICotacolClient CotacolClient
-
+@inject IHttpContextAccessor HttpContextManager
 @if (_cotacol != null)
 {
     <table style="width: 100%">
@@ -371,10 +372,11 @@ else
     {
         try
         {
+            var userId = HttpContextManager.HttpContext.User.GetUserId();
             var stravaSegment = _cotacol.Segments.First(s => s.Segmentid.Equals(NewSegmentId));
             var updateRequest = new UpdateSegmentRequest
             {
-                Remark = remark, SegmentConfidence = confidence, UserId = "",
+                Remark = remark, SegmentConfidence = confidence, UserId = userId,
                 Distance = stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
                 StravaSegmentId = stravaSegment.Segmentid
             };
