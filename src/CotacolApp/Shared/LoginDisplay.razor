@@ -13,7 +13,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 <AuthorizeView>
     <Authorized>
-        @if(uniqueCols>0)
+        @if (uniqueCols > 0)
         {
             <span class="iconify" data-icon="ant-design:line-chart-outlined" data-inline="false"></span>
             <span class="lekton">@uniqueCols cols&nbsp;&nbsp;</span>
@@ -31,12 +31,11 @@
 @code {
     private int uniqueCols = -1;
     private int totalPoints = -1;
-    
 
 
     protected override async Task OnInitializedAsync()
     {
-        if (uniqueCols < 0)
+        if (uniqueCols < 0 && !string.IsNullOrEmpty(UserProfile.UserId))
         {
             try
             {
@@ -48,7 +47,8 @@
             {
                 Console.WriteLine(e.ToString());
             }
-        }   
+        }
         await base.OnInitializedAsync();
     }
+
 }
