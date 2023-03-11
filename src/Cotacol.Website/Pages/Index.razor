@@ -41,3 +41,14 @@
         <MudText Typo="Typo.body1">Install Android App</MudText>
     </MudItem>
 </MudGrid>
+
+@code{
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "Your cotacol bucket list";
+    }
+}

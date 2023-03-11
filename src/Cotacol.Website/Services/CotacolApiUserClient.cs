@@ -1,5 +1,7 @@
 using Cotacol.Website.Interfaces;
+using Cotacol.Website.Models;
 using Cotacol.Website.Models.CotacolApi;
+using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services.Extensions;
 
 namespace Cotacol.Website.Services;
@@ -9,8 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using CotacolApp.Models;
-using CotacolApp.Settings;
 using Flurl;
 using Flurl.Http;
 using GuardNet;

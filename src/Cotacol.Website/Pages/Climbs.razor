@@ -1,0 +1,26 @@
+@page "/climbs"
+@page "/climbs/{UserId}"
+@using Cotacol.Website.Models
+
+<MudGrid>
+    <MudItem xs="12">
+        <ClimbListComponent Mode="@ClimbViewMode.Table" UserId="@UserId"></ClimbListComponent>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "The list";
+        base.OnInitialized();
+    }
+
+}

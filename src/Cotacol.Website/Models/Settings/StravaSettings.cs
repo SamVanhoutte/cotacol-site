@@ -1,4 +1,4 @@
-namespace CotacolApp.Models.Settings
+namespace Cotacol.Website.Models.Settings
 {
     public class StravaSettings
     {

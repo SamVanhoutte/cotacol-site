@@ -1,8 +1,7 @@
 using System.Security.Claims;
 using Cotacol.Website.Interfaces;
+using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services.Extensions;
-using CotacolApp.Models.Settings;
-using CotacolApp.Settings;
 using Microsoft.Extensions.Options;
 
 namespace Cotacol.Website.Services

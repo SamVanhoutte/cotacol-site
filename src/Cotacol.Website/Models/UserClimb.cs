@@ -1,6 +1,4 @@
-using System;
-
-namespace CotacolApp.Models
+namespace Cotacol.Website.Models
 {
     public class UserClimb : ClimbData
     {

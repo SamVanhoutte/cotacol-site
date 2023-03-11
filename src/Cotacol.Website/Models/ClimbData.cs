@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cotacol.Website.Models.CotacolApi;
 using Newtonsoft.Json;
 
-namespace CotacolApp.Models
+namespace Cotacol.Website.Models
 {
     public class ClimbData
     {
@@ -28,6 +25,9 @@ namespace CotacolApp.Models
 
         [JsonProperty("bom_score")]
         public int BomScore { get; set; }
+        
+        [JsonIgnore]
+        public string BombPrinted => BomScore > 0 ? BomScore.ToString() : "-";
 
         [JsonProperty("avg_grade")]
         public double AvgGrade { get; set; }

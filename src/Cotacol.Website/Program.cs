@@ -1,11 +1,10 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Cotacol.Website.Interfaces;
+using Cotacol.Website.Models.Identity;
+using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
-using CotacolApp.Models.Identity;
-using CotacolApp.Models.Settings;
-using CotacolApp.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
