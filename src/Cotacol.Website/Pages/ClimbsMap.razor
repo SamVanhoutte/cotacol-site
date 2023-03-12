@@ -1,12 +1,8 @@
 @page "/map"
 @page "/map/{UserId}"
 @using Cotacol.Website.Models
-<Title Value="Cotacol: the map"/>
 
 <MudGrid Spacing="2">
-    <MudItem xs="12">
-        <MudText Typo="Typo.h1" Color="Color.Tertiary">The big map</MudText>
-    </MudItem>
     <MudItem xs="12">
         <ClimbListComponent Mode="@ClimbViewMode.Map" UserId="@UserId"></ClimbListComponent>
     </MudItem>
@@ -16,5 +12,14 @@
 
     [Parameter]
     public string UserId { get; set; }
+    
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "The big map";
+        base.OnInitialized();
+    }
 
 }

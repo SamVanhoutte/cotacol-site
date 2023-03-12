@@ -1,0 +1,112 @@
+@using Cotacol.Website.Models.CotacolApi
+@using System.Drawing.Imaging
+@using ScottPlot
+@using SkiaSharp
+@using Edge = ScottPlot.Edge
+@if (!string.IsNullOrEmpty(ImageContent))
+{
+    <MudImage Src="@ImageContent" Width="Width" Height="Height"/>
+}
+else
+{
+    if (string.IsNullOrEmpty(Error))
+    {
+        <LoadingPatienceComponent WaitingMessage="Loading chart..."/>
+    }
+    else
+    {
+        <ErrorDisplay ErrorMessage="@Error"/>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public int Width { get; set; } = 600;
+
+    [Parameter]
+    public int Height { get; set; } = 300;
+
+    [Parameter]
+    public bool TwoAxises { get; set; } = false;
+
+    [Parameter]
+    public UserAchievements Achievements { get; set; }
+
+    private ChartOptions ChartOptions => new ChartOptions
+    {
+        DisableLegend = true,
+        XAxisLines = false,
+        YAxisLines = false,
+        MaxNumYAxisTicks = 20
+    };
+
+    private string? ImageContent { get; set; }
+    private string Error { get; set; }
+    private List<ChartSeries>? series;
+    private string[] axisLabels;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            if (Achievements?.ColResults != null)
+            {
+                var achievements = Achievements.ColResults.OrderBy(cr => cr.Achievements?.Min(a => a.AchievementDate));
+                if (achievements.Any())
+                {
+                    var days = new List<double>();
+                    var points = new List<double>();
+                    var counts = new List<double>();
+                    var currentPoints = 0;
+                    var colCount = 0;
+                    foreach (var colResult in achievements)
+                    {
+                        currentPoints += colResult.CotacolPoints;
+                        colCount += 1;
+                        points.Add(currentPoints);
+                        counts.Add(colCount);
+                        days.Add(colResult.Achievements.Min(a => a.AchievementDate).ToOADate());
+                    }
+
+                    var plt = new ScottPlot.Plot();
+
+                    plt.FigureBackground = ScottPlot.Color.FromHex("#F9F1E6");
+                    plt.DataBackground = ScottPlot.Color.FromHex("#F9F1E6");
+                    var pointsScatter = plt.Add.Scatter(days.ToArray(), points.ToArray()); //, color: Color.FromArgb(253,125,122));
+                    pointsScatter.LineStyle.Color = ScottPlot.Color.FromHex("#06163d");
+                    pointsScatter.MarkerStyle = new MarkerStyle(
+                        shape: MarkerShape.FilledCircle,
+                        size: 2,
+                        color: ScottPlot.Color.FromHex("#FD7D7A"));
+
+                    if (TwoAxises)
+                    {
+                        // create a second axis and add it to the plot
+                        ScottPlot.Axis.StandardAxes.LeftAxis countYAxis = new();
+                        countYAxis.Label.Text = "Number of cols";
+                        plt.YAxes.Add(countYAxis);
+                        var countScatter = plt.Add.Scatter(days.ToArray(), counts.ToArray()); //, color: Color.FromArgb(253,125,122));
+                        countScatter.Axes.XAxis = plt.XAxis;
+                        countScatter.Axes.YAxis = countYAxis;
+                    }
+                    plt.Axes.DateTimeTicks(Edge.Bottom);
+                    var imageStream = new MemoryStream();
+                    var surface = SKSurface.Create(new SKImageInfo(Width, Height));
+                    plt.Render(surface);
+                    var image = surface.Snapshot();
+                    image.Encode(SKEncodedImageFormat.Png, 100).SaveTo(imageStream);
+                    imageStream.Position = 0;
+
+                    ImageContent = $"data:image/png;base64, {Convert.ToBase64String(imageStream.ToArray())}";
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+}

@@ -9,7 +9,7 @@
     @if (_climbs == null)
     {
         <MudItem xs="12">
-            <PatienceComponent WaitingMessage="Retrieving the cotacol list"/>
+            <LoadingPatienceComponent WaitingMessage="Retrieving the cotacol list"/>
         </MudItem>
     }
     else
@@ -61,7 +61,7 @@
         }
         else
         {
-            @* <ClimbListMapComponent @bind-Climbs="@_climbs"/> *@
+            <ClimbListMapComponent @bind-Climbs="@_climbs"/>
         }
     }
 </MudGrid>

@@ -1,0 +1,82 @@
+@using Cotacol.Website.Models.CotacolApi
+<style>
+    .square {
+      width: 100%;
+      height: 0;
+      padding-top: 100%;
+      position: relative;
+      background-color: transparent; /*#dcd5cb;*/
+      /*box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);*/
+    }
+    
+    .squarecontent {
+      position: absolute;
+      text-align: center;
+      top: 0;
+      left: 0;
+      background-color: transparent; /*#dcd5cb;*/
+      width: 100%;
+    }
+</style>
+<div class="square d-flex justify-center border-solid">
+    <div class="squarecontent">
+        <MudLink Href="@GetHref()">
+            <MudTooltip Text="@GetDescription()">
+                <MudImage Alt="@BadgeStatus.Description" Src='@($"images/badges/{BadgeStatus.BadgeId}.png")' onerror="this.onerror=null; this.src='images/badges/default.png'" Style="@GetBadgeStyle()"></MudImage>
+                <br/>
+                <MudText Typo="Typo.body1">@BadgeStatus.Name</MudText>
+            </MudTooltip>
+        </MudLink>
+    </div>
+</div>
+<MudProgressLinear Value="@(BadgeStatus.Progress * 100)"></MudProgressLinear>
+@if (BadgeStatus.Completed)
+{
+    <MudText Typo="Typo.body1" Align="Align.Center">Completed @(BadgeStatus.AchievementDate?.Date.ToString("dd MMM yy"))</MudText>
+}
+else
+{
+    <MudText Typo="Typo.body1" Align="Align.Center">@(BadgeStatus.NumberColsNeeded - BadgeStatus.NumberColsAchieved) cols missing</MudText>
+}
+@code {
+
+    [Parameter]
+    public UserBadgeStatus BadgeStatus { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string Width { get; set; } = "80%";
+
+
+    private string GetHref()
+    {
+        if ((BadgeStatus?.ValidFrom ?? DateTime.MinValue) < DateTime.Today)
+        {
+            if (string.IsNullOrEmpty(UserId))
+            {
+                return $"badge/{BadgeStatus.BadgeId}";
+            }
+            return $"badge/{BadgeStatus.BadgeId}/{UserId}";
+        }
+        return "javascript: void(0)";
+    }
+
+    private string GetDescription()
+    {
+        if ((BadgeStatus?.ValidFrom ?? DateTime.MinValue) < DateTime.Today)
+        {
+            return BadgeStatus.Description;
+        }
+        return $"Badge only active as from {BadgeStatus.ValidFrom:MMM dd}";
+    }
+
+    private string GetBadgeStyle()
+    {
+        return BadgeStatus.Completed ?
+            $"width: {Width};" :
+            $"z-index: 0; width: {Width};-webkit-filter: grayscale(100%); filter: grayscale(100%);";
+    }
+
+}
