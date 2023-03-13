@@ -19,16 +19,13 @@
     }
     else
     {
-        <MudItem xs="12">
-            <MudText Typo="Typo.h1" Color="Color.Tertiary">#@climbDetail.Id - @climbDetail.Name</MudText>
-        </MudItem>
         @if (UserProfile.IsAdmin)
         {
             <MudItem xs="12">
                 <MudButton StartIcon="@Icons.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
             </MudItem>
         }
-        <MudItem xs="4">
+        <MudItem xs="3">
             <MudText Typo="Typo.h2" Color="Color.Secondary">Info</MudText>
             <MudText Typo="Typo.body1">@climbDetail.City, @climbDetail.Province</MudText>
             <MudGrid Spacing="1">
@@ -131,6 +128,7 @@
                 {
                     <MudItem xs="12">
                         <MudText Typo="Typo.h2" Color="Color.Secondary">Local legends</MudText>
+                        <MudText Typo="Typo.body1">@climbDetail.Stats.MaximumUserAttempts attempts</MudText>
                     </MudItem>
                     foreach (var legend in climbDetail.Stats.LocalLegends)
                     {
@@ -147,18 +145,16 @@
         </MudItem>
         @if (UserProfile.IsAuthenticated)
         {
-            <MudItem xs="3">
+            <MudItem xs="4">
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Your attempts</MudText>
                 @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
                 {
-                    <MudList>
+                    <MudList Clickable="true">
                         @foreach (var activity in climbDetail.UserColDetail.Activities)
                         {
-                            <MudListItem Dense="true">
+                            <MudListItem Icon="@(activity.Duration.Equals(BestDuration) ? Icons.Filled.FlashOn : Icons.Filled.Timelapse)" Dense="true" Href='@($"https://www.strava.com/activities/{activity.Id}")'>
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">@(TimeSpan.FromSeconds(activity.Duration).ToString("g")) - @(activity.StartTime.ToString("D"))</MudText>
-                            </MudListItem>
-                            <MudListItem Dense="true">
-                                <MudLink Href='@($"https://www.strava.com/activities/{activity.Id}")' Typo="Typo.body1">@PrintActivityTitle(activity)</MudLink>
+                                <MudText Typo="Typo.body1">@PrintActivityTitle(activity)</MudText>
                             </MudListItem>
                             <MudDivider DividerType="DividerType.FullWidth" Light="false"/>
                         }
@@ -170,31 +166,36 @@
                 }
             </MudItem>
         }
-        <MudItem xs="@(UserProfile.IsAuthenticated ? 5 : 8)">
+        <MudItem xs="@(UserProfile.IsAuthenticated ? 5 : 9)">
             <ClimbMapComponent Cotacol="@GetClimbData()" Height="360px"></ClimbMapComponent>
         </MudItem>
         <MudItem xs="6">
-        @if (climbDetail.Stats?.UserList != null) {
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Leader board</MudText>
-            <MudTable Items="@climbDetail.Stats.UserList" Hover="true" Breakpoint="Breakpoint.Sm">
-                <HeaderContent>
-                    <MudTh>User</MudTh>
-                    <MudTh>Attempts</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="UserName">
-                        <MudLink Href='@($"achievements/{context.UserId}")'>@context.UserName</MudLink>
-                    </MudTd>
-                    <MudTd DataLabel="Attempts">@context.Attempts.Number()</MudTd>
-                </RowTemplate>
-            </MudTable>
-        }
+            @if (climbDetail.Stats?.UserList != null)
+            {
+                <MudText Typo="Typo.h2" Color="Color.Secondary">Leader board</MudText>
+                <MudTable Items="@climbDetail.Stats.UserList" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>User</MudTh>
+                        <MudTh>Attempts</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="UserName">
+                            <MudLink Href='@($"achievements/{context.UserId}")'>@context.UserName</MudLink>
+                        </MudTd>
+                        <MudTd DataLabel="Attempts">@context.Attempts.Number()</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
         </MudItem>
         <MudItem xs="6"></MudItem>
     }
 </MudGrid>
 
 @code {
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
 
     [Parameter]
     public string CotacolId { get; set; }
@@ -215,12 +216,14 @@
 
     private string FirstAchievement => climbDetail.UserColDetail.Activities.Min(a => a.StartTime).ToShortDateString();
     private string BestTime => TimeSpan.FromSeconds(climbDetail.UserColDetail.Activities.Min(a => a.Duration)).ToString("g");
+    private long BestDuration => climbDetail.UserColDetail.Activities.OrderBy(a => a.Duration).First().Duration;
     private string TotalAttempts => climbDetail.UserColDetail.Activities.Count().ToString();
 
     protected override async Task OnInitializedAsync()
     {
         var userId = UserProfile.IsAuthenticated ? UserProfile.UserId : null;
         climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId, userId);
+        Layout.Title = $"#{@climbDetail.Id} - {@climbDetail.Name}";
     }
 
     private string PrintActivityTitle(ColActivity activity)

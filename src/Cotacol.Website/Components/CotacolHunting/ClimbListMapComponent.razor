@@ -10,18 +10,31 @@
 @inject ILogger<ClimbListMapComponent> Logger
 @inject IJSRuntime JsRuntime
 @inject IMapService MapService
-@if (Climbs != null)
-{
-    <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await PlotGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
-                   @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
-        <ButtonTemplate>
-            <MudPaper Height="50px" Outlined="true" Class="@DragClass">
-                <MudText Typo="Typo.body1">Show route on map (click or drag your gpx here)</MudText>
-            </MudPaper>
-        </ButtonTemplate>
-    </MudFileUpload>
-    <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
-}
+<MudGrid>
+    @if (Climbs != null)
+    {
+        <MudItem xs="8"></MudItem>
+        <MudItem xs="4">
+            <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await PlotGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
+                           @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
+                <ButtonTemplate>
+                    <MudPaper Height="50px" Outlined="true" Class="@DragClass">
+                        <MudText Typo="Typo.body1">Show route on map (click or drag your gpx here)</MudText>
+                    </MudPaper>
+                </ButtonTemplate>
+            </MudFileUpload>
+        </MudItem>
+        <MudItem xs="12">
+            <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Loading map"/>
+        </MudItem>
+    }
+</MudGrid>
 
 @code {
     private MapOptions _mapOptions;
@@ -163,7 +176,7 @@
         try
         {
             var stream = new MemoryStream();
-            await files.File.OpenReadStream().CopyToAsync(stream);
+            await files.File.OpenReadStream(2048 * 1024 * 10).CopyToAsync(stream);
             if (stream.CanSeek)
             {
                 stream.Position = 0;
@@ -184,3 +197,4 @@
     }
 
 }
+
