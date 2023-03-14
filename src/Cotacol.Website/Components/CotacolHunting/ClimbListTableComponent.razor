@@ -9,7 +9,6 @@
           LoadingProgressColor="Color.Secondary"
           Filter="new Func<UserClimb, bool>(FilterClimb)" Items="@Climbs" RowsPerPage="2000" Style="width: 80vw; background-color: transparent">
     <ToolBarContent>
-        <MudText Typo="Typo.h2">The Cotacols</MudText>
         <MudSpacer/>
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
