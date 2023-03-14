@@ -1,0 +1,113 @@
+@page "/colstats"
+@using Cotacol.Website.Models.CotacolApi
+@using Microsoft.AspNetCore.Components
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+<MudGrid Spacing="1">
+    @if (stats == null)
+    {
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Crunching numbers..."/>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudTable FixedHeader="true" Height="100%"
+                      LoadingProgressColor="Color.Secondary"
+                      Filter="new Func<CotacolClimb, bool>(FilterCol)" Items="@stats.Cotacols" RowsPerPage="50" Style="width: 100%; background-color: transparent">
+                <ToolBarContent>
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<CotacolClimb, object>(x => x.CotacolName)">
+                            <MudText Typo="Typo.subtitle1">Name</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyleRight">
+                        <MudTableSortLabel SortBy="new Func<CotacolClimb, object>(x => x.UniqueUsers)">
+                            <MudText Typo="Typo.subtitle1">Users</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyleRight">
+                        <MudTableSortLabel SortBy="new Func<CotacolClimb, object>(x => x.TotalAttempts)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Total Attempts</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<CotacolClimb, object>(x => x.MaxAttempts)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Local Legends</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                </HeaderContent>
+                <RowTemplate Context="activity">
+                    <MudTd>
+                        <MudLink Href='@($"cotacol/{activity.CotacolId}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@activity.CotacolName</MudLink>
+                    </MudTd>
+                    <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueUsers.Number()</MudText></MudTd>
+                    <MudTd>
+                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalAttempts.Number(belowZeroIsNull: true)</MudText>
+                    </MudTd>
+                    <MudTd>
+                        @if (ColHasLocalLegends(activity.CotacolId))
+                        {
+                            <MudText Typo="Typo.body1">@PrintLocalLegends(activity)</MudText>
+                        }
+                        else
+                        {
+                            <span>&nbsp;</span>
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private SiteStats stats = null;
+    public int tabIndex = 0;
+    private string searchString;
+    private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderStyleRight => "background-color: #dcd5cb; font-weight: bold; text-align: right";
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = "The popularity of Cotacols";
+        stats = await CotacolClient.GetStatsAsync();
+    }
+
+    private bool ColHasLocalLegends(string colId)
+    {
+        var legendcol = stats.Cotacols.FirstOrDefault(col => col.CotacolId.Equals(colId));
+        return legendcol?.LocalLegends?.Any() ?? false;
+    }
+
+
+    private string PrintLocalLegends(CotacolClimb legendcol)
+    {
+        if (legendcol?.LocalLegends?.Any() ?? false)
+        {
+            if (!UserProfile.IsAuthenticated)
+            {
+                return $"{legendcol.LocalLegends.Count} legend{(legendcol.LocalLegends.Count > 1 ? "s" : "")} ({legendcol.LocalLegends.First().Attempts} attempts)";
+            }
+            return $"{string.Join(", ", legendcol.LocalLegends.Select(leg => leg.UserName))} ({legendcol.LocalLegends.First().Attempts} attempts)";
+        }
+        return "";
+    }
+
+    private bool FilterCol(CotacolClimb col, string query)
+    {
+        if (string.IsNullOrEmpty(query)) return true;
+        return col.CotacolName.Contains(query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool FilterCol(CotacolClimb arg) => FilterCol(arg, searchString);
+
+}

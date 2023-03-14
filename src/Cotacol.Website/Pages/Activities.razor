@@ -96,12 +96,12 @@
     public MainLayout Layout { get; set; } = null!;
 
     private string _notAuthorizedMessage;
-    private string searchString;
     private List<CotacolActivity> _activities;
     private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
     private ActivitySyncStatus activitySyncResponse;
     private UserProfile _userProfile;
     
+    private string searchString;
     private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
 
     protected override async Task OnInitializedAsync()
