@@ -112,7 +112,7 @@
                         @foreach (var badge in _userBadges.Where(ub => ub.Completed).OrderBy(ub => ub.AchievementDate))
                         {
                             <MudItem xs="3" md="2">
-                                <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+                                <UserBadgeComponent BadgeStatus="badge" UserId="@UserIdToShow"></UserBadgeComponent>
                             </MudItem>
                         }
                     </MudGrid>
