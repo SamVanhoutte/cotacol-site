@@ -19,7 +19,7 @@
     }
     else
     {
-        <MudItem xs="12">
+        <MudItem xs="11" md="8">
             <MudTable FixedHeader="true" Height="100%"
                       LoadingProgressColor="Color.Secondary"
                       Filter="new Func<UserStatistics, bool>(FilterUser)" Items="@stats.Users" RowsPerPage="50" Style="width: 100%; background-color: transparent">
@@ -78,6 +78,7 @@
                 </RowTemplate>
             </MudTable>
         </MudItem>
+        <MudItem xs="1" md="4"></MudItem>
     }
 </MudGrid>
 
