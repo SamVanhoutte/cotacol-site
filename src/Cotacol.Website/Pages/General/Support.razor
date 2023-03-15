@@ -1,0 +1,169 @@
+@page "/support"
+@inject ICotacolUserClient CotacolClient
+
+<MudGrid>
+    <MudItem xs="12">
+<MudText Typo="Typo.h2" Color="Color.Secondary">Strava integration</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Sync not working?</MudText>
+                <MudText Typo="Typo.subtitle2">My strava sync does not seem to work.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudText Typo="Typo.body1">
+                    In order for Cotacol to be able to read your activities and efforts, we need our users to authorize access to the Strava data.
+                    The only person able to give us the right permissions (or rights) to do so, is you, the user and the owner of your data.
+                </MudText>
+                <MudText Typo="Typo.body1">
+                    Sometimes, the permissions we have received from you, might not be enough. And for that, it will be needed to 're-authorize' Cotacol
+                    That can happen by navigating to the <a href="settings">settings</a> page in your Strava profile.
+                    (You need to be logged in, at the cotacol website)
+                    Here you can see a checklist of our access to your strava account.
+                    If our permissions are not good enough, please click the 'Re-Authorize Strava' button at the bottom of the page
+                </MudText>
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Missing Cotacol?</MudText>
+                <MudText Typo="Typo.subtitle2">I believe I conquered a Cotacol that does not show.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudText Typo="Typo.body1">
+                    It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the actual Strava Segment (that you can find in the col list) has been ridden.
+                    We have chosen to stick true to the actual descriptions and routes of the original book, which means that the popular track of a col is not always the exact matching one.
+                    If you feel there is indeed an activity that has not been matched well by the backend, please contact us, so we can follow up
+                </MudText>
+                @* <MatStringField Label="Activity ID" @bind-value="@MissingActivityId" HelperText="The Strava activity id is part of the url of your strava activity page"></MatStringField> *@
+                @* <MatStringField Label="Cotacol Number" @bind-value="@MissingCotacolId"></MatStringField> *@
+                @* <MatIconButton Icon="send" OnClick="@(async () => await SubmitMissingColAsync())"></MatIconButton><em>@_missingDataMessage</em> *@
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Points are not increasing</MudText>
+                <MudText Typo="Typo.subtitle2">My points are not increasing, when riding Cotacols</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudText Typo="Typo.body1">
+                    It is important to understand that the total points you see in the different apps or site are the points for the unique (distinct) Cotacols you rode.
+                </MudText>
+                <MudText Typo="Typo.body1">
+                    So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride it, you'll only get the 81 points once.
+                </MudText>
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Multiple efforts per activity?</MudText>
+                <MudText Typo="Typo.subtitle2">Multiple efforts of the same Cotacol in 1 activity only count for one.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudText Typo="Typo.body1">
+                    This is because of the current implementation in the synchronization backend. It is planned to update this in the future, but this will require a resync for those activities, normally. Please follow this article for the latest news.
+                </MudText>
+                <MudText Typo="Typo.body1">
+                    When implemented, this will finally turn your Everesting activities into become a Cotacol Local Legend.
+                </MudText>
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Update Strava activity descriptions?</MudText>
+                <MudText Typo="Typo.subtitle2">How can I show the cols in my strava ride descriptions.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudText Typo="Typo.body1">We can update the activity description of an activity on strava, to show and indicate the different cotacols and badges you conquered.
+                    This is not only nice to show off your climbing skills, but it also can drive other users to our community.</MudText>
+                <MudText Typo="Typo.body1">In order to achieve this, two things are needed:</MudText>
+                <MudList>
+                    <MudListItem><MudText Typo="Typo.body1">Strava needs your permission to update the activity descriptions. For that, it is important that you enable the checkbox <b>Upload your activities from Cotacol Hunting to Strava</b> when logging on to Strava</MudText></MudListItem>
+                    <MudListItem><MudImage Src="images/support/strava-permissions.png" Width="200"></MudImage> <MudText Typo="Typo.body1"></MudText></MudListItem>
+                    <MudListItem>If you want to review or update your Strava permissions, you can navigate to our <a href="settings">settings page</a></MudListItem>
+                </MudList>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h2" Color="Color.Secondary">Data & privacy</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Privacy policy?</MudText>
+                <MudText Typo="Typo.subtitle2">What about my data?</MudText>
+            </TitleContent>
+            <ChildContent>
+                <p>Please read our policy <a href="privacy">here</a></p>
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">No public profile?</MudText>
+                <MudText Typo="Typo.subtitle2">I don't want to show up in public pages.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <p>When joining Cotacol.cc, you automatically will be joined to the Cotacol leader boards, where your Full Name will be visible.</p>
+                <p>Your name will only be visible for users that are registered and logged in. For anonymous users, only the initials will be shown in leader boards</p>
+                <p>A new feature is coming, where you can opt out of leader boards and stats. There is already a check box in your profile where you can indicate you don't want to be part of the leader boards. For that, you can navigate to your <a href="/Identity/Account/Manage/Settings">profile page</a> and check the <b>Private profile</b> checkbox</p>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h2" Color="Color.Secondary">Incidents history</MudText>
+        </MudItem>
+    <MudItem xs="12">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.subtitle1">Support issues?</MudText>
+                <MudText Typo="Typo.subtitle2">Is there a list of releases and incidents?.</MudText>
+            </TitleContent>
+            <ChildContent>
+                <p>Yes. You can find this <a href="releases">here</a></p>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudItem>
+</MudGrid>
+
+
+
+@code {
+    private string MissingActivityId;
+    private string MissingCotacolId;
+    private bool _dataSubmitted = false;
+    private string _missingDataMessage = "";
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "Support";
+        base.OnInitialized();
+    }
+
+    private async Task SubmitMissingColAsync()
+    {
+        Console.WriteLine($"{MissingActivityId} - {MissingCotacolId}");
+        try
+        {
+            var httpStatus = await CotacolClient.SubmitMissingSegmentAsync(MissingActivityId, MissingCotacolId);
+            if (httpStatus < 200 || httpStatus >= 300)
+            {
+                _dataSubmitted = false;
+                _missingDataMessage = $"❌ (HTTP error {httpStatus})";
+            }
+            else
+            {
+                _missingDataMessage = "Submitted";
+            }
+        }
+        catch (Exception e)
+        {
+            _missingDataMessage = e.Message;
+        }
+    }
+
+}
