@@ -1,0 +1,91 @@
+@page "/admin/segments/{CotacolId}"
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@attribute [Authorize]
+
+@if (UserProfile.IsAdmin)
+{
+    <MudGrid>
+        <MudItem xs="10">
+            <MudExpansionPanels MultiExpansion="true">
+                <MudExpansionPanel Text="User guidance for segment editing">
+                    <ul>
+                        <li>- When setting a new segment, the old segment will be made invalid after one week.</li>
+                        <li>- Old segments will still be valid and matched for activities that happened, while the segment was active</li>
+                        <li>- Create or search the right segment on strava and keep the SegmentId (part of the url)</li>
+                        <li>- Enter the SegmentId in the 'New Segment' text box and press enter</li>
+                        <li>- Shortly after that, the new segment will be shown on the map, and in the table</li>
+                        <li>- At this point, nothing has been changed yet, as we need you to validate the segment</li>
+                        <li>- If the segment looks right, press the 'Check' icon and enter the details in the popup window</li>
+                    </ul>
+                    <hr/>
+                    <ul>
+                        <li>-It's also possible to update the actual segment of the map</li>
+                        <li>-Just upload or drop a GPX with the right route and you will see the update reflected</li>
+                        <li>-Don't forget to press the icon to confirm and update the actual data on the backend</li>
+                    </ul>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </MudItem>
+        <MudItem xs="2">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Filled.PersonPin" Href="@($"cotacol/{CotacolId}")">Cotacol page</MudButton>
+        </MudItem>
+        @if (climbDetail == null)
+        {
+            <MudItem xs="12">
+                <LoadingPatienceComponent WaitingMessage="Loading details from the backend"></LoadingPatienceComponent>
+            </MudItem>
+        }
+        else
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2" Color="Color.Secondary">#@CotacolId: @climbDetail.Name</MudText>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <b>Length:</b> @climbDetail.Distance.Number() m
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <b>Points:</b> @climbDetail.Cotacolpoints
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <b>Province:</b> @climbDetail.Province
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <b>Surface:</b> @climbDetail.Surface
+            </MudItem>
+            <MudItem xs="12">
+                <SegmentMapComponent Cotacol="climbDetail"/>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else
+{
+    <MudItem xs="12">
+        <MudText Color="Color.Warning" Typo="Typo.subtitle1">Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</MudText>
+    </MudItem>
+}
+
+@code {
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    [Parameter]
+    public string CotacolId { get; set; }
+
+    private ClimbDetail climbDetail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = "Segment details";
+        if (UserProfile.IsAdmin)
+        {
+            climbDetail = await CotacolClient.GetClimbSegmentsAsync(CotacolId);
+            Layout.Title = climbDetail.Name;
+        }
+    }
+
+
+}

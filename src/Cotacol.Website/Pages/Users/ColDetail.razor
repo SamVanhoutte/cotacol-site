@@ -22,7 +22,7 @@
         @if (UserProfile.IsAdmin)
         {
             <MudItem xs="12">
-                <MudButton StartIcon="@Icons.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
             </MudItem>
         }
         <MudItem xs="3">

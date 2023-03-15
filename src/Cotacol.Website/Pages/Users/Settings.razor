@@ -54,7 +54,7 @@
                                 <MudDivider></MudDivider>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudButton StartIcon="@Icons.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
                             </MudItem>
                         </MudGrid>
                     }
@@ -122,7 +122,7 @@
                                 <MudText Typo="Typo.body2">If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudButton StartIcon="@Icons.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
                             </MudItem>
                         </MudGrid>
                     }
