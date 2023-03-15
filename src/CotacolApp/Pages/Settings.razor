@@ -41,14 +41,14 @@
                     {
                         if (_userProfile != null)
                         {
-                            <h2>Your settings</h2>
+                               <h2>Your settings</h2>
                             @if (!string.IsNullOrEmpty(StatusMessage))
                             {
                                 <p>
                                     <em style="color: darkred">@StatusMessage</em>
                                 </p>
                             }
-                            <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
+                                <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
                             <hr/>
                             <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
                             <span>Join beta features</span>

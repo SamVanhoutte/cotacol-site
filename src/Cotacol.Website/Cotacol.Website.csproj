@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <Folder Include="Data" />
+      <Folder Include="Pages\Admin" />
     </ItemGroup>
 
     <ItemGroup>
