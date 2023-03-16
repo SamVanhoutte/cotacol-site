@@ -1,0 +1,207 @@
+@using System.IO
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Models
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<ClimbListComponent> Logger
+<MudGrid>
+    @if (_climbs == null)
+    {
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Retrieving the cotacol list"/>
+        </MudItem>
+    }
+    else
+    {
+        @if (!HideFilters)
+        {
+            <MudItem xs="12">
+                <MudChipSet MultiSelection="false" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
+                    <MudChip Text="All" Value='"NoFilter"'></MudChip>
+                    @if (UserProfile.IsAuthenticated)
+                    {
+                        <MudChip Text="To do" Value='"TodoFilter"' Color="Color.Secondary"></MudChip>
+                        <MudChip Text="Planned" Value='"PlannedFilter"' Color="Color.Secondary"></MudChip>
+                        <MudChip Text="Done" Value='"DoneFilter"' Color="Color.Secondary"></MudChip>
+                    }
+                    <MudChip Text="Top 50" Value='"TopFilter"'></MudChip>
+                    <MudChip Text="Bomb" Value='"BombFilter"'></MudChip>
+                    <MudChip Text="Easiest" Value='"EasyFilter"'></MudChip>
+                    <MudChip Text="Highest" Value='"HighFilter"'></MudChip>
+                    <MudChip Text="Longest" Value='"LongFilter"'></MudChip>
+                    <MudChip Text="Steepest" Value='"SteepFilter"'></MudChip>
+                </MudChipSet>
+            </MudItem>
+            <MudItem xs="12">
+                <MudChipSet @ref="ProvinceFilter" MultiSelection="true" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
+                    <MudChip Text="WFL" Value='"WestVlFilter"'></MudChip>
+                    <MudChip Text="EFL" Value='"OostVlFilter"'></MudChip>
+                    <MudChip Text="ANT" Value='"AntwerpenFilter"'></MudChip>
+                    <MudChip Text="LIM" Value='"LimburgFilter"'></MudChip>
+                    <MudChip Text="BRU" Value='"BrusselsFilter"'></MudChip>
+                    <MudChip Text="FLB" Value='"VlBrFilter"'></MudChip>
+                    <MudChip Text="WLB" Value='"BrabantWallonFilter"'></MudChip>
+                    <MudChip Text="HNT" Value='"HainautFilter"'></MudChip>
+                    <MudChip Text="NAM" Value='"NamurFilter"'></MudChip>
+                    <MudChip Text="LIE" Value='"LiegeFilter"'></MudChip>
+                    <MudChip Text="LUX" Value='"LuxemburgFilter"'></MudChip>
+                </MudChipSet>
+            </MudItem>
+            @if (!string.IsNullOrEmpty(_filterMessage))
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@_filterMessage</MudText>
+                </MudItem>
+            }
+        }
+        @if (Mode == ClimbViewMode.Table)
+        {
+            <ClimbListTableComponent @bind-Climbs="@_climbs" HideFilters="@HideFilters"/>
+        }
+        else
+        {
+            <ClimbListMapComponent @bind-Climbs="@_climbs"/>
+        }
+    }
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public ClimbViewMode Mode { get; set; }
+
+    [Parameter]
+    public List<string> CotacolIds { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public bool HideFilters { get; set; }
+
+    private string _currentFilter = "noFilter";
+    private List<string> _provinceFilters = null;
+    private IEnumerable<UserClimb> _climbList;
+    private IEnumerable<UserClimb> _climbs;
+    private string _filterMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    public MudChipSet ProvinceFilter { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            _climbList = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
+        }
+        else
+        {
+            _climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
+        }
+        if (CotacolIds != null)
+        {
+            _climbList = _climbList.Where(c => CotacolIds.Contains(c.Id));
+        }
+        _climbs = _climbList;
+    }
+
+    private async Task ApplyProvinceFilterAsync(MudChip filter)
+    {
+        if (filter == null)
+        {
+            _provinceFilters = null;
+        }
+        else
+        {
+            _provinceFilters = ProvinceFilter.SelectedChips
+                .Select(chip => GetSystemName(chip.Value.ToString())).ToList();
+        }
+        await FilterClimbsAsync();
+    }
+
+
+    private async Task ApplyFilterAsync(MudChip filter)
+    {
+        _currentFilter = filter.Value.ToString();
+        await FilterClimbsAsync();
+    }
+
+    private string GetSystemName(string value)
+    {
+        return value.Replace("Filter", "")
+            .Replace(" ", "")
+            .Replace("-", "")
+            .ToLower();
+    }
+
+    private async Task FilterClimbsAsync()
+    {
+        _climbs = _climbList;
+        _filterMessage = null;
+        // Filter on category
+        switch (_currentFilter.ToLower())
+        {
+            case "nofilter":
+                break;
+            case "donefilter":
+                _climbs = _climbList.Where(c => c.Done);
+                _filterMessage = $"You have conquered these __COUNT__ Cotacols";
+                break;
+            case "plannedfilter":
+                _climbs = _climbList.Where(c => c.Bookmarked);
+                _filterMessage = $"You have bookmarked __COUNT-SUFFIX__";
+                break;
+            case "todofilter":
+                _climbs = _climbList.Where(c => !c.Done);
+                _filterMessage = $"You still have to conquer __COUNT-SUFFIX__";
+                break;
+            case "bombfilter":
+                _climbs = _climbList.Where(c => c.BomScore > 0).OrderByDescending(c => c.BomScore);
+                _filterMessage = $"You did __DONE-COUNT__ of __COUNT-SUFFIX__ that have a Bomb score, which means they cause a lot of suffering on a relatively shorter distance";
+                break;
+            case "topfilter":
+                _climbs = _climbList.OrderByDescending(c => c.CotacolPoints).Take(50);
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 toughest Cotacols.  These will help increasing your score quickly.";
+                break;
+            case "easyfilter":
+                _climbs = _climbList.OrderBy(c => c.CotacolPoints).Take(50);
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 easiest Cotacols.  Good to get started.";
+                break;
+            case "highfilter":
+                _climbs = _climbList.OrderByDescending(c => c.ElevationDiff).Take(50);
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 Cotacols with the highest elevation";
+                break;
+            case "longfilter":
+                _climbs = _climbList.OrderByDescending(c => c.Distance).Take(50);
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 longest Cotacols.  The ones for the diesels.";
+                break;
+            case "steepfilter":
+                _climbs = _climbList.OrderByDescending(c => c.AvgGrade).Take(50);
+                _filterMessage = $"You did __DONE-COUNT__ of the 50 steepest Cotacols.  Unleash the Watts!";
+                break;
+        }
+        
+
+        // Filter on province
+        if (_provinceFilters?.Any() ?? false)
+        {
+            _climbs = _climbs.Where(c =>
+                _provinceFilters.Any(province => GetSystemName(province).Equals(GetSystemName(c.Province))));
+        }
+        if (!string.IsNullOrEmpty(_filterMessage))
+        {
+            _filterMessage = _filterMessage.Replace("__COUNT__", _climbs.Count().ToString());
+            _filterMessage = _filterMessage.Replace("__COUNT-SUFFIX__", GetCountSuffix());
+            _filterMessage = _filterMessage.Replace("__DONE-COUNT__", _climbs.Count(c => c.Done).ToString());
+        }
+    }
+
+    private string GetCountSuffix()
+    {
+        if (!_climbs.Any()) return "no Cotacols";
+        if (_climbs.Count() == 1) return "this one Cotacol";
+        return $"these {_climbs.Count()} Cotacols";
+    }
+
+
+}

@@ -1,0 +1,21 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using Cotacol.Website
+@using Cotacol.Website.Shared
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Services.Extensions
+@using Cotacol.Website.Components
+@using Cotacol.Website.Components.General
+@using Cotacol.Website.Components.CotacolHunting
+@using Cotacol.Website.Components.Admin
+@using MudBlazor
+@inject ISnackbar AlertProvider
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject ICotacolUserClient CotacolUserClient

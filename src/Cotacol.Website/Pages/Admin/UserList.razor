@@ -1,0 +1,158 @@
+@page "/admin/users"
+@using Newtonsoft.Json
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+
+@if (UserProfile.IsAdmin)
+{
+    <MudGrid>
+        <MudItem xs="6">
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" StartIcon="@Icons.Filled.Search" OnClick="async () => await LoadUserListAsync()">Load all users</MudButton>
+        </MudItem>
+        <MudItem xs="6">
+            <MudTextField T="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user"></MudTextField>
+        </MudItem>
+    </MudGrid>
+
+    @if (userList != null)
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.body1">
+                @userList.Count users // @ExpiredUsers expired users // @TestUsers test users
+            </MudText>
+        </MudItem>
+    }
+    @if (queryLaunched && userList == null)
+    {
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Loading users"></LoadingPatienceComponent>
+        </MudItem>
+    }
+    <hr/>
+    @if (userList != null)
+    {
+        <MudTable FixedHeader="true" Height="100%"
+                  LoadingProgressColor="Color.Secondary"
+                  Filter="new Func<UserListRecord, bool>(FilterUser)" Items="@userList" RowsPerPage="50" Style="width: 100%; background-color: transparent">
+            <ToolBarContent>
+                <MudSpacer/>
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.UserId)">
+                        <MudText Typo="Typo.subtitle1">#</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.FullName)">
+                        <MudText Typo="Typo.subtitle1">Name</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Health.TokenExpired)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Expired</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Health.TokenExpiration)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Valid until</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Health.SyncStatus)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Sync</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.UserSettings.UpdateActivityDescription)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Update Description</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.UserSettings.PrivateProfile)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Private</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Health.TotalActivities)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Total Activities</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.EmailAddress)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Email</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+            </HeaderContent>
+            <RowTemplate Context="user">
+                <MudTd>
+                    <MudLink Href='@($"admin/users/{user.Profile.UserId}")' Typo="Typo.body1" Color="Color.Secondary">@user.Profile.UserId</MudLink>
+                </MudTd>
+                <MudTd>@user.Profile.FullName</MudTd>
+                <MudTd>@user.Health.TokenExpired</MudTd>
+                <MudTd>@user.Health.TokenExpiration</MudTd>
+                <MudTd>@user.Health.SyncStatus</MudTd>
+                <MudTd>@user.Profile.UserSettings.UpdateActivityDescription</MudTd>
+                <MudTd>@user.Profile.UserSettings.PrivateProfile</MudTd>
+                <MudTd>@user.Health.TotalActivities.Number()</MudTd>
+                <MudTd>@user.Profile.EmailAddress</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+}
+else
+{
+    <MudText Typo="Typo.subtitle1" Color="Color.Warning">Only accessible for admin users. Please contact someone of the crew if you believe you should be an admin.</MudText>
+}
+
+@code {
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    List<UserListRecord> userList;
+    private bool loadTokens = false;
+    private bool loadSync = false;
+    private bool queryLaunched = false;
+    private string searchString;
+    private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderStyleRight => "background-color: #dcd5cb; font-weight: bold; text-align: right";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = "User overview";
+    }
+
+    private async Task LoadUserListAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            queryLaunched = true;
+            userList = null;
+            userList = await CotacolClient.GetUserListAsync();
+        }
+    }
+
+    private void NavigateUser(string userId)
+    {
+        NavManager.NavigateTo($"admin/user/{userId}");
+    }
+
+    private int TestUsers => userList.Count(u => u.Profile?.TestUser ?? false);
+    private int ExpiredUsers => userList.Count(u => u.Health?.TokenExpired ?? false);
+
+    private bool FilterUser(UserListRecord user, string query)
+    {
+        if (string.IsNullOrEmpty(query)) return true;
+        if (user.Profile.FullName.Contains(query, StringComparison.OrdinalIgnoreCase)) return true;
+        if (user.Profile.UserName.Contains(query, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
+
+    private bool FilterUser(UserListRecord arg) => FilterUser(arg, searchString);
+
+
+}

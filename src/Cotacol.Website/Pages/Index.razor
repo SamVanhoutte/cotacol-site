@@ -1,0 +1,52 @@
+﻿@page "/"
+<Title Value="Cotacol.cc"/>
+
+
+<MudGrid Spacing="1" Style="height: 100%;">
+    @if (!UserProfile.IsAuthenticated)
+    {
+        <MudItem xs="12">
+            <a class="nav-link text-dark" href="@UserProfile.GetLoginLink()">Enable strava integration for the full experience !</a>
+        </MudItem>
+    }
+    <MudItem xs="4" lg="4" md="4" sm="4">
+        <MudGrid Spacing="0">
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2" Color="Color.Tertiary">How it all started</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1">
+                    The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.
+                    Each climb is described by several facts: name, a short description, height, grade, length, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.
+                    The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396 meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book. Each hill has a so-called COTACOL score. This score is determined using several parameters: grade, length, road surface. A higher score means a tougher climb.
+                    More than 30 years later, some cycling &amp; tech enthousiasts virtually got together and built apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer as much Cotacols as possible and automatically flag them when integrating with Strava.
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="4" lg="4" md="4" sm="4">
+        <HomeStatsComponent/>
+    </MudItem>
+    <MudItem xs="2" lg="2" md="2" sm="2">
+        <MudText Typo="Typo.h2" Color="Color.Tertiary">Apps</MudText>
+        <MudLink Href="https://apps.apple.com/be/app/cotacol/id1526464862" Target="_blank">
+            <MudImage Src="images/apple-store.png" Width="80" ObjectPosition="ObjectPosition.Center"></MudImage>
+        </MudLink>
+        <MudText Typo="Typo.body1">Install iOS App</MudText>
+        <MudLink Href="https://play.google.com/store/apps/details?id=be.cotacolhunting.COTACOL" Target="_blank">
+            <MudImage Src="images/google-play.png" Width="80" ObjectPosition="ObjectPosition.Center"></MudImage>
+        </MudLink>
+        <MudText Typo="Typo.body1">Install Android App</MudText>
+    </MudItem>
+</MudGrid>
+
+@code{
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "Your cotacol bucket list";
+    }
+}

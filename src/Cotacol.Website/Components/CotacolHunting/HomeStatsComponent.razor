@@ -1,0 +1,129 @@
+@using System.Xml
+@using System.Text
+@using System.ComponentModel
+@using Cotacol.Website.Interfaces
+@using Cotacol.Website.Models.CotacolApi
+@inject ILogger<HomeStatsComponent> Logger
+<MudGrid Spacing="0">
+    <MudItem xs="12">
+        <MudText Typo="Typo.h2" Color="Color.Tertiary">Migration status</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.body1">
+            Users have been migrated to the new runtime. This should solve previous synchronization problems.
+            Badges still require to be migrated and contains some flaws. They will be recalculated after that migration.
+        </MudText>
+    </MudItem>
+    @if (Stats?.RecentActivities != null)
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.h2" Color="Color.Tertiary">Combined achievements</MudText>
+        </MudItem>
+        <MudItem xs="12" Class="d-flex">
+            <MudIcon Icon="@Icons.Filled.PersonAdd"></MudIcon>
+            <MudText Typo="Typo.body1">@GetRegisteredUsersText()</MudText>
+        </MudItem>
+        <MudItem xs="12" Class="d-flex">
+            <MudIcon Icon="@Icons.Filled.Numbers"></MudIcon>
+            <MudText Typo="Typo.body1">@GetCollectedPointsText()</MudText>
+        </MudItem>
+        <MudItem xs="1">
+        </MudItem>
+        <MudItem xs="11">
+            <ul style="list-style-type: square;" class="mud-typography mud-typography-body1">
+                @foreach (var recent in Stats.RecentActivities
+                    .GroupBy(act => act.UserId)
+                    .Take(20))
+                {
+                    var act = recent.First();
+                    @if (UserProfile.IsAuthenticated)
+                    {
+                        <li class="lektonicgrey"><a href="achievements/@(recent.Key)" class="mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1">@(act.FullName.Split(" ").FirstOrDefault())</a> did @GetCotacolsFromActivity(recent, true) <a href="https://www.strava.com/activities/@act.ActivityId" class="mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1">@(PrintTime(act.ActivityDate))</a></li>
+                    }
+                    else
+                    {
+                        <li class="lektonicgrey">@(act.FullName.Split(" ").FirstOrDefault()) did @GetCotacolsFromActivity(recent, false) @(PrintTime(act.ActivityDate))</li>
+                    }
+                }
+            </ul>
+        </MudItem>
+    }
+</MudGrid>
+
+
+@code {
+    private HomeStats? Stats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Stats ??= await CotacolClient.GetHomeStatsAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private string PrintTime(DateTime recentActivityDate)
+    {
+        var timeSpan = DateTime.UtcNow - recentActivityDate;
+        if (recentActivityDate.DayOfYear == DateTime.UtcNow.DayOfYear)
+        {
+    // return today
+            return "today";
+        }
+        if (recentActivityDate.DayOfYear + 1 == DateTime.UtcNow.DayOfYear)
+        {
+    // return yesterday
+            return "yesterday";
+        }
+    // return days
+        return $"{timeSpan.Days} days ago";
+    }
+
+    private MarkupString GetCotacolsFromActivity(IGrouping<string, RecentActivity> recent, bool includeLinks)
+    {
+        var totalCols = recent.Count();
+        int iteration = 0;
+        var builder = new StringBuilder();
+        foreach (var col in recent.Take(3))
+        {
+            iteration++;
+            if (builder.Length > 0 && iteration < totalCols) builder.Append(", ");
+            if (builder.Length > 0 && iteration == totalCols) builder.Append(" and ");
+            if (includeLinks)
+            {
+                builder.Append($"<a href='cotacol/{col.CotacolId}' class='mud-typography mud-link mud-secondary-text mud-link-underline-hover mud-typography-body1'>{col.CotacolName}</a>");
+            }
+            else
+            {
+                builder.Append($"{col.CotacolName}");
+            }
+        }
+        if (recent.Count() > 3)
+        {
+            builder.Append($" and {recent.Count() - 3} more");
+        }
+        return new MarkupString(builder.ToString());
+    }
+
+    private string GetRecentText(IGrouping<string, RecentActivity> recent, RecentActivity act)
+    {
+        return $"{act.FullName.Split(" ").FirstOrDefault()} did {@GetCotacolsFromActivity(recent, true)} {PrintTime(act.ActivityDate)}";
+    }
+
+    private string GetRegisteredUsersText()
+    {
+        return $"{Stats?.Users} registered users";
+    }
+
+    private string GetCollectedPointsText()
+    {
+        return $"have collected {Stats?.TotalPoints.Number()} Cotacol points";
+    }
+
+}

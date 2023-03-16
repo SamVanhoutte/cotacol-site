@@ -1,0 +1,19 @@
+@if (UserProfile.IsAdmin)
+{
+    <MudButton StartIcon="@Icons.Filled.PersonAdd" Href="@($"admin/user/{SelectedUserId}")">Admin access</MudButton>
+    <MudButton StartIcon="@Icons.Filled.ChangeHistory" Href="@($"climbs/{SelectedUserId}")">Climbs</MudButton>
+    <MudButton StartIcon="@Icons.Filled.MultilineChart" Href="@($"achievements/{SelectedUserId}")">Achievements page</MudButton>
+    <MudButton StartIcon="@Icons.Filled.Map" Href="@($"activities/{SelectedUserId}")">Activities page</MudButton>
+    <MudButton StartIcon="@Icons.Filled.SportsMotorsports" Target="_blank" Href="@($"https://www.strava.com/athletes/{SelectedUserId}")">Strava page</MudButton>
+    <MudButton StartIcon="@Icons.Filled.Bookmarks" Href="@($"badges/{SelectedUserId}")">Badges</MudButton>
+    <MudButton StartIcon="@Icons.Filled.Settings" Href="@($"settings/{SelectedUserId}")">Settings</MudButton>
+}
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+}
+

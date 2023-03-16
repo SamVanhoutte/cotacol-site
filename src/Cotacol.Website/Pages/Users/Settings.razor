@@ -1,0 +1,204 @@
+@page "/settings"
+@page "/settings/{UserId}"
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject ILogger<Climbs> Logger
+@inject NavigationManager NavManager
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <MudGrid>
+            @if (UserProfile.IsAdmin)
+            {
+                <MudItem xs="12">
+                    <UserAdminLinks UserId="@UserIdToShow"/>
+                </MudItem>
+            }
+            <MudItem xs="6" md="4">
+                @if (!string.IsNullOrEmpty(_notAuthorizedMessage))
+                {
+                    <MudText Typo="Typo.body1" Color="Color.Warning">@_notAuthorizedMessage</MudText>
+                }
+                else
+                {
+                    if (_userProfile != null)
+                    {
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h2" Color="Color.Secondary">Your settings</MudText>
+                            </MudItem>
+                            @if (!string.IsNullOrEmpty(StatusMessage))
+                            {
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.body1" Color="Color.Success">@StatusMessage</MudText>
+                                </MudItem>
+                            }
+                            <MudItem xs="12">
+                                <MudTextField T="string" @bind-Text="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Join beta feature" @bind-Checked="@_userProfile.UserSettings.EnableBetaFeatures"></MudSwitch>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Update activity descriptions" @bind-Checked="@_userProfile.UserSettings.UpdateActivityDescription"></MudSwitch>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Hide profile from stats" @bind-Checked="@_userProfile.UserSettings.PrivateProfile"></MudSwitch>
+                                <MudDivider></MudDivider>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        <LoadingPatienceComponent WaitingMessage="Loading settings..."/>
+                    }
+                }
+            </MudItem>
+            <MudItem xs="6">
+                @if (!string.IsNullOrEmpty(_stravaNotAuthorizedMessage))
+                {
+                    <MudText Typo="Typo.body1" Color="Color.Warning">@_stravaNotAuthorizedMessage</MudText>
+                }
+                else
+                {
+                    @if (_stravaProfile != null)
+                    {
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h2" Color="Color.Secondary">Strava permission review</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudList Clickable="true" Dense="true">
+                                    <MudListItem Icon='@(_stravaProfile.AuthorizationTokenValid ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.AuthorizationTokenValid ? Color.Success : Color.Error)'>
+                                        <MudText Typo="Typo.body2">Strava token validity</MudText>
+                                        <MudText Typo="Typo.body1">We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MudText>
+                                    </MudListItem>
+                                    <MudListItem Icon='@(_stravaProfile.ActivitiesCanBeRead ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.ActivitiesCanBeRead ? Color.Success : Color.Error)'>
+                                        <MudText Typo="Typo.body2">Activity access</MudText>
+                                        <MudText Typo="Typo.body1">We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MudText>
+                                    </MudListItem>
+                                    @if (_stravaProfile.UpdateDescriptionFlag)
+                                    {
+                                        <MudListItem Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Color.Success : Color.Error)'>
+                                            <MudText Typo="Typo.body2">Activity Description</MudText>
+                                            <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MudText>
+                                        </MudListItem>
+                                    }
+                                    else
+                                    {
+                                        <MudListItem Icon='@Icons.Rounded.Check' IconColor='@Color.Success'>
+                                            <MudText Typo="Typo.body2">Activity Description</MudText>
+                                            <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "do" : "don't") update your activity descriptions, but you disabled that setting.</MudText>
+                                        </MudListItem>
+                                    }
+                                    @if (UserProfile.IsAdmin)
+                                    {
+                                        <MudListItem>
+                                            <MudText Typo="Typo.body2">Strava permissions</MudText>
+                                            <MudText Typo="Typo.body1">"@(_stravaProfile.StravaPermissions ?? _stravaProfile.TokenScope)"</MudText>
+                                        </MudListItem>
+                                        <MudListItem>
+                                            <MudText Typo="Typo.body2">Token last refreshed</MudText>
+                                            <MudText Typo="Typo.body1">@(_stravaProfile.TokenLastRefreshed.ToString("g"))</MudText>
+                                        </MudListItem>
+                                        <MudListItem>
+                                            <MudText Typo="Typo.body2">Token expiration</MudText>
+                                            <MudText Typo="Typo.body1">@(_stravaProfile.TokenExpiration.ToString("g"))</MudText>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body2">If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        <LoadingPatienceComponent WaitingMessage="Loading strava persmissions..."/>
+                    }
+                }
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    private string StatusMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    private string _stravaNotAuthorizedMessage;
+    private StravaUserProfile _stravaProfile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = "Settings";
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "You are not allowed to see other user's settings";
+            }
+            else
+            {
+                _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+                if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                {
+                    _notAuthorizedMessage = "The user profile is not public";
+                    _userProfile = null;
+                }
+            }
+        }
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _stravaNotAuthorizedMessage = "You are not allowed to see other user's Strava permissions";
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(UserIdToShow))
+                {
+                    _stravaProfile = await CotacolUserClient.GetStravaUserConfigurationAsync(UserIdToShow);
+                }
+            }
+        }
+    }
+
+    private async Task SaveSettingsAsync()
+    {
+        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, _userProfile.UserSettings, _userProfile.EmailAddress);
+        StatusMessage = "Settings were successfully updated.";
+    }
+
+    private string GetName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return $"({UserProfile.FullName})";
+        }
+        return string.IsNullOrEmpty(_userProfile?.FullName) ? "" : $"({_userProfile?.FullName})";
+    }
+
+}

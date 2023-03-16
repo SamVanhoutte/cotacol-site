@@ -91,10 +91,8 @@ else
                 <hr/>
                 @if (climbDetail.Stats?.LocalLegends?.Any() ?? false)
                 {
-                    <span>Local legends</span>
-                }
-                @if (climbDetail.Stats?.LocalLegends != null)
-                {
+                    <span>Local legends (@climbDetail.Stats.MaximumUserAttempts attempts)</span>
+                    
                     foreach (var legend in climbDetail.Stats.LocalLegends)
                     {
                         <div class="lektonic">

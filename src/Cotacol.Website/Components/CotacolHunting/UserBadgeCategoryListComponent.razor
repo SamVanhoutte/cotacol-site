@@ -1,0 +1,28 @@
+@using Cotacol.Website.Models.CotacolApi
+<MudItem xs="12">
+    <MudText Typo="Typo.h2" Color="Color.Secondary">@Title</MudText>
+</MudItem>
+@foreach (var badge in Badges)
+{
+    <MudItem xs="3" md="2">
+        <UserBadgeComponent BadgeStatus="badge"></UserBadgeComponent>
+    </MudItem>
+}
+<MudItem xs="@GetRemainder(3)" md="@GetRemainder(3)"></MudItem>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<UserBadgeStatus> Badges { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    private int GetRemainder(int size)
+    {
+        return 12 - ((size*Badges.Count()) % 12);
+    }
+}

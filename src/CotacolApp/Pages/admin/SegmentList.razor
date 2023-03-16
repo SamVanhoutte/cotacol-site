@@ -18,51 +18,48 @@
     }
     else
     {
-        <div style="overflow-y: scroll; height:100vh;">
-
-            <MatTable FilterByColumnName="Name" Items="@segmentList" class="lektonic" PageSize="2000"
-                      AllowSelection="false"
-                      ShowPaging="false" UseSortHeaderRow="true">
-                <MatTableHeader>
-                    <MatSortHeaderRow SortChanged="SortSegments">
-                        <MatSortHeader SortId="id">#</MatSortHeader>
-                        <MatSortHeader SortId="name">
-                            <span style="width:250px">Name</span>
-                        </MatSortHeader>
-                        <MatSortHeader SortId="segmentname">
-                            <span style="width:250px">Segment Name</span>
-                        </MatSortHeader>
-                        <MatSortHeader SortId="segmentupdated">Segment Updated</MatSortHeader>
-                        <MatSortHeader SortId="colupdated">Col Updated</MatSortHeader>
-                        <MatSortHeader SortId="length">Official Length</MatSortHeader>
-                        <MatSortHeader SortId="segmentlength">Segment Length</MatSortHeader>
-                        <MatSortHeader SortId="difference">Difference</MatSortHeader>
-                        <MatSortHeader SortId="user">User</MatSortHeader>
-                        <MatSortHeader SortId="confidence">Confidence</MatSortHeader>
-                        <MatSortHeader SortId="id">Actions</MatSortHeader>
-                    </MatSortHeaderRow>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.CotacolId</td>
-                    <td style="max-width: 200px">
-                        <b>
-                            <a href="admin/segments/@context.CotacolId" target="_self">@context.Name</a>
-                        </b>
-                    </td>
-                    <td style="max-width: 200px">@context.SegmentName</td>
-                    <td>@context.SegmentUpdated.DateTime()</td>
-                    <td>@context.ClimbUpdated.DateTime()</td>
-                    <td style="text-align: right">@context.CotacolLength.WholeNumber() m</td>
-                    <td style="text-align: right">@context.SegmentLength.WholeNumber() m</td>
-                    <td style="text-align: right">@context.LengthDifference.WholeNumber() m</td>
-                    <td>@context.User</td>
-                    <td>@context.SegmentConfidence</td>
-                    <td>
-                        <MatIconButton Icon="refresh" OnClick="@(async () => await FetchSegmentAsync(context.CotacolId, context.SegmentId))"></MatIconButton>
-                    </td>
-                </MatTableRow>
-            </MatTable>
-        </div>
+        <MatTable FilterByColumnName="Name" Items="@segmentList" class="lektonic" PageSize="2000"
+                  AllowSelection="false"
+                  ShowPaging="false" UseSortHeaderRow="true">
+            <MatTableHeader>
+                <MatSortHeaderRow SortChanged="SortSegments">
+                    <MatSortHeader SortId="id">#</MatSortHeader>
+                    <MatSortHeader SortId="name">
+                        <span style="width:250px">Name</span>
+                    </MatSortHeader>
+                    <MatSortHeader SortId="segmentname">
+                        <span style="width:250px">Segment Name</span>
+                    </MatSortHeader>
+                    <MatSortHeader SortId="segmentupdated">Segment Updated</MatSortHeader>
+                    <MatSortHeader SortId="colupdated">Col Updated</MatSortHeader>
+                    <MatSortHeader SortId="length">Official Length</MatSortHeader>
+                    <MatSortHeader SortId="segmentlength">Segment Length</MatSortHeader>
+                    <MatSortHeader SortId="difference">Difference</MatSortHeader>
+                    <MatSortHeader SortId="user">User</MatSortHeader>
+                    <MatSortHeader SortId="confidence">Confidence</MatSortHeader>
+                    <MatSortHeader SortId="id">Actions</MatSortHeader>
+                </MatSortHeaderRow>
+            </MatTableHeader>
+            <MatTableRow>
+                <td>@context.CotacolId</td>
+                <td style="max-width: 200px">
+                    <b>
+                        <a href="admin/segments/@context.CotacolId" target="_self">@context.Name</a>
+                    </b>
+                </td>
+                <td style="max-width: 200px">@context.SegmentName</td>
+                <td>@context.SegmentUpdated.DateTime()</td>
+                <td>@context.ClimbUpdated.DateTime()</td>
+                <td style="text-align: right">@context.CotacolLength.WholeNumber() m</td>
+                <td style="text-align: right">@context.SegmentLength.WholeNumber() m</td>
+                <td style="text-align: right">@context.LengthDifference.WholeNumber() m</td>
+                <td>@context.User</td>
+                <td>@context.SegmentConfidence</td>
+                <td>
+                    <MatIconButton Icon="refresh" OnClick="@(async () => await FetchSegmentAsync(context.CotacolId, context.SegmentId))"></MatIconButton>
+                </td>
+            </MatTableRow>
+        </MatTable>
     }
 }
 else
@@ -145,7 +142,7 @@ else
     {
         Console.WriteLine("Calling " + segmentId);
         var segmentDetail = await CotacolClient.FetchStravaSegmentAsync(segmentId, true);
-        if (segmentDetail!=null)
+        if (segmentDetail != null)
         {
             var segment = segmentList.First(s => s.CotacolId.Equals(cotacolId));
             segment.SegmentName = segmentDetail.Name;

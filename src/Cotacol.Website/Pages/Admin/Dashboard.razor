@@ -1,0 +1,93 @@
+@page "/admin/dashboard"
+@using Cotacol.Website.Models.CotacolApi
+@inject IUserProfileManager UserProfile
+@inject ICotacolClient CotacolClient
+@attribute [Authorize]
+@if (UserProfile.IsAdmin)
+{
+    <MudGrid>
+        @if (_systemStatus == null)
+        {
+            <MudItem xs="12">
+                <LoadingPatienceComponent WaitingMessage="Fetching backend status"></LoadingPatienceComponent>
+            </MudItem>
+        }
+        else
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2" Color="Color.Secondary">Strava API throttling status</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Current Interval:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudProgressLinear Value="@(ProgressOfInterval * 100)"></MudProgressLinear>
+                <MudText Typo="Typo.body2">@CallsOfInterval / @IntervalLimits (@ProgressOfInterval.Percentage(true))</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Today:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudProgressLinear Value="@(ProgressOfDay * 100)"></MudProgressLinear>
+                <MudText Typo="Typo.body2">@CallsOfDay / @DayLimits (@ProgressOfDay.Percentage(true))</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudDivider></MudDivider>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Strava throttling interval:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.body2">@_systemStatus.ThrottlingInterval</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Server time:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.body2">@_systemStatus.ServerTime</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Last stats update:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.body2">@(PrintDate(_systemStatus.LastStatsUpdate))</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Reported users:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.body2">@_systemStatus.ListedUserCount.Number()</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.body1"><b>Activity Queue Depth:</b></MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.body2">@_systemStatus.ActivityQueueDepth</MudText>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    private SystemStatus _systemStatus;
+        private const int IntervalLimits = 600;
+        private const int DayLimits = 30000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            _systemStatus = await CotacolClient.GetSystemStatusAsync();
+        }
+    }
+    
+    private string PrintDate(DateTimeOffset? date) => date == null ? "--" : date.Value.ToString("g");
+
+    public double ProgressOfInterval => (CallsOfInterval / IntervalLimits);
+    public double ProgressOfDay => (CallsOfDay / DayLimits);
+    public double CallsOfInterval => _systemStatus?.StravaThrottlingValue==null ? -1D:
+        double.Parse(_systemStatus.StravaThrottlingValue.Split(",").First());
+    public double CallsOfDay =>
+        _systemStatus?.StravaThrottlingValue==null ? -1D:
+        double.Parse(_systemStatus.StravaThrottlingValue.Split(",").Last());
+}

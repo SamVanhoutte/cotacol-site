@@ -1,0 +1,9 @@
+<MudPaper Outlined="true">
+    <MudText Typo="Typo.caption" Color="Color.Warning">@ErrorMessage</MudText>
+</MudPaper>
+@code {
+
+    [Parameter]
+    public string ErrorMessage { get; set; }
+
+}

@@ -1,0 +1,113 @@
+@page "/badge/{BadgeId}"
+@page "/badge/{BadgeId}/{UserId}"
+@using Cotacol.Website.Models
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <MudGrid Spacing="1">
+            @if (_badgeDetail == null)
+            {
+                <MudItem xs="12">
+                    <LoadingPatienceComponent WaitingMessage="Retrieving the badge details..."/>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2">
+                    <MudImage Style="width: 80%" Alt="@_badgeDetail.Description" Src='@($"images/badges/{_badgeDetail.BadgeId}.png")' onerror="this.onerror=null; this.src='images/badges/default.png'"></MudImage>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudText Typo="Typo.body1">@_badgeDetail.Description</MudText>
+                    @if (_badgeDetail.Completed)
+                    {
+                        <MudText Typo="Typo.body2"><b>Badge completed:</b> @_badgeDetail.AchievementDate.Date()</MudText>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Value="@(_badgeDetail.Progress * 100)" Color="Color.Secondary"/>
+                        <MudText Typo="Typo.body2" Align="Align.Center">@_badgeDetail.NumberColsAchieved / @_badgeDetail.NumberColsNeeded done</MudText>
+                        @if (_badgeDetail.ValidTo.HasValue)
+                        {
+                            <MudText Typo="Typo.body2" Align="Align.Center">Badge available until @_badgeDetail.ValidTo.Date()</MudText>
+                        }
+                    }
+                </MudItem>
+                <MudItem xs="6"></MudItem>
+                <MudItem xs="12">
+                    <MudSwitch @bind-Checked="@mapMode" Label='@(mapMode ? "Map view" : "List view")' Color="Color.Secondary"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2">Required cols</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <ClimbListComponent HideFilters="true" Mode="@ViewMode" CotacolIds="@GetColIds()" UserId="@UserId"></ClimbListComponent>
+                </MudItem>
+            }
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public string BadgeId { get; set; }
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    private ClimbViewMode ViewMode => mapMode ? ClimbViewMode.Map : ClimbViewMode.Table;
+    private bool mapMode;
+    private UserBadgeStatus _badgeDetail;
+    private UserProfile _userProfile;
+    private string _notAuthorizedMessage;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            _badgeDetail = await CotacolUserClient.GetBadgeAsync(BadgeId, UserIdToShow);
+            Layout.Title = _badgeDetail.Name;
+        }
+    }
+
+    protected List<string> GetColIds()
+    {
+        var ids = new List<string>();
+        if (_badgeDetail?.ColsAchieved != null)
+            ids.AddRange(_badgeDetail.ColsAchieved);
+        if (_badgeDetail?.ColsMissing != null)
+            ids.AddRange(_badgeDetail.ColsMissing);
+        return ids;
+    }
+
+    private string GetPageTitle()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "User's badges";
+    }
+
+}

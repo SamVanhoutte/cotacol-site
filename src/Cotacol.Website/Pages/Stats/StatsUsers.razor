@@ -1,0 +1,150 @@
+@page "/stats"
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+
+<MudGrid Spacing="1" Justify="Justify.Center">
+    @if (!UserProfile.IsAuthenticated)
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.caption">Since you are not a registered user, user names and activity details are hidden for user privacy.</MudText>
+        </MudItem>
+    }
+
+    @if (stats == null)
+    {
+        <MudItem xs="12">
+            <LoadingPatienceComponent WaitingMessage="Crunching numbers..."/>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="11" md="8">
+            <MudTable FixedHeader="true" Height="100%"
+                      LoadingProgressColor="Color.Secondary"
+                      Filter="new Func<UserStatistics, bool>(FilterUser)" Items="@stats.Users" RowsPerPage="50" Style="width: 100%; background-color: transparent">
+                <ToolBarContent>
+                    @if (colPosition > 0 && pointsPosition > 0)
+                    {
+                        <MudText Typo="Typo.body2">You're at place <b>@pointsPosition</b>.<br />And at place <b>@colPosition</b> for number of climbs</MudText>
+                    }
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<UserStatistics, object>(x => x.Position)">
+                            <MudText Typo="Typo.subtitle1">Position</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<UserStatistics, object>(x => x.FullName)">
+                            <MudText Typo="Typo.subtitle1">Name</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<UserStatistics, object>(x => x.UniqueCols)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Climbs</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<UserStatistics, object>(x => x.TotalPoints)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Points</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                </HeaderContent>
+                <RowTemplate Context="activity">
+                    <MudTd>
+                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.Position.Number()</MudText>
+                    </MudTd>
+                    <MudTd>
+                        @if (activity.PrivateProfile ?? false)
+                        {
+                            <MudText Typo="Typo.body1">
+                                <b>@PrintName(activity)</b>
+                            </MudText>
+                        }
+                        else
+                        {
+                            <MudLink Href='@($"achievements/{activity.UserId}")' Target="_blank" Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@PrintName(activity)</MudLink>
+                        }
+                    </MudTd>
+                    <MudTd>
+                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueCols.Number(belowZeroIsNull: true)</MudText>
+                    </MudTd>
+                    <MudTd>
+                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalPoints.Number(belowZeroIsNull: true)</MudText>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+        <MudItem xs="1" md="4"></MudItem>
+    }
+</MudGrid>
+
+@code {
+    private SiteStats stats = null;
+    public int tabIndex = 0;
+    private int pointsPosition = 0;
+    private int colPosition = 0;
+    private string searchString;
+    private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = "Leader boards";
+        stats = await CotacolClient.GetStatsAsync();
+        if (stats != null && UserProfile.IsAuthenticated)
+        {
+            var userId = UserProfile.UserId;
+            var boards = stats.Users;
+            colPosition = boards.OrderByDescending(u => u.UniqueCols).ToList().FindIndex(u => u.UserId.Equals(userId));
+            pointsPosition = boards.OrderByDescending(u => u.TotalPoints).ToList().FindIndex(u => u.UserId.Equals(userId));
+        }
+    }
+
+    private string GetName(string fullName, string userName)
+    {
+        if (UserProfile.IsAuthenticated)
+        {
+            if (!string.IsNullOrEmpty(fullName))
+                return fullName;
+            if (!string.IsNullOrEmpty(userName))
+                return userName;
+            return "Anonymous";
+        }
+        if (!string.IsNullOrEmpty(fullName))
+        {
+            var result = "";
+            foreach (var namePart in fullName.Split(' '))
+            {
+                if (!string.IsNullOrEmpty(namePart))
+                {
+                    var newChar = namePart[0];
+                    if (newChar < 128)
+                        result += newChar;
+                }
+            }
+            return result;
+        }
+        return "Anonymous";
+    }
+
+    private string PrintName(UserStatistics user)
+    {
+        return GetName(user.FullName, user.UserName);
+    }
+
+
+    private bool FilterUser(UserStatistics user, string query)
+    {
+        if (string.IsNullOrEmpty(query)) return true;
+        return user.FullName.Contains(query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool FilterUser(UserStatistics arg) => FilterUser(arg, searchString);
+
+}

@@ -1,0 +1,162 @@
+@page "/activities"
+@page "/activities/{UserId}"
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+@using Cotacol.Website.Models.CotacolApi
+@using Microsoft.AspNetCore.Components
+<AuthorizeView>
+    <NotAuthorized>
+        @if (true)
+        {
+            NavManager.NavigateTo(UserProfile.GetLoginLink(), true);
+        }
+    </NotAuthorized>
+    <Authorized>
+        <MudGrid Spacing="1">
+
+            @if (UserProfile.IsAdmin)
+            {
+                <MudItem xs="12">
+                    <UserAdminLinks UserId="@UserId"/>
+                </MudItem>
+            }
+            @if (_activities == null)
+            {
+                <MudItem xs="12">
+                    <LoadingPatienceComponent WaitingMessage="Loading your activities..."/>
+                </MudItem>
+            }
+            else
+            {
+                @if (ActivitiesMissingMetadata)
+                {
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.body1" Color="Color.Warning">You might see some metadata is missing from your activities. We are fetching them and they will be made available in a few minutes...</MudText>
+                    </MudItem>
+                }
+                <MudItem xs="3" md="3">
+                    <MudSwitch T="bool" Label='Show all activities' Color="Color.Secondary" CheckedChanged="@(async (val) => { await LoadActivitiesAsync(val); })"/>
+                </MudItem>
+                <MudItem xs="1" md="5" />
+                <MudItem xs="8" md="4">
+                    <MudText Typo="Typo.body2" Align="Align.Right">You might want to resync an activity, if you believe there were segments missing, or the activity description should've been updated. Click the sync icons for that. By default only the 'Cotacol Activities' are shown, but you can use the toggle to show all activities and resync them.</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudDivider></MudDivider>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTable FixedHeader="true" Height="70vh"
+                              LoadingProgressColor="Color.Secondary"
+                              Filter="new Func<CotacolActivity, bool>(FilterActivity)" Items="@_activities" RowsPerPage="50" Style="width: 100%; background-color: transparent">
+                        <ToolBarContent>
+                            <MudSpacer/>
+                            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.ActivityDate)"><MudText Typo="Typo.subtitle1">Date</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.ActivityName)"><MudText Typo="Typo.subtitle1">Activity</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Distance</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Elevation)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Elevation</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.UniqueCols)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Cols</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.TotalPoints)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Points</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderStyle"><MudText Typo="Typo.subtitle1">Sync</MudText></MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="activity">
+                            <MudTd Style="min-width: 240px">
+                                <MudLink Href='@activity.ActivityUrl' Target="_blank" Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@activity.ActivityDate.ToString("D")</MudLink>
+                            </MudTd>
+                            <MudTd><MudText Typo="Typo.body1">@(activity.ActivityName ?? $"Activity id: {activity.ActivityId}")</MudText></MudTd>
+                            <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@((activity.Distance / 1000).Number(" km", true))</MudText></MudTd>
+                            <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.Elevation.WholeNumber(" m", true)</MudText></MudTd>
+                            <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueCols.Number(belowZeroIsNull: true)</MudText></MudTd>
+                            <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalPoints.Number(belowZeroIsNull:true)</MudText></MudTd>
+                            <MudTd>
+                                <MudIconButton Icon="@Icons.Filled.Sync" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MudIconButton>
+                                @if (activitySyncResponse?.ActivityId == activity.ActivityId)
+                                {
+                                    <LoadingPatienceComponent WaitingMessage="Syncing..."/>
+                                }
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+            }
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    private string _notAuthorizedMessage;
+    private List<CotacolActivity> _activities;
+    private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+    private ActivitySyncStatus activitySyncResponse;
+    private UserProfile _userProfile;
+    
+    private string searchString;
+    private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.Title = GetName();
+        if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
+        {
+            if (!string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            {
+                _notAuthorizedMessage = "The user profile is not public";
+                return;
+            }
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                _userProfile = await CotacolUserClient.GetProfileAsync(UserId);
+            }
+            _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, false);
+        }
+    }
+
+    private async Task LoadActivitiesAsync(bool showAllActivities)
+    {
+        _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, showAllActivities);
+    }
+
+    private async Task PerformActivitySyncAsync(string activityId)
+    {
+        var status = await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, activityId);
+        activitySyncResponse = new ActivitySyncStatus {ActivityId = activityId, Result = status};
+    }
+
+
+    private class ActivitySyncStatus
+    {
+        public string ActivityId { get; set; }
+        public AsyncWorkflowResult Result { get; set; }
+    }
+
+    private bool ActivitiesMissingMetadata => _activities?.Take(10).Any(a => string.IsNullOrEmpty(a.ActivityName)) ?? true;
+
+
+    private string GetName()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            return UserProfile.FullName;
+        }
+        return _userProfile?.FullName ?? "Users activities";
+    }
+
+    private bool FilterActivity(CotacolActivity activity, string query)
+    {
+        if (string.IsNullOrEmpty(query)) return true;
+        return activity.ActivityName.Contains(query, StringComparison.OrdinalIgnoreCase) ;
+    }
+    private bool FilterActivity(CotacolActivity arg) => FilterActivity(arg, searchString);
+
+}

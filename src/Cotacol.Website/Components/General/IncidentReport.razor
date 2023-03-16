@@ -1,0 +1,42 @@
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@Timestamp.ToString("D")</MudText>
+        <MudText Typo="Typo.h2" Color="Color.Secondary">@Title</MudText>
+    </MudItem>
+    <MudItem xs="8" md="5">
+        <MudTextField ReadOnly="true" Label="Severity" Variant="Variant.Text" @bind-Value="@Severity"/>
+    </MudItem>
+    <MudItem xs="4" md="7"></MudItem>
+    <MudItem xs="8" md="5">
+        <MudTextField ReadOnly="true" Label="Which users were impacted by this?" Variant="Variant.Text" @bind-Value="@UsersImpacted"/>
+    </MudItem>
+    <MudItem xs="4" md="7"></MudItem>
+    <MudItem xs="12">
+        <MudTextField ReadOnly="true" Label="Description" Lines="5" Variant="Variant.Text" @bind-Value="@Description"/>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTextField ReadOnly="true" Label="Resolution in case you're impacted" Variant="Variant.Text" @bind-Value="@Resolution"/>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public string UsersImpacted { get; set; }
+
+    [Parameter]
+    public string Severity { get; set; }
+
+    [Parameter]
+    public DateTime Timestamp { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Resolution { get; set; }
+
+}

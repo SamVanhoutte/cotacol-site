@@ -1,0 +1,25 @@
+@page "/map"
+@page "/map/{UserId}"
+@using Cotacol.Website.Models
+
+<MudGrid Spacing="2">
+    <MudItem xs="12">
+        <ClimbListComponent Mode="@ClimbViewMode.Map" UserId="@UserId"></ClimbListComponent>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+    
+    [CascadingParameter]
+    public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "The big map";
+        base.OnInitialized();
+    }
+
+}
