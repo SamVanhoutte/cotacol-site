@@ -118,7 +118,7 @@ namespace Cotacol.Website.Services
 
         public string GetLoginLink()
         {
-            var redirectUrl = "Identity/Account/Login";
+            var redirectUrl = "account/signin";
 
             if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
             {
