@@ -83,8 +83,11 @@
     
     private string PrintDate(DateTimeOffset? date) => date == null ? "--" : date.Value.ToString("g");
 
-    public double CallsOfInterval => double.Parse(_systemStatus.StravaThrottlingValue.Split(",").First());
     public double ProgressOfInterval => (CallsOfInterval / IntervalLimits);
-    public double CallsOfDay => double.Parse(_systemStatus.StravaThrottlingValue.Split(",").Last());
     public double ProgressOfDay => (CallsOfDay / DayLimits);
+    public double CallsOfInterval => _systemStatus?.StravaThrottlingValue==null ? -1D:
+        double.Parse(_systemStatus.StravaThrottlingValue.Split(",").First());
+    public double CallsOfDay =>
+        _systemStatus?.StravaThrottlingValue==null ? -1D:
+        double.Parse(_systemStatus.StravaThrottlingValue.Split(",").Last());
 }
