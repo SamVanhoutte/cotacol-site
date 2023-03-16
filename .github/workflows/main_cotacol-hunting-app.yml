@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      working-directory: src/CotacolApp
+      working-directory: src/Cotacol.Website
       app-name: cotacol-hunting-app
       slot-name: production  
 
@@ -43,7 +43,7 @@ jobs:
     needs: build
     runs-on: windows-latest
     env:
-      working-directory: src/CotacolApp
+      working-directory: src/Website
       app-name: cotacol-hunting-app
       slot-name: test  
 
@@ -170,7 +170,7 @@ jobs:
     needs: deploytest
     runs-on: windows-latest
     env:
-      working-directory: src/CotacolApp
+      working-directory: src/Cotacol.Website
       app-name: cotacol-hunting-app
       slot-name: production  
 
