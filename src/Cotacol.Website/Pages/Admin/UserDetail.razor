@@ -16,7 +16,7 @@
                         <MudText Typo="Typo.h2" Color="Color.Secondary">Trigger full sync</MudText>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Value="@fullSync"></MudSwitch>
+                        <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Checked="@fullSync"></MudSwitch>
                         <MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
                     </MudItem>
                 </MudGrid>

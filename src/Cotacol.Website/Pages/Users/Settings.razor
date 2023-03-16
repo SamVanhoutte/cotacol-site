@@ -41,16 +41,16 @@
                                 </MudItem>
                             }
                             <MudItem xs="12">
-                                <MudTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MudTextField>
+                                <MudTextField T="string" @bind-Text="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MudTextField>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudSwitch T="bool" Color="Color.Secondary" Label="Join beta feature" @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MudSwitch>
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Join beta feature" @bind-Checked="@_userProfile.UserSettings.EnableBetaFeatures"></MudSwitch>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudSwitch T="bool" Color="Color.Secondary" Label="Update activity descriptions" @bind-Value="@_userProfile.UserSettings.UpdateActivityDescription"></MudSwitch>
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Update activity descriptions" @bind-Checked="@_userProfile.UserSettings.UpdateActivityDescription"></MudSwitch>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudSwitch T="bool" Color="Color.Secondary" Label="Hide profile from stats" @bind-Value="@_userProfile.UserSettings.PrivateProfile"></MudSwitch>
+                                <MudSwitch T="bool" Color="Color.Secondary" Label="Hide profile from stats" @bind-Checked="@_userProfile.UserSettings.PrivateProfile"></MudSwitch>
                                 <MudDivider></MudDivider>
                             </MudItem>
                             <MudItem xs="12">
@@ -91,7 +91,7 @@
                                     {
                                         <MudListItem Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Color.Success : Color.Error)'>
                                             <MudText Typo="Typo.body2">Activity Description</MudText>
-                                            <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "do" : "don't") update your activity descriptions</MudText>
+                                            <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MudText>
                                         </MudListItem>
                                     }
                                     else
