@@ -168,6 +168,8 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    await CreateCotacolUserInBackendAsync(user, info);
+
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
@@ -178,9 +180,7 @@ namespace CotacolApp.Areas.Identity.Pages.Account
                         props.IsPersistent = true;
 
                         await _signInManager.SignInAsync(user, props);
-
-                        await CreateCotacolUserInBackendAsync(user, info);
-
+                        
                         _logger.LogInformation(
                             $"User {user.UserName} sign in result: {_signInManager.IsSignedIn(info.Principal)}");
                         return LocalRedirect(returnUrl);

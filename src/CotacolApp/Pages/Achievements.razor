@@ -44,18 +44,23 @@
                 }
                 <br/>
                 <h2>Your year in a Pic</h2>
-                <span style="text-align: left; display: block; ">
-                    <a href="img/year/@UserIdToShow" target="_blank">
-                        <img src="img/year/@UserIdToShow" style="width: 350px"/>
-                    </a>
-                </span>
+                @if (!NavManager.IsLocal())
+                {
+                    <span style="text-align: left; display: block; ">
+                        <a href="img/year/@UserIdToShow" target="_blank">
+                            <img src="img/year/@UserIdToShow" style="width: 350px"/>
+                        </a>
+                    </span>
+                }
                 <p class="lektonic">Share you achievements with your friends on social media!</p>
                 <br/>
                 <h2>Score</h2>
                 <div class="lektonic">Total points: @_achievements.TotalScore.Number()</div>
                 <div class="lektonic">Unique cols: @_achievements.UniqueCols.Number()</div>
-                <AchievementChartComponent Achievements="@_achievements"/>
-
+                @if (!NavManager.IsLocal())
+                {
+                    <AchievementChartComponent Achievements="@_achievements"/>
+                }
                 @if (_achievements.LocalLegends?.Any() ?? false)
                 {
                     <h2>Local legend at the following climbs</h2>

@@ -57,6 +57,7 @@ namespace CotacolApp.Services
         {
             // TODO : validation of required props
             var response = await $"{_settings.ApiUrl}/user/{userSettings.UserId}"
+                .SetQueryParam("skipauth", "true")
                 .AllowAnyHttpStatus()
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .PostJsonAsync(userSettings);
