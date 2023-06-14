@@ -41,14 +41,14 @@
                     {
                         if (_userProfile != null)
                         {
-                               <h2>Your settings</h2>
+                            <h2>Your settings</h2>
                             @if (!string.IsNullOrEmpty(StatusMessage))
                             {
                                 <p>
                                     <em style="color: darkred">@StatusMessage</em>
                                 </p>
                             }
-                                <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
+                            <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
                             <hr/>
                             <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
                             <span>Join beta features</span>
@@ -72,71 +72,79 @@
                     }
                     else
                     {
-                        @if (_stravaProfile == null)
+                        if (_requireStravaAuth)
                         {
-                            <p>
-                                <em>Fetching your strava configuration...</em>
-                            </p>
+                            <p>It seems we need your Strava authorization at our backend.  Please click the link below and come back to refresh, after you successfully authenticated against Strava.</p>
+                            <MatButtonLink Unelevated="true" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write" Icon="@MatIconNames.Link">Re-Authorize Strava</MatButtonLink>
                         }
                         else
                         {
-                            <h2>Strava permission review</h2>
-                            <MatList SingleSelection="true" TwoLine="true">
-                                <MatListItem>
-                                    <MatListItemText>
-                                        <MatListItemPrimaryText>Strava token validity</MatListItemPrimaryText>
-                                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
-                                    </MatListItemText>
-                                </MatListItem>
-                                <MatListItem>
-                                    <MatListItemText>
-                                        <MatListItemPrimaryText>Activity access</MatListItemPrimaryText>
-                                        <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
-                                    </MatListItemText>
-                                </MatListItem>
-                                @if (_stravaProfile.UpdateDescriptionFlag)
-                                {
+                            @if (_stravaProfile == null)
+                            {
+                                <p>
+                                    <em>Fetching your strava configuration...</em>
+                                </p>
+                            }
+                            else
+                            {
+                                <h2>Strava permission review</h2>
+                                <MatList SingleSelection="true" TwoLine="true">
                                     <MatListItem>
                                         <MatListItemText>
-                                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
-                                            <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
-                                        </MatListItemText>
-                                    </MatListItem>
-                                }
-                                else
-                                {
-                                    <MatListItem>
-                                        <MatListItemText>
-                                            <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
-                                            <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
-                                        </MatListItemText>
-                                    </MatListItem>
-                                }
-                                @if (UserProfile.IsAdmin)
-                                {
-                                    <MatListItem>
-                                        <MatListItemText>
-                                            <MatListItemPrimaryText>Strava permissions</MatListItemPrimaryText>
-                                            <MatListItemSecondaryText>"@(_stravaProfile.StravaPermissions ?? _stravaProfile.TokenScope)"</MatListItemSecondaryText>
+                                            <MatListItemPrimaryText>Strava token validity</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.AuthorizationTokenValid ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MatListItemSecondaryText>
                                         </MatListItemText>
                                     </MatListItem>
                                     <MatListItem>
                                         <MatListItemText>
-                                            <MatListItemPrimaryText>Token last refreshed</MatListItemPrimaryText>
-                                            <MatListItemSecondaryText>@(_stravaProfile.TokenLastRefreshed)</MatListItemSecondaryText>
+                                            <MatListItemPrimaryText>Activity access</MatListItemPrimaryText>
+                                            <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivitiesCanBeRead ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MatListItemSecondaryText>
                                         </MatListItemText>
                                     </MatListItem>
-                                    <MatListItem>
-                                        <MatListItemText>
-                                            <MatListItemPrimaryText>Token expiration</MatListItemPrimaryText>
-                                            <MatListItemSecondaryText>@(_stravaProfile.TokenExpiration)</MatListItemSecondaryText>
-                                        </MatListItemText>
-                                    </MatListItem>
-                                }
-                            </MatList>
-                            <hr/>
-                            <p>If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</p>
-                            <MatButtonLink Unelevated="true" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write" Icon="@MatIconNames.Link">Re-Authorize Strava</MatButtonLink>
+                                    @if (_stravaProfile.UpdateDescriptionFlag)
+                                    {
+                                        <MatListItem>
+                                            <MatListItemText>
+                                                <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                                                <MatListItemSecondaryText><MatIcon Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? "check_circle" : "error")'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MatListItemSecondaryText>
+                                            </MatListItemText>
+                                        </MatListItem>
+                                    }
+                                    else
+                                    {
+                                        <MatListItem>
+                                            <MatListItemText>
+                                                <MatListItemPrimaryText>Activity descriptions</MatListItemPrimaryText>
+                                                <MatListItemSecondaryText><MatIcon Icon='check_circle'></MatIcon>We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions, but you disabled that setting.</MatListItemSecondaryText>
+                                            </MatListItemText>
+                                        </MatListItem>
+                                    }
+                                    @if (UserProfile.IsAdmin)
+                                    {
+                                        <MatListItem>
+                                            <MatListItemText>
+                                                <MatListItemPrimaryText>Strava permissions</MatListItemPrimaryText>
+                                                <MatListItemSecondaryText>"@(_stravaProfile.StravaPermissions ?? _stravaProfile.TokenScope)"</MatListItemSecondaryText>
+                                            </MatListItemText>
+                                        </MatListItem>
+                                        <MatListItem>
+                                            <MatListItemText>
+                                                <MatListItemPrimaryText>Token last refreshed</MatListItemPrimaryText>
+                                                <MatListItemSecondaryText>@(_stravaProfile.TokenLastRefreshed)</MatListItemSecondaryText>
+                                            </MatListItemText>
+                                        </MatListItem>
+                                        <MatListItem>
+                                            <MatListItemText>
+                                                <MatListItemPrimaryText>Token expiration</MatListItemPrimaryText>
+                                                <MatListItemSecondaryText>@(_stravaProfile.TokenExpiration)</MatListItemSecondaryText>
+                                            </MatListItemText>
+                                        </MatListItem>
+                                    }
+                                </MatList>
+                                <hr/>
+                                <p>If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</p>
+                                <MatButtonLink Unelevated="true" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write" Icon="@MatIconNames.Link">Re-Authorize Strava</MatButtonLink>
+                            }
                         }
                     }
                 </div>
@@ -156,6 +164,7 @@
     private string _notAuthorizedMessage;
     private string _stravaNotAuthorizedMessage;
     private StravaUserProfile _stravaProfile;
+    private bool _requireStravaAuth = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,10 +177,18 @@
             else
             {
                 _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
-                if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                if (_userProfile == null)
                 {
-                    _notAuthorizedMessage = "The user profile is not public";
-                    _userProfile = null;
+                    _requireStravaAuth = true;
+                    return;
+                }
+                else
+                {
+                    if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                    {
+                        _notAuthorizedMessage = "The user profile is not public";
+                        _userProfile = null;
+                    }
                 }
             }
         }
