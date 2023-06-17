@@ -164,23 +164,30 @@
         if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
         {
             _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
-            Layout.Title = GetUserName();
-
-            if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+            if (_userProfile == null)
             {
-                _notAuthorizedMessage = "The user profile is not public";
-                return;
+                LinkManager.NavigateTo("settings?authRequired=true", true);
             }
-            _achievements = await CotacolUserClient.GetAchievementsAsync(UserIdToShow, true);
-            _climbs = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
-            _userBadges = await CotacolUserClient.GetBadgesAsync(UserIdToShow);
-            _nearLegendClimbs = _climbs.Where(c => c.AttemptsNeededToLegend == 1);
-            if (!_nearLegendClimbs.Any())
+            else
             {
-                _nearLegendClimbs = _climbs
-                    .Where(c => c.AttemptsNeededToLegend is >0 and <= 3)
-                    .OrderBy(c => c.AttemptsNeededToLegend)
-                    .Take(10);
+                Layout.Title = GetUserName();
+
+                if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                {
+                    _notAuthorizedMessage = "The user profile is not public";
+                    return;
+                }
+                _achievements = await CotacolUserClient.GetAchievementsAsync(UserIdToShow, true);
+                _climbs = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
+                _userBadges = await CotacolUserClient.GetBadgesAsync(UserIdToShow);
+                _nearLegendClimbs = _climbs.Where(c => c.AttemptsNeededToLegend == 1);
+                if (!_nearLegendClimbs.Any())
+                {
+                    _nearLegendClimbs = _climbs
+                        .Where(c => c.AttemptsNeededToLegend is >0 and <= 3)
+                        .OrderBy(c => c.AttemptsNeededToLegend)
+                        .Take(10);
+                }
             }
         }
     }
