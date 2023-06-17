@@ -67,12 +67,12 @@
                     </MudTableSortLabel>
                 </MudTh>
                 <MudTh Style="@HeaderStyle">
-                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.UserSettings.UpdateActivityDescription)">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.Settings.UpdateActivityDescription)">
                         <MudText Typo="Typo.subtitle1" Align="Align.Right">Update Description</MudText>
                     </MudTableSortLabel>
                 </MudTh>
                 <MudTh Style="@HeaderStyle">
-                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.UserSettings.PrivateProfile)">
+                    <MudTableSortLabel SortBy="new Func<UserListRecord, object>(x => x.Profile.Settings.PrivateProfile)">
                         <MudText Typo="Typo.subtitle1" Align="Align.Right">Private</MudText>
                     </MudTableSortLabel>
                 </MudTh>
@@ -95,8 +95,8 @@
                 <MudTd>@user.Health.TokenExpired</MudTd>
                 <MudTd>@user.Health.TokenExpiration</MudTd>
                 <MudTd>@user.Health.SyncStatus</MudTd>
-                <MudTd>@user.Profile.UserSettings.UpdateActivityDescription</MudTd>
-                <MudTd>@user.Profile.UserSettings.PrivateProfile</MudTd>
+                <MudTd>@user.Profile.Settings.UpdateActivityDescription</MudTd>
+                <MudTd>@user.Profile.Settings.PrivateProfile</MudTd>
                 <MudTd>@user.Health.TotalActivities.Number()</MudTd>
                 <MudTd>@user.Profile.EmailAddress</MudTd>
             </RowTemplate>

@@ -131,11 +131,15 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<UserProfile> GetProfileAsync(string userId = null)
     {
         userId ??= currentUserId;
-        var profile = await $"{_settings.ApiUrl}/user/{userId}"
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<UserProfile>();
+        var response = await $"{_settings.ApiUrl}/user/{userId}"
+            .AllowAnyHttpStatus()
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue).GetAsync();
 
-        return profile;
+        if (response.StatusCode >= 200 && response.StatusCode < 300)
+        {
+            return await response.ResponseMessage.Content.ReadFromJsonAsync<UserProfile>();
+        }
+        return null;
     }
 
     public async Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId = null)
