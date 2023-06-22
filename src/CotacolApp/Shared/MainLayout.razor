@@ -6,25 +6,22 @@
     <MudThemeProvider Theme="@CotacolTheme" DefaultScrollbar="true" IsDarkMode="false"/>
     <MudDialogProvider/>
     <MudSnackbarProvider/>
-    <MudGrid Spacing="0" Style="height: 100vh; width: 100vw; max-width: 100%">
-        <MudItem xs="12">
             <div class="page">
                 <div class="sidebar">
                     <NavMenu/>
                 </div>
 
                 <div class="main">
-                    <LoginDisplay/>
-                    <a href="about">About</a>
-                    <MatIconButton Link="/support" Icon="contact_support"></MatIconButton>
-
+                    <div style="text-align: right">
+                        <LoginDisplay/>
+                        <a href="about">About</a>
+                        <MatIconButton Link="/support" Icon="contact_support"></MatIconButton>
+                    </div>
                     <div class="content px-4">
                         @Body
                     </div>
                 </div>
             </div>
-        </MudItem>
-    </MudGrid>
 </CascadingValue>
 
 @code{
