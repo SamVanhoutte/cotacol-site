@@ -55,8 +55,8 @@
                 <td>@(context.Health.TokenExpired)</td>
                 <td>@context.Health.LastSynced.DateTime()</td>
                 <td>@context.Health.SyncStatus</td>
-                <td>@context.Profile.UserSettings.UpdateActivityDescription</td>
-                <td>@context.Profile.UserSettings.PrivateProfile</td>
+                <td>@context.Profile.Settings.UpdateActivityDescription</td>
+                <td>@context.Profile.Settings.PrivateProfile</td>
                 <td>@context.Health.TotalActivities.Number()</td>
                 <td>@context.Profile.EmailAddress</td>
             </MatTableRow>
@@ -126,8 +126,8 @@ else
                     break;
                 case "description":
                     userList = sort.Direction == MatSortDirection.Asc ?
-                        userList.OrderBy(c => c.Profile.UserSettings.UpdateActivityDescription).ToList() :
-                        userList.OrderByDescending(c => c.Profile.UserSettings.UpdateActivityDescription).ToList();
+                        userList.OrderBy(c => c.Profile.Settings.UpdateActivityDescription).ToList() :
+                        userList.OrderByDescending(c => c.Profile.Settings.UpdateActivityDescription).ToList();
                     break;
                 case "private":
                     userList = sort.Direction == MatSortDirection.Asc ?

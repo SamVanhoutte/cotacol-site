@@ -266,8 +266,8 @@ else
         if (UserProfile.IsAdmin && !string.IsNullOrEmpty(UserId))
         {
             var settings = await CotacolUserClient.GetProfileAsync(UserId);
-            settings.UserSettings.PersistenceService = "sql";
-            await CotacolUserClient.UpdateSettingsAsync(UserId, settings.UserSettings, settings.EmailAddress);
+            settings.Settings.PersistenceService = "sql";
+            await CotacolUserClient.UpdateSettingsAsync(UserId, settings.Settings, settings.EmailAddress);
         }
     }
 

@@ -156,7 +156,7 @@
             }
             else
             {
-                if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                if (_userProfile.Settings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
                 {
                     _notAuthorizedMessage = "The user profile is not public";
                     return;

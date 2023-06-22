@@ -50,13 +50,13 @@
                             }
                             <MatTextField @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MatTextField>
                             <hr/>
-                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.EnableBetaFeatures"></MatSlideToggle>
+                            <MatSlideToggle @bind-Value="@_userProfile.Settings.EnableBetaFeatures"></MatSlideToggle>
                             <span>Join beta features</span>
                             <hr/>
-                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.UpdateActivityDescription"></MatSlideToggle>
+                            <MatSlideToggle @bind-Value="@_userProfile.Settings.UpdateActivityDescription"></MatSlideToggle>
                             <span>Update activity descriptions</span>
                             <hr/>
-                            <MatSlideToggle @bind-Value="@_userProfile.UserSettings.PrivateProfile"></MatSlideToggle>
+                            <MatSlideToggle @bind-Value="@_userProfile.Settings.PrivateProfile"></MatSlideToggle>
                             <span>Hide profile from stats</span>
                             <hr/>
                             <MatButton Unelevated="true" Icon="@MatIconNames.Save" OnClick="async () => await SaveSettingsAsync()">Save</MatButton>
@@ -184,7 +184,7 @@
                 }
                 else
                 {
-                    if (_userProfile.UserSettings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                    if (_userProfile.Settings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
                     {
                         _notAuthorizedMessage = "The user profile is not public";
                         _userProfile = null;
@@ -210,7 +210,7 @@
 
     private async Task SaveSettingsAsync()
     {
-        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, _userProfile.UserSettings, _userProfile.EmailAddress);
+        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, _userProfile.Settings, _userProfile.EmailAddress);
         StatusMessage = "Settings were successfully updated.";
     }
 
