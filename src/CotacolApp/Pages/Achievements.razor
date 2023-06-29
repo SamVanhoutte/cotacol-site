@@ -150,9 +150,16 @@
         if (UserProfile.IsAuthenticated || !string.IsNullOrEmpty(UserId))
         {
             _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
-            if (_userProfile == null)
+            if (_userProfile?.Settings == null)
             {
-                NavManager.NavigateTo("settings?authRequired=true", true);
+                if (UserProfile.UserId == UserIdToShow)
+                {
+                    NavManager.NavigateTo("settings?authRequired=true", true);
+                }
+                else
+                {
+                    _notAuthorizedMessage = "This user has not yet been synchronized with Cotacol.";
+                }
             }
             else
             {
