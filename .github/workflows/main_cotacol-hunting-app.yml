@@ -237,8 +237,8 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
+        publish-profile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }}
+        package: ${{env.DOTNET_ROOT}}/mysite
 
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
   
