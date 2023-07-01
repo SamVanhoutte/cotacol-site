@@ -280,12 +280,12 @@ jobs:
                               },
                               {
                                 "name": "api:redirectdomain",
-                                "value": "cotacol-hunting-app.azurewebsites.net",
+                                "value": "cotacol-hunting-app-test.azurewebsites.net",
                                 "slotSetting": true
                               },
                               {
                                 "name": "api:loginUrl",
-                                "value": "https://cotacol-hunting-app.azurewebsites.net/account/signin",
+                                "value": "https://cotacol-hunting-app-test.azurewebsites.net/account/signin",
                                 "slotSetting": true
                               },
                               {
