@@ -64,32 +64,32 @@ jobs:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
 
-  deploytestApp:
-    needs: buildApp
-    runs-on: windows-latest
-    env:
-      working-directory: src/CotacolApp
-      app-name: cotacol-hunting-app
-      slot-name: test  
+  # deploytestApp:
+  #   needs: buildApp
+  #   runs-on: windows-latest
+  #   env:
+  #     working-directory: src/CotacolApp
+  #     app-name: cotacol-hunting-app
+  #     slot-name: test  
 
-    steps:
-    - uses: actions/checkout@master
+  #   steps:
+  #   - uses: actions/checkout@master
 
-    - uses: actions/download-artifact@v2
-      with:
-        name: publish-artifact
-        path: ${{env.DOTNET_ROOT}}/myapp 
+  #   - uses: actions/download-artifact@v2
+  #     with:
+  #       name: publish-artifact
+  #       path: ${{env.DOTNET_ROOT}}/myapp 
         
-    - name: Deploy test site
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{env.app-name}}
-        slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.TEST_AZURE_PUBLISH_PROFILE }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
+  #   - name: Deploy test site
+  #     uses: azure/webapps-deploy@v2
+  #     with:
+  #       app-name: ${{env.app-name}}
+  #       slot-name: ${{env.slot-name}}
+  #       publish-profile: ${{ secrets.TEST_AZURE_PUBLISH_PROFILE }}
+  #       package: ${{env.DOTNET_ROOT}}/myapp 
 
   deployprdApp:
-    needs: deploytestApp
+    needs: buildApp
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
