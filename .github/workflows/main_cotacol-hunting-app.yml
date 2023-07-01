@@ -10,12 +10,10 @@ on:
 
 jobs:
 
-  build:
+  buildApp:
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
-      app-name: cotacol-hunting-app
-      slot-name: production  
 
     steps:
     - uses: actions/checkout@master
@@ -39,8 +37,35 @@ jobs:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploytest:
-    needs: build
+  buildSite:
+    runs-on: windows-latest
+    env:
+      working-directory: src/Cotacol.Website
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+      working-directory: ${{env.working-directory}}
+
+    - name: dotnet publish
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/mysite
+      working-directory: ${{env.working-directory}}
+      
+    - name: Upload published app
+      uses: actions/upload-artifact@v2
+      with:
+        name: publish-artifact
+        path: ${{env.DOTNET_ROOT}}/mysite
+
+  deploytestApp:
+    needs: buildApp
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
@@ -63,111 +88,8 @@ jobs:
         publish-profile: ${{ secrets.TEST_AZURE_PUBLISH_PROFILE }}
         package: ${{env.DOTNET_ROOT}}/myapp 
 
-
-  # configuretst:
-  #   needs: deploytest
-  #   runs-on: windows-latest
-  #   env:
-  #     app-name: cotacol-hunting-app
-  #     slot-name: test
-
-  #   steps:
-  #   - name: Login to Azure
-  #     uses: azure/login@v1
-  #     with:
-  #       creds: '${{ secrets.AZURE_CREDENTIALS }}'
-
-  #   - name: Configure Azure Web App
-  #     uses: azure/appservice-settings@v1
-  #     id: settings
-  #     with:
-  #       app-name: ${{env.app-name}}
-  #       slot-name: ${{env.slot-name}}
-  #       app-settings-json: '[
-  #                             {
-  #                               "name": "api:sharedkeyvalue",
-  #                               "value": "${{ secrets.CotacolApiSecret }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "api:sharedkeyheadername",
-  #                               "value": "x-api-subscription-key",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "api:apiurl",
-  #                               "value": "https://cotacol-hunting-test.azure-api.net/api/v1",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "api:redirectdomain",
-  #                               "value": "cotacol-hunting-app-test.azurewebsites.net",
-  #                               "slotSetting": true
-  #                             },
-  #                             {
-  #                               "name": "api:loginUrl",
-  #                               "value": "https://cotacol-hunting-app-tst.azurewebsites.net/achievements",
-  #                               "slotSetting": true
-  #                             },
-  #                             {
-  #                               "name": "keyvault:keyvaultname",
-  #                               "value": "cotacol-hunting",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "keyvault:KeySasBlobUri2",
-  #                               "value": "${{ secrets.KeySasBlobUri }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "maps:googlemapkey",
-  #                               "value": "${{ secrets.GoogleMapsKey }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "admin:admins",
-  #                               "value": "${{ secrets.AdminUsers }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "keyvault:KeyKeyvaultUri",
-  #                               "value": "${{ secrets.KeyKeyvaultUri }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "logging:ApplicationInsightsInstrumentationKey",
-  #                               "value": "${{ secrets.ApplicationInsightsInstrumentationKey }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "strava:clientId",
-  #                               "value": "${{ secrets.StravaClientId }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "strava:clientOauthSecret",
-  #                               "value": "${{ secrets.StravaOAuthSecret }}",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "strava:AccessTokenUrl",
-  #                               "value": "https://www.strava.com/api/v3/oauth/token",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "ASPNETCORE_ENVIRONMENT",
-  #                               "value": "Development",
-  #                               "slotSetting": false
-  #                             },
-  #                             {
-  #                               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-  #                               "value": "6.9.1",
-  #                               "slotSetting": false
-  #                             }
-  #                           ]'
-
-  deployprd:
-    needs: deploytest
+  deployprdApp:
+    needs: deploytestApp
     runs-on: windows-latest
     env:
       working-directory: src/CotacolApp
@@ -192,12 +114,141 @@ jobs:
 
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
 
-  configureprd:
-    needs: deployprd
+  configureprdApp:
+    needs: deployprdApp
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
       slot-name: production
+
+    steps:
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+    - name: Configure Azure Web App
+      uses: azure/appservice-settings@v1
+      id: settings
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        app-settings-json: '[
+                              {
+                                "name": "api:sharedkeyvalue",
+                                "value": "${{ secrets.CotacolApiSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:sharedkeyheadername",
+                                "value": "x-api-subscription-key",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:apiurl",
+                                "value": "https://cotacol-hunting.azure-api.net/api/v1",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:redirectdomain",
+                                "value": "cotacol-hunting-app.azurewebsites.net",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "api:loginUrl",
+                                "value": "https://cotacol-hunting-app.azurewebsites.net/account/signin",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "keyvault:keyvaultname",
+                                "value": "cotacol-hunting",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeySasBlobUri2",
+                                "value": "${{ secrets.KeySasBlobUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "maps:googlemapkey",
+                                "value": "${{ secrets.GoogleMapsKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "admin:admins",
+                                "value": "${{ secrets.AdminUsers }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeyKeyvaultUri",
+                                "value": "${{ secrets.KeyKeyvaultUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "logging:ApplicationInsightsInstrumentationKey",
+                                "value": "${{ secrets.ApplicationInsightsInstrumentationKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientId",
+                                "value": "${{ secrets.StravaClientId }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientOauthSecret",
+                                "value": "${{ secrets.StravaOAuthSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:AccessTokenUrl",
+                                "value": "https://www.strava.com/api/v3/oauth/token",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "Development",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                                "value": "6.9.1",
+                                "slotSetting": false
+                              }
+                            ]'
+
+  deployprdSite:
+    needs: buildSite
+    runs-on: windows-latest
+    env:
+      working-directory: src/Cotacol.Website
+      app-name: cotacol-hunting-app
+      slot-name: test  
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: publish-artifact
+        path: ${{env.DOTNET_ROOT}}/mysite
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{env.app-name}}
+        slot-name: ${{env.slot-name}}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        package: ${{env.DOTNET_ROOT}}/myapp 
+
+    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+  
+
+  configureprdSite:
+    needs: deployprdSite
+    runs-on: windows-latest
+    env:
+      app-name: cotacol-hunting-app
+      slot-name: test
 
     steps:
     - name: Login to Azure
