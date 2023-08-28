@@ -72,6 +72,7 @@ jobs:
       working-directory: src/CotacolApp
       app-name: cotacol-hunting-app
       slot-name: test  
+      publish-profile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }}
 
     steps:
     - uses: actions/checkout@master
@@ -86,7 +87,7 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        publish-profile: ${{env.publish-profile}}
         package: ${{env.DOTNET_ROOT}}/myapp 
 
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
@@ -200,6 +201,7 @@ jobs:
       working-directory: src/Cotacol.Website
       app-name: cotacol-hunting-app
       slot-name: production  
+      publish-profile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
 
     steps:
     - uses: actions/checkout@master
@@ -214,7 +216,7 @@ jobs:
       with:
         app-name: ${{env.app-name}}
         slot-name: ${{env.slot-name}}
-        publish-profile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }}
+        publish-profile: ${{env.publish-profile}}
         package: ${{env.DOTNET_ROOT}}/mysite
 
     - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
