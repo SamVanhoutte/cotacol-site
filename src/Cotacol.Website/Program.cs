@@ -39,13 +39,12 @@ namespace Cotacol.Website
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
                 .AddHubOptions(cfg => cfg.MaximumReceiveMessageSize = 1048576); // For Blazor Google Maps
-            builder.Services.AddAuthentication(options =>
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(IdentityConstants.ExternalScheme, options =>
                 {
-                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.LoginPath = "/account/signin";
+                    options.LogoutPath = "/signout";
                 })
-                .AddCookie("Identity.External")
                 .AddOAuth(CookieAuthenticationDefaults.AuthenticationScheme, "Strava",
                     options =>
                     {
@@ -53,7 +52,7 @@ namespace Cotacol.Website
                         options.ClientSecret = stravaSettings.ClientOauthSecret;
                         options.CallbackPath = "/signin-strava"; //"/stravalogin"; //
 
-                        options.SaveTokens = true; // Save the auth/refresh token for later retrieval
+                        options.SaveTokens = false; // Save the auth/refresh token for later retrieval
 
                         options.SignInScheme = IdentityConstants.ExternalScheme;
                         options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";

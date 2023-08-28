@@ -64,29 +64,6 @@ jobs:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
 
-  # deploytestApp:
-  #   needs: buildApp
-  #   runs-on: windows-latest
-  #   env:
-  #     working-directory: src/CotacolApp
-  #     app-name: cotacol-hunting-app
-  #     slot-name: test  
-
-  #   steps:
-  #   - uses: actions/checkout@master
-
-  #   - uses: actions/download-artifact@v2
-  #     with:
-  #       name: publish-artifact
-  #       path: ${{env.DOTNET_ROOT}}/myapp 
-        
-  #   - name: Deploy test site
-  #     uses: azure/webapps-deploy@v2
-  #     with:
-  #       app-name: ${{env.app-name}}
-  #       slot-name: ${{env.slot-name}}
-  #       publish-profile: ${{ secrets.TEST_AZURE_PUBLISH_PROFILE }}
-  #       package: ${{env.DOTNET_ROOT}}/myapp 
 
   deployprdApp:
     needs: buildApp
@@ -94,7 +71,7 @@ jobs:
     env:
       working-directory: src/CotacolApp
       app-name: cotacol-hunting-app
-      slot-name: production  
+      slot-name: test  
 
     steps:
     - uses: actions/checkout@master
@@ -119,7 +96,7 @@ jobs:
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
-      slot-name: production
+      slot-name: test
 
     steps:
     - name: Login to Azure
@@ -222,7 +199,7 @@ jobs:
     env:
       working-directory: src/Cotacol.Website
       app-name: cotacol-hunting-app
-      slot-name: test  
+      slot-name: production  
 
     steps:
     - uses: actions/checkout@master
@@ -248,7 +225,7 @@ jobs:
     runs-on: windows-latest
     env:
       app-name: cotacol-hunting-app
-      slot-name: test
+      slot-name: production
 
     steps:
     - name: Login to Azure
