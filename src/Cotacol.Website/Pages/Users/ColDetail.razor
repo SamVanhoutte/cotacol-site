@@ -124,6 +124,9 @@
                         <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
                     </MudItem>
                 }
+                <MudItem xs="12">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Filled.LocationOn" Target="_blank" Href="@climbDetail.Url.ToString()" FullWidth="true">Strava segment</MudButton>
+                </MudItem>
                 @if (climbDetail.Stats?.LocalLegends?.Any() ?? false)
                 {
                     <MudItem xs="12">
@@ -169,7 +172,7 @@
         <MudItem xs="@(UserProfile.IsAuthenticated ? 5 : 9)">
             <ClimbMapComponent Cotacol="@GetClimbData()" Height="360px"></ClimbMapComponent>
         </MudItem>
-        <MudItem xs="6">
+        <MudItem xs="12">
             @if (climbDetail.Stats?.UserList != null)
             {
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Leader board</MudText>
@@ -187,7 +190,56 @@
                 </MudTable>
             }
         </MudItem>
-        <MudItem xs="6"></MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h2" Color="Color.Secondary">Comparable cotacols</MudText>
+            @if (comparableCols != null)
+            {
+                <MudTable FixedHeader="true" Height="100%"
+                          LoadingProgressColor="Color.Secondary"
+                          Items="@comparableCols" Style="width: 100%; background-color: transparent">
+                    <HeaderContent>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1">Name</MudText>
+                        </MudTh>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1">City</MudText>
+                        </MudTh>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1">Elevation diff</MudText>
+                        </MudTh>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Grade diff</MudText>
+                        </MudTh>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Distance diff</MudText>
+                        </MudTh>
+                        <MudTh>
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Points diff</MudText>
+                        </MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="col">
+                        <MudTd>
+                            <MudLink Href='@($"cotacol/{col.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@col.Name</MudLink>
+                        </MudTd>
+                        <MudTd>
+                            <MudText Typo="Typo.body1">@(col.City), @(col.Province)</MudText>
+                        </MudTd>
+                        <MudTd>
+                            <MudText Typo="Typo.body1" Align="Align.Right">@((col.ElevationDiff - climbDetail.ElevationDiff).Number(addSign: true, suffix: "m"))</MudText>
+                        </MudTd>
+                        <MudTd>
+                            <MudText Typo="Typo.body1" Align="Align.Right">@((col.AvgGrade - climbDetail.AvgGrade).Number(addSign: true, suffix: "%"))</MudText>
+                        </MudTd>
+                        <MudTd>
+                            <MudText Typo="Typo.body1" Align="Align.Right">@((col.Distance - climbDetail.Distance).Number(addSign: true, suffix: "m"))</MudText>
+                        </MudTd>
+                        <MudTd>
+                            <MudText Typo="Typo.body1" Align="Align.Right">@((col.CotacolPoints - climbDetail.CotacolPoints).Number(addSign: true))</MudText>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+        </MudItem>
     }
 </MudGrid>
 
@@ -201,6 +253,7 @@
     public string CotacolId { get; set; }
 
     private ClimbUserDetail? climbDetail;
+    private List<ClimbData> comparableCols = new List<ClimbData>();
 
     private bool CotacolDone
     {
@@ -223,6 +276,7 @@
     {
         var userId = UserProfile.IsAuthenticated ? UserProfile.UserId : null;
         climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId, userId);
+        comparableCols = await CotacolClient.GetComparableClimbsAsync(CotacolId, 5);
         Layout.Title = $"#{@climbDetail.Id} - {@climbDetail.Name}";
     }
 

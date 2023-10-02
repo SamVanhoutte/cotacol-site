@@ -9,10 +9,15 @@ namespace Cotacol.Website.Services.Extensions
             return value.ToString("#.##");
         }
 
-        public static string Number(this double value, string suffix = null, bool belowZeroIsNull = false)
+        public static string Number(this double value, string suffix = null, bool belowZeroIsNull = false,bool addSign = false)
         {
             if (belowZeroIsNull && value <= 0) return "-";
             var numberValue = value.ToString("#,###.00", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (addSign && value != 0)
+            {
+                var sign = value < 0 ? "" : "+";
+                numberValue = sign + numberValue;
+            }
             if (!string.IsNullOrEmpty(suffix))
             {
                 numberValue += suffix;
@@ -21,21 +26,27 @@ namespace Cotacol.Website.Services.Extensions
             return numberValue;
         }
 
-        public static string Number(this int value, string suffix = null, bool belowZeroIsNull = false)
+        public static string Number(this int value, string suffix = null, bool belowZeroIsNull = false,
+            bool addSign = false)
         {
             long v = value;
-            return v.Number(suffix, belowZeroIsNull);
+            return v.Number(suffix, belowZeroIsNull, addSign);
         }
 
-        public static string Number(this int? value, string suffix = null, bool belowZeroIsNull = false)
+        public static string Number(this int? value, string suffix = null, bool belowZeroIsNull = false,bool addSign = false)
         {
-            return value == null ? "-" : value.Value.Number(suffix, belowZeroIsNull);
+            return value == null ? "-" : value.Value.Number(suffix, belowZeroIsNull, addSign);
         }
 
-        public static string Number(this long value, string suffix = null, bool belowZeroIsNull = false)
+        public static string Number(this long value, string suffix = null, bool belowZeroIsNull = false,bool addSign = false)
         {
             if (belowZeroIsNull && value <= 0) return "-";
             var numberValue = value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
+            if (addSign && value != 0)
+            {
+                var sign = value < 0 ? "" : "+";
+                numberValue = sign + numberValue;
+            }
             if (!string.IsNullOrEmpty(suffix))
             {
                 numberValue += suffix;
@@ -44,15 +55,6 @@ namespace Cotacol.Website.Services.Extensions
             return numberValue;
         }
 
-        
-        public static string Number(this int? value)
-        {
-            return value==null?"-": value.Value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
-        }
-        public static string Number(this long value)
-        {
-            return value.ToString("#,###", new NumberFormatInfo {NumberGroupSeparator = "."});
-        }
         
         public static string Percentage(this double value, bool fractional = false)
         {

@@ -6,6 +6,7 @@ namespace Cotacol.Website.Interfaces
     public interface ICotacolClient
     {
         Task<List<ClimbData>> GetClimbDataAsync();
+        Task<List<ClimbData>> GetComparableClimbsAsync(string cotacolId, int count);
         Task<SiteStats> GetStatsAsync();
         Task<bool> SetupUserAsync(UserSetupRequest userSettings);
         Task<HomeStats> GetHomeStatsAsync();
