@@ -1,0 +1,11 @@
+@using MudBlazor.Utilities
+<MudLink Href="@Link" Color="@Color.Primary" Style="font-weight: bold; color: #FC4C02; text-decoration: underline" Target="_new">@Text</MudLink>
+@code {
+
+    [Parameter]
+    public string Link { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "View on Strava";
+
+}

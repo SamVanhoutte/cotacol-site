@@ -79,6 +79,7 @@
             </MudTd>
         }
         <MudTd>
+            @* <StravaLink Link='@($"https://www.strava.com/segments/{context.StravaSegment}")'></StravaLink> *@
             <a href="https://www.strava.com/segments/@context.StravaSegment" target="_blank">
                 <img src="images/strava-logo-small.png" asp-append-version="true"/>
             </a>

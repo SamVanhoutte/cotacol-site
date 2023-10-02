@@ -14,6 +14,10 @@
     }
     else
     {
+        <div>Elevation : @_climbs.Min(c=>c.ElevationDiff) - @_climbs.Max(c=>c.ElevationDiff) </div> 
+        <div>Grade : @_climbs.Min(c=>c.AvgGrade) - @_climbs.Max(c=>c.AvgGrade) </div> 
+        <div>Distance : @_climbs.Min(c=>c.Distance) - @_climbs.Max(c=>c.Distance) </div> 
+        <div>Points : @_climbs.Min(c=>c.CotacolPoints) - @_climbs.Max(c=>c.CotacolPoints) </div> 
         @if (!HideFilters)
         {
             <MudItem xs="12">

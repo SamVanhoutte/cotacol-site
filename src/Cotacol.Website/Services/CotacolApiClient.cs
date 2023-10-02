@@ -13,6 +13,7 @@ public class CotacolApiClient : ICotacolClient
 {
     private CotacolApiSettings _settings;
     private ILogger<CotacolApiClient> _logger;
+    private List<ClimbData>? _climbData;
 
     public CotacolApiClient(IOptions<CotacolApiSettings> apiSettings, ILogger<CotacolApiClient> logger)
     {
@@ -23,11 +24,45 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<List<ClimbData>> GetClimbDataAsync()
     {
-        var fullData = await $"{_settings.ApiUrl}/cotacoldata"
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<List<ClimbData>>();
+        if (_climbData == null)
+        {
+            _climbData = await $"{_settings.ApiUrl}/cotacoldata"
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<List<ClimbData>>();
+        }
 
-        return fullData;
+        return _climbData;
+    }
+
+    public async Task<List<ClimbData>> GetComparableClimbsAsync(string cotacolId, int count)
+    {
+        var climbs = await GetClimbDataAsync();
+        var compareCol = climbs.First(c => c.Id.Equals(cotacolId));
+        var rnd = new Random();
+        return climbs
+            .Where(c => c.Id != cotacolId)
+            .OrderBy(col => CompareScore(col, compareCol)).Take(count).ToList();
+    }
+
+    private double CompareScore(ClimbData referenceCol, ClimbData compareCol)
+    {
+        // Distance : 100 - 13500
+        var distanceOff = getComparePercentage(referenceCol.Distance, compareCol.Distance, 100, 13500);
+        // Grade : 3,3 - 20,5
+        var gradientOff = getComparePercentage(referenceCol.AvgGrade, compareCol.AvgGrade, 3.3, 20.5);
+        // Elevation : 17 - 449
+        var altitudeOff = getComparePercentage(referenceCol.ElevationDiff, compareCol.ElevationDiff, 17, 449);
+        // Points : 41 - 363
+        var scoreOff = getComparePercentage(referenceCol.CotacolPoints, compareCol.CotacolPoints, 41, 363);
+        var score = distanceOff + gradientOff + altitudeOff + scoreOff;
+        return score;
+    }
+
+    private double getComparePercentage(double compValue, double refValue, double minValue, double maxValue)
+    {
+        var value1 = (compValue - minValue) / (maxValue - minValue);
+        var value2 = (refValue - minValue) / (maxValue - minValue);
+        return Math.Abs(value1 - value2);
     }
 
     public async Task<SiteStats> GetStatsAsync()
