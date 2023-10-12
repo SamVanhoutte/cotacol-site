@@ -34,22 +34,22 @@
                     <MudItem xs="12">
                         <UserAdminLinks UserId="@UserId"/>
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="12" md="6">
                         <MudText Typo="Typo.h2" Color="Color.Tertiary">Your year in a Pic</MudText>
                         <MudLink Href='@($"img/year/{UserIdToShow}")' Target="_blank">
                             <MudImage Src='@($"img/year/{UserIdToShow}")' Width="350"></MudImage>
                         </MudLink>
                         <MudText Typo="Typo.body1">Share you achievements with your friends on social media!</MudText>
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="12" md="6">
                         <MudText Typo="Typo.h2" Color="Color.Tertiary">Evolution</MudText>
                         <MudText Typo="Typo.body1">Total points: @_achievements.TotalScore.Number()</MudText>
                         <MudText Typo="Typo.body1">Unique cols: @_achievements.UniqueCols.Number()</MudText>
                         <AchievementChartComponent Achievements="@_achievements"/>
                     </MudItem>
 
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Most popular climbs</MudText>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Your most popular climbs</MudText>
                         @if (string.IsNullOrEmpty(UserId))
                         {
                             <MudText Typo="Typo.body1">These climbs are the climbs you ride the most, the stars indicate you're local legend.</MudText>
@@ -76,7 +76,7 @@
 
                     @if (_nearLegendClimbs.Any() || _achievements.LocalLegends.Any())
                     {
-                        <MudItem xs="6">
+                        <MudItem xs="12" md="6">
                             <MudGrid>
                                 @if (_achievements.LocalLegends.Any())
                                 {

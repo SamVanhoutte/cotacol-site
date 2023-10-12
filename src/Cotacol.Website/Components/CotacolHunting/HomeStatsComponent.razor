@@ -5,15 +5,6 @@
 @using Cotacol.Website.Models.CotacolApi
 @inject ILogger<HomeStatsComponent> Logger
 <MudGrid Spacing="0">
-    <MudItem xs="12">
-        <MudText Typo="Typo.h2" Color="Color.Tertiary">Migration status</MudText>
-    </MudItem>
-    <MudItem xs="12">
-        <MudText Typo="Typo.body1">
-            Users have been migrated to the new runtime. This should solve previous synchronization problems.
-            Badges still require to be migrated and contains some flaws. They will be recalculated after that migration.
-        </MudText>
-    </MudItem>
     @if (Stats?.RecentActivities != null)
     {
         <MudItem xs="12">
@@ -29,11 +20,17 @@
         </MudItem>
         <MudItem xs="1">
         </MudItem>
+        <MudHidden Breakpoint="Breakpoint.Md">
+            @{
+                Console.WriteLine("Small window");
+                latestActivityCount = 5;
+            }
+        </MudHidden>
         <MudItem xs="11">
             <ul style="list-style-type: square;" class="mud-typography mud-typography-body1">
                 @foreach (var recent in Stats.RecentActivities
                     .GroupBy(act => act.UserId)
-                    .Take(20))
+                    .Take(latestActivityCount))
                 {
                     var act = recent.First();
                     @if (UserProfile.IsAuthenticated)
@@ -48,11 +45,18 @@
             </ul>
         </MudItem>
     }
+    else
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.body1" Color="Color.Tertiary">latest activities loading</MudText>
+        </MudItem>
+    }
 </MudGrid>
 
 
 @code {
     private HomeStats? Stats;
+    private int latestActivityCount = 20;
 
     protected override async Task OnInitializedAsync()
     {
