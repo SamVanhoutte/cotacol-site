@@ -14,7 +14,7 @@
     <MudThemeProvider DefaultScrollbar="true" IsDarkMode="false" Theme="@CotacolTheme"/>
     <MudDialogProvider/>
     <MudSnackbarProvider/>
-    <PageTitle>Cotacol.Website</PageTitle>
+    <PageTitle>Cotacol.cc</PageTitle>
 
     <div class="page">
         <div class="sidebar">
@@ -27,12 +27,12 @@
 
         <main>
             <MudGrid Spacing="0">
-                <MudItem md="6" xs="6">
+                <MudItem md="6" xs="12">
                     <div class="top-row-left">
                         <MudText Typo="Typo.h1" Align="Align.Left">@Title</MudText>
                     </div>
                 </MudItem>
-                <MudItem md="6" xs="6">
+                <MudItem md="6" xs="12">
                     <div class="top-row px-4">
                         <LoginDisplay/>
                     </div>
@@ -76,11 +76,11 @@
         },
         Typography = new Typography()
         {
-            H1 = new H1() {FontSize = "32px", FontFamily = new[] {"Merkury", "sans-serif"}, LineHeight = 1.2, TextTransform = "uppercase", FontWeight = 1200, LetterSpacing = "1px",},
-            H2 = new H2() {FontSize = "32px", FontFamily = new[] {"Cooper", "serif"}, LineHeight = 1.2, FontWeight = 900, LetterSpacing = "1px",},
-            Body1 = new Body1() {FontSize = "16px", FontFamily = new[] {"Lekton", "sans-serif"}, LineHeight = 2, FontWeight = 400},
-            Subtitle1 = new Subtitle1() {FontSize = "16px", FontFamily = new[] {"Merkury", "serif"}, LineHeight = 2, FontWeight = 800, LetterSpacing = "1px"},
-            Default = new Default() {FontSize = "16px", FontFamily = new[] {"Lekton", "sans-serif"}, LineHeight = 2, FontWeight = 400}
+            H1 = new H1() {FontSize = "1.5rem", FontFamily = new[] {"Merkury", "sans-serif"}, LineHeight = 1.2, TextTransform = "uppercase", FontWeight = 1200, LetterSpacing = "1px",},
+            H2 = new H2() {FontSize = "1.25rem", FontFamily = new[] {"Cooper", "serif"}, LineHeight = 1.2, FontWeight = 900, LetterSpacing = "1px",},
+            Body1 = new Body1() {FontSize = "0.8rem", FontFamily = new[] {"Lekton", "sans-serif"}, LineHeight = 2, FontWeight = 400},
+            Subtitle1 = new Subtitle1() {FontSize = "1.1rem", FontFamily = new[] {"Merkury", "serif"}, LineHeight = 2, FontWeight = 800, LetterSpacing = "1px"},
+            Default = new Default() {FontSize = "0.8rem", FontFamily = new[] {"Lekton", "sans-serif"}, LineHeight = 2, FontWeight = 400}
         }
     };
 

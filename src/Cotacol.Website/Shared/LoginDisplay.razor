@@ -27,7 +27,7 @@
         <MudLink Href="signout" Color="Color.Secondary" Typo="Typo.body1">Log out</MudLink>
     </Authorized>
     <NotAuthorized>
-        <MudLink Color="Color.Secondary" Href="@UserProfile.GetLoginLink()" Typo="Typo.body1"><img src="/images/btn_strava_connectwith_orange.png" width="140px" asp-append-version="true"/></MudLink>
+        <StravaLogin />
     </NotAuthorized>
 </AuthorizeView>
 

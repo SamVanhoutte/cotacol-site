@@ -14,10 +14,6 @@
     }
     else
     {
-        <div>Elevation : @_climbs.Min(c=>c.ElevationDiff) - @_climbs.Max(c=>c.ElevationDiff) </div> 
-        <div>Grade : @_climbs.Min(c=>c.AvgGrade) - @_climbs.Max(c=>c.AvgGrade) </div> 
-        <div>Distance : @_climbs.Min(c=>c.Distance) - @_climbs.Max(c=>c.Distance) </div> 
-        <div>Points : @_climbs.Min(c=>c.CotacolPoints) - @_climbs.Max(c=>c.CotacolPoints) </div> 
         @if (!HideFilters)
         {
             <MudItem xs="12">
@@ -29,28 +25,48 @@
                         <MudChip Text="Planned" Value='"PlannedFilter"' Color="Color.Secondary"></MudChip>
                         <MudChip Text="Done" Value='"DoneFilter"' Color="Color.Secondary"></MudChip>
                     }
-                    <MudChip Text="Top 50" Value='"TopFilter"'></MudChip>
-                    <MudChip Text="Bomb" Value='"BombFilter"'></MudChip>
-                    <MudChip Text="Easiest" Value='"EasyFilter"'></MudChip>
-                    <MudChip Text="Highest" Value='"HighFilter"'></MudChip>
-                    <MudChip Text="Longest" Value='"LongFilter"'></MudChip>
-                    <MudChip Text="Steepest" Value='"SteepFilter"'></MudChip>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        <MudChip Text="Top 50" Value='"TopFilter"'></MudChip>
+                        <MudChip Text="Bomb" Value='"BombFilter"'></MudChip>
+                        <MudChip Text="Easiest" Value='"EasyFilter"'></MudChip>
+                        <MudChip Text="Highest" Value='"HighFilter"'></MudChip>
+                        <MudChip Text="Longest" Value='"LongFilter"'></MudChip>
+                        <MudChip Text="Steepest" Value='"SteepFilter"'></MudChip>
+                    </MudHidden>
                 </MudChipSet>
             </MudItem>
             <MudItem xs="12">
-                <MudChipSet @ref="ProvinceFilter" MultiSelection="true" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
-                    <MudChip Text="WFL" Value='"WestVlFilter"'></MudChip>
-                    <MudChip Text="EFL" Value='"OostVlFilter"'></MudChip>
-                    <MudChip Text="ANT" Value='"AntwerpenFilter"'></MudChip>
-                    <MudChip Text="LIM" Value='"LimburgFilter"'></MudChip>
-                    <MudChip Text="BRU" Value='"BrusselsFilter"'></MudChip>
-                    <MudChip Text="FLB" Value='"VlBrFilter"'></MudChip>
-                    <MudChip Text="WLB" Value='"BrabantWallonFilter"'></MudChip>
-                    <MudChip Text="HNT" Value='"HainautFilter"'></MudChip>
-                    <MudChip Text="NAM" Value='"NamurFilter"'></MudChip>
-                    <MudChip Text="LIE" Value='"LiegeFilter"'></MudChip>
-                    <MudChip Text="LUX" Value='"LuxemburgFilter"'></MudChip>
-                </MudChipSet>
+                <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                    <MudChipSet @ref="ProvinceFilter" MultiSelection="true" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
+                        <MudChip Text="WFL" Value='"WestVlFilter"'></MudChip>
+                        <MudChip Text="EFL" Value='"OostVlFilter"'></MudChip>
+                        <MudChip Text="ANT" Value='"AntwerpenFilter"'></MudChip>
+                        <MudChip Text="LIM" Value='"LimburgFilter"'></MudChip>
+                        <MudChip Text="BRU" Value='"BrusselsFilter"'></MudChip>
+                        <MudChip Text="FLB" Value='"VlBrFilter"'></MudChip>
+                        <MudChip Text="WLB" Value='"BrabantWallonFilter"'></MudChip>
+                        <MudChip Text="HNT" Value='"HainautFilter"'></MudChip>
+                        <MudChip Text="NAM" Value='"NamurFilter"'></MudChip>
+                        <MudChip Text="LIE" Value='"LiegeFilter"'></MudChip>
+                        <MudChip Text="LUX" Value='"LuxemburgFilter"'></MudChip>
+                    </MudChipSet>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                    <MudSelect Margin="Margin.Dense" T="string" Label="Province" Variant="Variant.Outlined" ValueChanged="@(async (val) => await ApplyProvinceSelectionAsync(val))">
+                        <MudSelectItem Value='"WestVl"'/>
+                        <MudSelectItem Value='"OostVl"'/>
+                        <MudSelectItem Value='"Antwerpen"'/>
+                        <MudSelectItem Value='"Limburg"'/>
+                        <MudSelectItem Value='"Brussels"'/>
+                        <MudSelectItem Value='"VlBr"'/>
+                        <MudSelectItem Value='"BrabantWallon"'/>
+                        <MudSelectItem Value='"Hainaut"'/>
+                        <MudSelectItem Value='"Namur"'/>
+                        <MudSelectItem Value='"Liege"'/>
+                        <MudSelectItem Value='"Luxemburg"'/>
+                    </MudSelect>
+                </MudHidden>
+
             </MudItem>
             @if (!string.IsNullOrEmpty(_filterMessage))
             {
@@ -109,6 +125,12 @@
         _climbs = _climbList;
     }
 
+    private async Task ApplyProvinceSelectionAsync(string province)
+    {
+        _provinceFilters = new List<string> {province};
+        await FilterClimbsAsync();
+    }
+
     private async Task ApplyProvinceFilterAsync(MudChip filter)
     {
         if (filter == null)
@@ -142,7 +164,7 @@
     {
         _climbs = _climbList;
         _filterMessage = null;
-        // Filter on category
+    // Filter on category
         switch (_currentFilter.ToLower())
         {
             case "nofilter":
@@ -184,9 +206,9 @@
                 _filterMessage = $"You did __DONE-COUNT__ of the 50 steepest Cotacols.  Unleash the Watts!";
                 break;
         }
-        
 
-        // Filter on province
+
+    // Filter on province
         if (_provinceFilters?.Any() ?? false)
         {
             _climbs = _climbs.Where(c =>
