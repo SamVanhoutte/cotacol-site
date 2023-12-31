@@ -39,7 +39,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
     {
-        var userClimbs = await $"{_settings.ApiUrl}/cotacoldata/{userId}"
+        var userClimbs = await $"{_settings.ApiUrl}/users/{userId}/climbs"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<UserClimb>>();
 
@@ -49,7 +49,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<List<UserColAchievement>> GetColsAsync(string userId)
     {
-        var cols = await $"{_settings.ApiUrl}/user/{userId}/cols"
+        var cols = await $"{_settings.ApiUrl}/users/{userId}/cols"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<UserColAchievement>>();
 
@@ -59,7 +59,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null, bool allActivities = true)
     {
         userId ??= currentUserId;
-        var cols = await $"{_settings.ApiUrl}/user/{userId}/activities"
+        var cols = await $"{_settings.ApiUrl}/users/{userId}/activities"
             .SetQueryParam("allactivities", allActivities)
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<CotacolActivity>>();
@@ -71,7 +71,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     {
         userId ??= currentUserId;
 
-        var isBookmarked = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+        var isBookmarked = await $"{_settings.ApiUrl}/users/{userId}/bookmark/{climbId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<bool>();
 
@@ -82,7 +82,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     {
         userId ??= currentUserId;
 
-        var response = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/bookmark/{climbId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .PostAsync();
         return response.StatusCode >= 200 && response.StatusCode < 299;
@@ -92,7 +92,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     {
         userId ??= currentUserId;
 
-        var response = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/bookmark/{climbId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .DeleteAsync();
         return response.StatusCode >= 200 && response.StatusCode < 299;
@@ -102,7 +102,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     {
         try
         {
-            var achievements = await $"{_settings.ApiUrl}/user/{userId}/achievements"
+            var achievements = await $"{_settings.ApiUrl}/users/{userId}/achievements"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .AllowAnyHttpStatus()
                 .GetJsonAsync<UserAchievements>();
@@ -131,7 +131,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<UserProfile> GetProfileAsync(string userId = null)
     {
         userId ??= currentUserId;
-        var response = await $"{_settings.ApiUrl}/user/{userId}"
+        var response = await $"{_settings.ApiUrl}/users/{userId}"
             .AllowAnyHttpStatus()
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue).GetAsync();
 
@@ -145,7 +145,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId = null)
     {
         userId ??= currentUserId;
-        var profile = await $"{_settings.ApiUrl}/user/strava/{userId}"
+        var profile = await $"{_settings.ApiUrl}/users/strava/{userId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<StravaUserProfile>();
 
@@ -177,7 +177,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<SyncStatus> GetSyncStatus(string userId)
     {
-        var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/sync"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<SyncStatus>();
         return response;
@@ -186,7 +186,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<AsyncWorkflowResult> SynchronizeAsync(string userId, bool fullSync = false)
     {
         _logger.LogInformation($"Sync request for user {userId}");
-        var response = await $"{_settings.ApiUrl}/user/{userId}/sync"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/sync"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .AllowAnyHttpStatus()
             .PostJsonAsync(new SyncRequest {ForceSync = false, FullSync = fullSync, MaxActivityCount = 0});
@@ -204,7 +204,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<AsyncWorkflowResult> SynchronizeActivityAsync(string userId, string activityId)
     {
         _logger.LogInformation($"Sync request for user {userId} activity {activityId}");
-        var response = await $"{_settings.ApiUrl}/user/{userId}/activity/{activityId}/sync"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/activity/{activityId}/sync"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .AllowAnyHttpStatus()
             .PostJsonAsync(new { });
@@ -241,7 +241,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<int> RemoveUserAsync(string userId)
     {
         _logger.LogWarning($"Removing user {userId} from the Backend, executed by admin {currentUserId}");
-        var response = await $"{_settings.ApiUrl}/user/{userId}"
+        var response = await $"{_settings.ApiUrl}/users/{userId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .AllowAnyHttpStatus()
             .DeleteAsync();
@@ -251,7 +251,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<YearReview> GetYearReviewAsync(string userId, int year)
     {
-        var response = await $"{_settings.ApiUrl}/user/{userId}/year"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/year/{year}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<YearReview>();
         return response;
@@ -259,7 +259,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<List<UserBadgeStatus>> GetBadgesAsync(string userId)
     {
-        var response = await $"{_settings.ApiUrl}/user/{userId}/badges"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/badges"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<UserBadgeStatus>>();
         return response;
@@ -267,7 +267,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId)
     {
-        var response = await $"{_settings.ApiUrl}/user/{userId}/badges/{badgeId}"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/badges/{badgeId}"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<UserBadgeStatus>();
         return response;
@@ -276,7 +276,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     public async Task<List<BadgeSyncResult>> SynchronizeUserBadgesAsync(string userId)
     {
         _logger.LogInformation($"Sync request for user {userId} badges");
-        var response = await $"{_settings.ApiUrl}/user/{userId}/badges/sync"
+        var response = await $"{_settings.ApiUrl}/users/{userId}/badges/sync"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .AllowAnyHttpStatus()
             .PostJsonAsync(new { });

@@ -93,7 +93,7 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<HomeStats> GetHomeStatsAsync()
     {
-        var stats = await $"{_settings.ApiUrl}/home/stats"
+        var stats = await $"{_settings.ApiUrl}/stats/home"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<HomeStats>();
 
@@ -163,7 +163,7 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<List<SegmentDataValidation>> GetSegmentListAsync()
     {
-        return await $"{_settings.ApiUrl}/segmentdata"
+        return await $"{_settings.ApiUrl}/segments"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<SegmentDataValidation>>();
     }

@@ -17,13 +17,18 @@ namespace Cotacol.Website.Controllers
         }
         
         [HttpGet]
-        [Route("img/year/{userId}")]
-        public async Task<IActionResult> Get(string userId)
+        [Route("img/year/{userId}/{yearRequested?}")]
+        public async Task<IActionResult> Get(string userId, string? yearRequested)
         {
             YearReview summary = null;
             try
             {
                 var year = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
+                if (int.TryParse(yearRequested, out var yearOutput))
+                {
+                    year = yearOutput;
+                }
+                Console.WriteLine($"Plotting year {year}");
                 summary = await _userClient.GetYearReviewAsync(userId, year);
             }
             catch (Exception e)
