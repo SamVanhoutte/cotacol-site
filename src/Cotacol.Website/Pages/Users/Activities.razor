@@ -64,7 +64,7 @@
                         </HeaderContent>
                         <RowTemplate Context="activity">
                             <MudTd Style="min-width: 240px">
-                                <MudLink Href='@activity.ActivityUrl' Target="_blank" Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@activity.ActivityDate.ToString("D")</MudLink>
+                                <StravaLink Link="@activity.ActivityUrl" Text="@activity.ActivityDate.ToString("D")"></StravaLink>
                             </MudTd>
                             <MudTd><MudText Typo="Typo.body1">@(activity.ActivityName ?? $"Activity id: {activity.ActivityId}")</MudText></MudTd>
                             <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@((activity.Distance / 1000).Number(" km", true))</MudText></MudTd>

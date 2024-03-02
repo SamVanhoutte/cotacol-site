@@ -54,7 +54,7 @@
                         <MudLink Href='@($"achievements/{activity.UserId}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@PrintName(activity)</MudLink>
                     </MudTd>
                     <MudTd>
-                        <MudLink Href='@activity.ActivityUrl' Target="_blank" Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@activity.ActivityDate.ToString("D")</MudLink>
+                        <StravaLink Link="@activity.ActivityUrl" Text="@activity.ActivityDate.ToString("D")"></StravaLink>
                     </MudTd>
                     <MudTd>
                         <MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueCols.Number(belowZeroIsNull: true)</MudText>
