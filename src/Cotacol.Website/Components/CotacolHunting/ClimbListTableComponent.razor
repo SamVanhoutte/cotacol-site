@@ -17,11 +17,11 @@
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Name)"><MudText Typo="Typo.subtitle1">Name</MudText></MudTableSortLabel></MudTh>
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Province)"><MudText Typo="Typo.subtitle1">Province</MudText></MudTableSortLabel></MudTh>
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Surface)"><MudText Typo="Typo.subtitle1">Surface</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.CotacolPoints)"><MudText Typo="Typo.subtitle1">Points</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1">Length</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.ElevationDiff)"><MudText Typo="Typo.subtitle1">Elevation</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.AvgGrade)"><MudText Typo="Typo.subtitle1">Grade</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.BomScore)"><MudText Typo="Typo.subtitle1">Bomb#</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.CotacolPoints)"><MudText Typo="Typo.subtitle1" Align="Align.End">Points</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1">Length</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.ElevationDiff)"><MudText Typo="Typo.subtitle1">Elevation</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.AvgGrade)"><MudText Typo="Typo.subtitle1">Grade</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.BomScore)"><MudText Typo="Typo.subtitle1">Bomb#</MudText></MudTableSortLabel></MudTh>
         @if (UserProfile.IsAuthenticated)
         {
             <MudTh Style="@HeaderStyle"><MudText Typo="Typo.subtitle1">Plan</MudText></MudTh>
@@ -112,6 +112,7 @@
     }
 
     private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderRightStyle => "background-color: #dcd5cb; font-weight: bold; text-align: right;";
 
     [Parameter]
     public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }

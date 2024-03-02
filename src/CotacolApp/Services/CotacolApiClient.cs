@@ -145,7 +145,7 @@ namespace CotacolApp.Services
 
         public async Task<UserStateDetail> GetUserAdminInfoAsync(string userId)
         {
-            var userState = await $"{_settings.ApiUrl}/user/{userId}/state"
+            var userState = await $"{_settings.ApiUrl}/users/{userId}/state"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<UserStateDetail>();
 

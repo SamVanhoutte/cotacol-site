@@ -112,10 +112,12 @@
     {
         if (UserProfile.IsAuthenticated)
         {
+            Console.WriteLine("Get climb data for " + UserIdToShow);
             _climbList = await CotacolUserClient.GetClimbDataAsync(UserIdToShow);
         }
         else
         {
+            Console.WriteLine("Get climb data");
             _climbList = (await CotacolClient.GetClimbDataAsync()).Select(climb => new UserClimb(climb));
         }
         if (CotacolIds != null)

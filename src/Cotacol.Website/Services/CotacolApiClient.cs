@@ -26,7 +26,7 @@ public class CotacolApiClient : ICotacolClient
     {
         if (_climbData == null)
         {
-            _climbData = await $"{_settings.ApiUrl}/cotacoldata"
+            _climbData = await $"{_settings.ApiUrl}/climbs"
                 .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
                 .GetJsonAsync<List<ClimbData>>();
         }
@@ -170,7 +170,7 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<UserStateDetail> GetUserAdminInfoAsync(string userId)
     {
-        var userState = await $"{_settings.ApiUrl}/user/{userId}/state"
+        var userState = await $"{_settings.ApiUrl}/users/{userId}/state"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<UserStateDetail>();
 
