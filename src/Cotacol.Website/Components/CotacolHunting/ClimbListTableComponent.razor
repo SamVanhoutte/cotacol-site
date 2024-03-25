@@ -31,7 +31,7 @@
     <RowTemplate>
         @if (context.Done)
         {
-            <MudTd style="background-color: #FD7D7A; color: white">
+            <MudTd style='@($"background-color:' {MainLayout.CotacolTheme.Palette.Secondary.Value}; color: white")'>
                 <MudText Typo="Typo.body1">@context.Id</MudText>
             </MudTd>
         }

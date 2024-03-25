@@ -59,7 +59,7 @@ namespace Cotacol.Website.Services.Maps
             {
                 Position = new LatLngLiteral(start.Latitude, start.Longitude),
                 Map = map,
-                Icon = new Icon {Url = climb.Done ? "images/climb-icon-map-green.png": "images/climb-icon-map-pink.png"},
+                Icon = new Icon {Url = climb.Done ? "images/climb-icon-map-green.svg": "images/climb-icon-map-pink.svg"},
                 Clickable = true,
                 Title = climb.Name,
                 Visible = true

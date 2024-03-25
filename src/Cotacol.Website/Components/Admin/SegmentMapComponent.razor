@@ -233,13 +233,14 @@ else
         }
 
         var lines = new Dictionary<string, PolylineOptions>();
+        var secondaryColor = MainLayout.CotacolTheme.Palette.Secondary.Value;
         if (UpdatedRoute != null)
         {
-            lines.Add(climbDetail.Id, DrawMainLine(map1, UpdatedRoute.ToPolylineString(), "#FD7D7A"));
+            lines.Add(climbDetail.Id, DrawMainLine(map1, UpdatedRoute.ToPolylineString(), secondaryColor));
         }
         else
         {
-            lines.Add(climbDetail.Id, DrawMainLine(map1, climbDetail.Polyline, "#FD7D7A"));
+            lines.Add(climbDetail.Id, DrawMainLine(map1, climbDetail.Polyline, secondaryColor));
         }
         var index = 0;
         foreach (var climbDetailSegment in climbDetail.Segments)
