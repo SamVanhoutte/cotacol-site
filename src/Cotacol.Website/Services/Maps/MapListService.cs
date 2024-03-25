@@ -5,6 +5,9 @@ using Microsoft.JSInterop;
 using Columbae;
 using Columbae.World;
 using Cotacol.Website.Models;
+using Cotacol.Website.Shared;
+using MudBlazor;
+using MouseEvent = GoogleMapsComponents.Maps.MouseEvent;
 using Route = Columbae.World.Route;
     
 namespace Cotacol.Website.Services.Maps
@@ -169,7 +172,7 @@ namespace Cotacol.Website.Services.Maps
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Latitude, v.Longitude));
             var options = new PolylineOptions()
             {
-                StrokeColor = climb.Done ? "#C1E1C1" : "#FD7D7A",
+                StrokeColor = climb.Done ? MainLayout.CotacolTheme.Palette.Success.Value : MainLayout.CotacolTheme.Palette.Secondary.Value,
                 Clickable = true,
                 Draggable = false,
                 Editable = false,

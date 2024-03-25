@@ -75,21 +75,17 @@
                         <LoadingPatienceComponent WaitingMessage="Loading settings..."/>
                     }
                     <MudItem xs="12">
-                        <MudText Typo="Typo.h2" Color="Color.Secondary">Debug info</MudText>
+                        <MudText Typo="Typo.h2" Color="Color.Secondary">Danger zone</MudText>
+                        <MudCheckBox T="bool" @bind-Checked="@confirmed">By deleting my account, I understand all data will be removed from the server.</MudCheckBox>
+                        @if (confirmed)
+                        {
+                            <MudButton Variant="Variant.Filled" OnClick="@(()=>confirmationDialogOpen=!confirmationDialogOpen)" StartIcon="@Icons.Filled.DeleteForever" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Warning">Delete data</MudButton>
+                        }
                     </MudItem>
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.h3">Cookies</MudText>
-                    </MudItem>
-                    @foreach (var cookie in HttpContextAccessor.HttpContext.Request.Cookies)
-                    {
-                        <MudItem xs="12">
-                            <MudText Typo="Typo.body1">@cookie.Key</MudText>
-                        </MudItem>
-                    }
                 </MudGrid>
             }
         </MudItem>
-        <MudItem xs="6">
+        <MudItem xs="6" md="4">
             @if (!string.IsNullOrEmpty(_stravaNotAuthorizedMessage))
             {
                 <MudText Typo="Typo.body1" Color="Color.Warning">@_stravaNotAuthorizedMessage</MudText>
@@ -157,11 +153,34 @@
                 }
             }
         </MudItem>
+        <MudItem xs="6" md="4">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h2" Color="Color.Secondary">Sync Strava</MudText>
+                </MudItem>
+                    <MudItem xs="12">
+                    <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Checked="@fullSync"></MudSwitch>
+                    <MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
     }
 
 </MudGrid>
 
-
+<MudDialog @bind-IsVisible="@confirmationDialogOpen">
+    <TitleContent>
+        <MudText Typo="Typo.subtitle1">Deleting the user?</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText Typo="Typo.body1" Color="Color.Warning">This action is irriversable, Sure you want to remove the user?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(async () => await CotacolUserClient.RemoveUserAsync(UserId))">Delete user</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(e => { confirmationDialogOpen = false; })">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
 @code {
 
     [CascadingParameter]
@@ -174,12 +193,16 @@
     [SupplyParameterFromQuery(Name = "authRequired")]
     public bool StravaAuthRequired { get; set; } = false;
 
+    private AsyncWorkflowResult fullSyncResponse;
+    private bool confirmed = false;
+    private bool confirmationDialogOpen = false;
     private string StatusMessage;
     internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
     private UserProfile _userProfile;
     private string _notAuthorizedMessage;
     private string _stravaNotAuthorizedMessage;
     private StravaUserProfile _stravaProfile;
+    private bool fullSync;
 
     protected override async Task OnInitializedAsync()
     {
@@ -228,6 +251,11 @@
         StatusMessage = "Settings were successfully updated.";
     }
 
+    private async Task DeleteAccountAsync()
+    {
+        await CotacolUserClient.RemoveUserAsync(UserId);
+    }
+    
     private string GetName()
     {
         if (string.IsNullOrEmpty(UserId))
@@ -235,6 +263,11 @@
             return $"({UserProfile.FullName})";
         }
         return string.IsNullOrEmpty(_userProfile?.FullName) ? "" : $"({_userProfile?.FullName})";
+    }
+
+    private async Task PerformUserSyncAsync()
+    {
+        fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
     }
 
 }
