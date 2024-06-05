@@ -36,7 +36,7 @@ public class CotacolApiUserClient : ICotacolUserClient
     }
 
     private string currentUserId => _context.HttpContext.User.GetUserId();
-
+    
     public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
     {
         var userClimbs = await $"{_settings.ApiUrl}/cotacoldata/{userId}"

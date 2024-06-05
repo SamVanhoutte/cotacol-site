@@ -42,7 +42,7 @@
             </MudTd>
         }
         <MudTd style="max-width: 200px">
-            <MudLink Href='@($"cotacol/{context.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@context.Name</MudLink>
+            <MudLink id='@($"cotacol-{context.Id}")' Href='@($"cotacol/{context.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@context.Name</MudLink>
         </MudTd>
         <MudTd>
             <MudText Typo="Typo.body1">@context.Province</MudText>
