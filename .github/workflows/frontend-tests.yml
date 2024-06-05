@@ -1,0 +1,24 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Run Cypress front end tests 
+
+on:
+  workflow_call:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install npm dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          project: ./src/Cotacol.Website.UiTests
+          build: npm run build
+          start: npm start
+          browser: chrome
+          config: pageLoadTimeout=30000,baseUrl='${{ vars.UI_TEST_BASEURL }}'
