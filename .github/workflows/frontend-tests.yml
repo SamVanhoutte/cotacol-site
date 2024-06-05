@@ -5,7 +5,8 @@ name: Run Cypress front end tests
 
 on:
   workflow_call:
-
+  workflow_dispatch:
+    
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
