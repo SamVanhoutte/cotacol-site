@@ -8,17 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  cypress-install:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Cypress install
-      uses: cypress-io/github-action@v6
-      with:
-        # Disable running of tests within install job
-        runTests: false
-        build: npm run build
+  # cypress-install:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #   - name: Cypress install
+  #     uses: cypress-io/github-action@v6
+  #     with:
+  #       # Disable running of tests within install job
+  #       runTests: false
+  #       build: npm run build
   cypress-run:
     runs-on: ubuntu-latest
     steps:
@@ -32,7 +32,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           project: ./src/Cotacol.Website.UiTests
-          #build: npm run build
+          build: npm run build
           start: npm start
           browser: chrome
           config: pageLoadTimeout=30000,baseUrl='${{ vars.UI_TEST_BASEURL }}'
