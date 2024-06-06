@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CotacolApp", "CotacolApp\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotacol.Website", "Cotacol.Website\Cotacol.Website.csproj", "{D5909AE9-64F1-4628-993D-425CAC41479A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotacol.Website.Tests", "Cotacol.Website.Tests\Cotacol.Website.Tests.csproj", "{93A19158-B661-408B-B995-06A8C3EAF0D7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93A19158-B661-408B-B995-06A8C3EAF0D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93A19158-B661-408B-B995-06A8C3EAF0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93A19158-B661-408B-B995-06A8C3EAF0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93A19158-B661-408B-B995-06A8C3EAF0D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

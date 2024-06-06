@@ -9,5 +9,6 @@ describe('Cotacol information', () => {
     cy.get('#cotacoldistance').should('exist');
     cy.get('#cotacolsurface').should('exist');
     cy.get('#cotacoldone').should('not.exist');
+    cy.get('#map1').should('exist');
   });
 })
