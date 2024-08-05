@@ -7,6 +7,7 @@
 .DS_Store
 src/CotacolApp/app.db
 appsettings.dev.json
+screenshots
 
 # User-specific files
 *.rsuser

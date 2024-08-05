@@ -13,7 +13,7 @@
     else
     {
         <MudItem xs="11" md="8">
-            <MudTable FixedHeader="true" Height="100%"
+            <MudTable FixedHeader="true" Height="100%" id="coltable"
                       LoadingProgressColor="Color.Secondary"
                       Filter="new Func<CotacolClimb, bool>(FilterCol)" Items="@stats.Cotacols" RowsPerPage="50" Style="width: 100%; background-color: transparent">
                 <ToolBarContent>
@@ -48,7 +48,7 @@
                     </MudTd>
                     <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueUsers.Number()</MudText></MudTd>
                     <MudTd>
-                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalAttempts.Number(belowZeroIsNull: true)</MudText>
+                        <MudText id="cotacolitem" Typo="Typo.body1" Align="Align.Right">@activity.TotalAttempts.Number(belowZeroIsNull: true)</MudText>
                     </MudTd>
                     <MudTd>
                         @if (ColHasLocalLegends(activity.CotacolId))

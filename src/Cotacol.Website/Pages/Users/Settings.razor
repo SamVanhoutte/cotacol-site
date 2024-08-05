@@ -7,6 +7,7 @@
 @inject ILogger<Climbs> Logger
 @inject NavigationManager NavManager
 @inject IHttpContextAccessor HttpContextAccessor
+@attribute [Authorize]
 <AuthorizeView>
     <NotAuthorized>
         @if (true)
