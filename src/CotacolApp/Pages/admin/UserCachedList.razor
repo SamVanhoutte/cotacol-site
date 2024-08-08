@@ -49,7 +49,7 @@
             </MatTableHeader>
             <MatTableRow>
                 <td>
-                    <a href="admin/user/@context.Profile.UserId">@context.Profile.UserId</a>
+                    <a href="admin/users/@context.Profile.UserId">@context.Profile.UserId</a>
                 </td>
                 <td style="max-width: 200px">@context.Profile.FullName</td>
                 <td>@(context.Health.TokenExpired)</td>
@@ -92,7 +92,7 @@ else
 
     private void NavigateUser(string userId)
     {
-        NavManager.NavigateTo($"admin/user/{userId}");
+        NavManager.NavigateTo($"admin/users/{userId}");
     }
 
     private int TestUsers => userList.Count(u => u.Profile?.TestUser ?? false);

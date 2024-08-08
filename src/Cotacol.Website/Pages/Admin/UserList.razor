@@ -138,7 +138,7 @@ else
 
     private void NavigateUser(string userId)
     {
-        NavManager.NavigateTo($"admin/user/{userId}");
+        NavManager.NavigateTo($"admin/users/{userId}");
     }
 
     private int TestUsers => userList.Count(u => u.Profile?.TestUser ?? false);
