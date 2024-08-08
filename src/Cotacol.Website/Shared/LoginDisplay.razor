@@ -38,7 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (uniqueCols < 0)
+        if (uniqueCols < 0 && !string.IsNullOrEmpty(UserProfile?.UserId))
         {
             try
             {
