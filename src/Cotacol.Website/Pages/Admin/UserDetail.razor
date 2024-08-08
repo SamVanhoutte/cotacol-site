@@ -52,41 +52,57 @@
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Sync status</MudText>
-                @if(syncStatus!=null)
+                @if (syncStatus != null)
                 {
                     <MudList>
                         <MudListItem Avatar="@Icons.Filled.Sync">
-                            <MudText Typo="Typo.body1"><b>Synchronization Status</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Synchronization Status</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@syncStatus.Status</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.ToggleOn">
-                            <MudText Typo="Typo.body1"><b>Active sync</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Active sync</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@syncStatus.SyncActive</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Numbers">
-                            <MudText Typo="Typo.body1"><b>Activity count</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Activity count</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@syncStatus.Processed.Number() / @syncStatus.Total.Number()</MudText>
                         </MudListItem>
                         @if (userDetail?.SyncStatus != null)
                         {
                             <MudListItem Avatar="@Icons.Filled.Check">
-                                <MudText Typo="Typo.body1"><b>Full sync succeeded</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>Full sync succeeded</b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">@userDetail.SyncStatus.Succeeded</MudText>
                             </MudListItem>
                             <MudListItem Avatar="@Icons.Filled.SwitchLeft">
-                                <MudText Typo="Typo.body1"><b>Full sync trigger</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>Full sync trigger</b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">@userDetail.SyncStatus.Trigger</MudText>
                             </MudListItem>
                             <MudListItem Avatar="@Icons.Filled.Timelapse">
-                                <MudText Typo="Typo.body1"><b>Full sync time</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>Full sync time</b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">@userDetail.SyncStatus.SyncTime.DateTime()</MudText>
-                            </MudListItem>                                
+                            </MudListItem>
                             <MudListItem Avatar="@Icons.Filled.Error">
-                                <MudText Typo="Typo.body1"><b>Full sync error code</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>Full sync error code</b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">@userDetail.SyncStatus.ErrorCode</MudText>
-                            </MudListItem>                                
+                            </MudListItem>
                             <MudListItem Avatar="@Icons.Filled.SyncProblem">
-                                <MudText Typo="Typo.body1"><b>Full sync error</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>Full sync error</b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">@userDetail.SyncStatus.ErrorDescription</MudText>
                             </MudListItem>
                         }
@@ -94,75 +110,101 @@
                 }
                 else
                 {
-                    <LoadingPatienceComponent WaitingMessage="Retrieving sync status" />
+                    <LoadingPatienceComponent WaitingMessage="Retrieving sync status"/>
                 }
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Audit history</MudText>
-                @if(userDetail.Audit!=null)
+                @if (userDetail.Audit != null)
                 {
                     <MudList>
                         <MudListItem Avatar="@Icons.Filled.Web">
-                            <MudText Typo="Typo.body1"><b>Web site login</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Web site login</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.Audit.WebLogin.DateTime()</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.IosShare">
-                            <MudText Typo="Typo.body1"><b>iOS login</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>iOS login</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.Audit.IOSLogin.DateTime()</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.PhoneAndroid">
-                            <MudText Typo="Typo.body1"><b>Android login</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Android login</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.Audit.AndroidLogin.DateTime()</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Sync">
-                            <MudText Typo="Typo.body1"><b>Last full sync</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Last full sync</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.Audit.FullSync.DateTime()</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.PedalBike">
-                            <MudText Typo="Typo.body1"><b>Last activity pushed</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Last activity pushed</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.Audit.ActivityWebhookSync.DateTime()</MudText>
                         </MudListItem>
                     </MudList>
                 }
                 else
                 {
-                    <LoadingPatienceComponent WaitingMessage="Retrieving audit info" />
+                    <LoadingPatienceComponent WaitingMessage="Retrieving audit info"/>
                 }
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Strava token</MudText>
-                @if(userDetail.UserTokens!=null)
+                @if (userDetail.UserTokens != null)
                 {
                     <MudList>
                         <MudListItem Avatar="@Icons.Filled.Person">
-                            <MudText Typo="Typo.body1"><b>User ID</b></MudText>
-                            <MudText Typo="Typo.body2"><MudLink Color="Color.Secondary" Href="@($"https://www.strava.com/athletes/{userDetail.UserTokens.UserId}")" Target="_blank">@userDetail.UserTokens.UserId</MudLink></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>User ID</b>
+                            </MudText>
+                            <MudText Typo="Typo.body2">
+                                <MudLink Color="Color.Secondary" Href="@($"https://www.strava.com/athletes/{userDetail.UserTokens.UserId}")" Target="_blank">@userDetail.UserTokens.UserId</MudLink>
+                            </MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.HourglassBottom">
-                            <MudText Typo="Typo.body1"><b>Is Expired</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Is Expired</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.UserTokens.IsExpired</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Timeline">
-                            <MudText Typo="Typo.body1"><b>Token expiration</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Token expiration</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.UserTokens.Expiration</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Refresh">
-                            <MudText Typo="Typo.body1"><b>Last refresh</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Last refresh</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@userDetail.UserTokens.LastRefreshTime</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Security">
-                            <MudText Typo="Typo.body1"><b>Scope</b></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Scope</b>
+                            </MudText>
                             <MudText Typo="Typo.body2">@(userDetail.UserTokens.Scope ?? "not set")</MudText>
                         </MudListItem>
                         <MudListItem Avatar="@Icons.Filled.Key">
-                            <MudText Typo="Typo.body1"><b>Key vault</b></MudText>
-                            <MudText Typo="Typo.body2"><MudLink Color="Color.Secondary" Target="_blank" Href="@($"https://portal.azure.com/#@@marchitec.onmicrosoft.com/asset/Microsoft_Azure_KeyVault/Secret/https://cotacol-hunting.vault.azure.net/secrets/strava-{UserId}-bearer/")">Portal</MudLink></MudText>
+                            <MudText Typo="Typo.body1">
+                                <b>Key vault</b>
+                            </MudText>
+                            <MudText Typo="Typo.body2">
+                                <MudLink Color="Color.Secondary" Target="_blank" Href="@($"https://portal.azure.com/#@@marchitec.onmicrosoft.com/asset/Microsoft_Azure_KeyVault/Secret/https://cotacol-hunting.vault.azure.net/secrets/strava-{UserId}-bearer/")">Portal</MudLink>
+                            </MudText>
                         </MudListItem>
                     </MudList>
                 }
                 else
                 {
-                    <LoadingPatienceComponent WaitingMessage="Retrieving strava token info" />
+                    <LoadingPatienceComponent WaitingMessage="Retrieving strava token info"/>
                 }
             </MudItem>
             <MudItem xs="12" md="6">
@@ -192,11 +234,9 @@ else
 
 @code {
 
-    [Parameter]
-    public string UserId { get; set; }
+    [Parameter] public string UserId { get; set; }
 
-    [CascadingParameter]
-    public MainLayout Layout { get; set; } = null!;
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
     private bool confirmationDialogOpen = false;
     private bool fullSync;
@@ -243,7 +283,10 @@ else
 
     private async Task PerformUserSyncAsync()
     {
-        fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
+        if (!string.IsNullOrEmpty(UserId))
+        {
+            fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
+        }
     }
 
 }

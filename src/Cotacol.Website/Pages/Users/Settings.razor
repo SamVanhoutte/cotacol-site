@@ -267,7 +267,10 @@
 
     private async Task PerformUserSyncAsync()
     {
-        fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
+        if (!string.IsNullOrEmpty(UserId))
+        {
+            fullSyncResponse = await CotacolUserClient.SynchronizeAsync(UserId, fullSync);
+        }
     }
 
 }
