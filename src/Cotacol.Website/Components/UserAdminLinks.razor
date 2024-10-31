@@ -1,6 +1,6 @@
 @if (UserProfile.IsAdmin)
 {
-    <MudButton StartIcon="@Icons.Filled.PersonAdd" Href="@($"admin/user/{SelectedUserId}")">Admin access</MudButton>
+    <MudButton StartIcon="@Icons.Filled.PersonAdd" Href="@($"admin/users/{SelectedUserId}")">Admin access</MudButton>
     <MudButton StartIcon="@Icons.Filled.ChangeHistory" Href="@($"climbs/{SelectedUserId}")">Climbs</MudButton>
     <MudButton StartIcon="@Icons.Filled.MultilineChart" Href="@($"achievements/{SelectedUserId}")">Achievements page</MudButton>
     <MudButton StartIcon="@Icons.Filled.Map" Href="@($"activities/{SelectedUserId}")">Activities page</MudButton>

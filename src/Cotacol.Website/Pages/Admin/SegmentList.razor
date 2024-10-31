@@ -1,4 +1,5 @@
 @page "/admin/segments"
+@using Cotacol.Website.Models
 @using Cotacol.Website.Models.CotacolApi
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
@@ -15,86 +16,117 @@
         }
         else
         {
-            <div style="overflow-y: scroll; height:100vh;">
-                <MudTable FixedHeader="true" Height="100%"
-                          LoadingProgressColor="Color.Secondary"
-                          Filter="new Func<SegmentDataValidation, bool>(FilterSegment)" Items="@segmentList" RowsPerPage="50" Style="width: 100%; background-color: transparent">
-                    <ToolBarContent>
-                        <MudSpacer/>
-                        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.CotacolId)">
-                                <MudText Typo="Typo.subtitle1">#</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.Name)">
-                                <MudText Typo="Typo.subtitle1">Cotacol name</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentName)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Segment name</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentUpdated)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Updated</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.ClimbUpdated)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Col updated</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.CotacolLength)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Length</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentLength)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Segment length</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.LengthDifference)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Diff</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.User)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">User</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentConfidence)">
-                                <MudText Typo="Typo.subtitle1" Align="Align.Right">Confidence</MudText>
-                            </MudTableSortLabel>
-                        </MudTh>
-                        <MudTh Style="@HeaderStyle">
-                            <MudText Typo="Typo.subtitle1" Align="Align.Center">Actions</MudText>
-                        </MudTh>
-                    </HeaderContent>
-                    <RowTemplate Context="segment">
-                        <MudTd>@segment.CotacolId</MudTd>
-                        <MudTd>
-                            <MudLink Href='@($"admin/segments/{segment.CotacolId}")' Typo="Typo.body1" Color="Color.Secondary">@segment.Name</MudLink>
-                        </MudTd>
-                        <MudTd>@segment.SegmentName</MudTd>
-                        <MudTd>@segment.SegmentUpdated.DateTime()</MudTd>
-                        <MudTd>@segment.ClimbUpdated.DateTime()</MudTd>
-                        <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@segment.CotacolLength.WholeNumber() m</MudText></MudTd>
-                        <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@segment.SegmentLength.WholeNumber() m</MudText></MudTd>
-                        <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@segment.LengthDifference.WholeNumber() m</MudText></MudTd>
-                        <MudTd>@segment.User</MudTd>
-                        <MudTd>@segment.SegmentConfidence</MudTd>
-                        <MudTd><MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await FetchSegmentAsync(segment.CotacolId, segment.SegmentId))"></MudIconButton> </MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </div>
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudSwitch T="bool" Label='Show tricky segments' Color="Color.Secondary" CheckedChanged="@(async (val) => { await LoadSegmentListAsync(val); })"/>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.caption">@(segmentList.Count) segments listed</MudText>
+                </MudItem>
+                <MudItem xs="12">
+
+                    <div style="overflow-y: scroll; height:100vh;">
+                        <MudTable FixedHeader="true" Height="100%"
+                                  LoadingProgressColor="Color.Secondary"
+                                  Filter="new Func<SegmentDataValidation, bool>(FilterSegment)" Items="@segmentList" RowsPerPage="50" Style="width: 100%; background-color: transparent">
+                            <ToolBarContent>
+                                <MudSpacer/>
+                                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.CotacolId)">
+                                        <MudText Typo="Typo.subtitle1">#</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.Name)">
+                                        <MudText Typo="Typo.subtitle1">Cotacol name</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentName)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Segment name</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentUpdated)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Updated</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.ClimbUpdated)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Col updated</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.CotacolLength)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Length</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentLength)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Segment length</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.LengthDifference)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Diff</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.User)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">User</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.SegmentConfidence)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Confidence</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.IsOfficial)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Official</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.ValidTo)">
+                                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Valid To</MudText>
+                                    </MudTableSortLabel>
+                                </MudTh>
+                                <MudTh Style="@HeaderStyle">
+                                    <MudText Typo="Typo.subtitle1" Align="Align.Center">Actions</MudText>
+                                </MudTh>
+                            </HeaderContent>
+                            <RowTemplate Context="segment">
+                                <MudTd>@segment.CotacolId</MudTd>
+                                <MudTd>
+                                    <MudLink Href='@($"admin/segments/{segment.CotacolId}")' Typo="Typo.body1" Color="Color.Secondary">@segment.Name</MudLink>
+                                </MudTd>
+                                <MudTd>@segment.SegmentName</MudTd>
+                                <MudTd>@segment.SegmentUpdated.DateTime()</MudTd>
+                                <MudTd>@segment.ClimbUpdated.DateTime()</MudTd>
+                                <MudTd>
+                                    <MudText Typo="Typo.body1" Align="Align.Right">@segment.CotacolLength.WholeNumber() m</MudText>
+                                </MudTd>
+                                <MudTd>
+                                    <MudText Typo="Typo.body1" Align="Align.Right">@segment.SegmentLength.WholeNumber() m</MudText>
+                                </MudTd>
+                                <MudTd>
+                                    <MudText Typo="Typo.body1" Align="Align.Right">@segment.LengthDifference.WholeNumber() m</MudText>
+                                </MudTd>
+                                <MudTd>@segment.User</MudTd>
+                                <MudTd>@segment.SegmentConfidence</MudTd>
+                                <MudTd>@segment.IsOfficial</MudTd>
+                                <MudTd>@segment.ValidTo</MudTd>
+                                <MudTd>
+                                    <MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await FetchSegmentAsync(segment.CotacolId, segment.SegmentId))"></MudIconButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </div>
+                </MudItem>
+            </MudGrid>
         }
     </MudGrid>
 }
@@ -105,8 +137,7 @@ else
 
 @code {
 
-    [CascadingParameter]
-    public MainLayout Layout { get; set; } = null!;
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
     private List<SegmentDataValidation> segmentList;
     private StravaSegment segmentDetail;
@@ -116,9 +147,19 @@ else
     protected override async Task OnInitializedAsync()
     {
         Layout.Title = "The segments (admin)";
+        await LoadSegmentListAsync(false);
+    }
+
+    private async Task LoadSegmentListAsync(bool onlyTrickySegments)
+    {
         if (UserProfile.IsAdmin)
         {
             segmentList = await CotacolClient.GetSegmentListAsync();
+            if (onlyTrickySegments)
+            {
+                Console.WriteLine("Only show the tricky segments");
+                segmentList = segmentList.Where(s => (s.IsOfficial ?? false) && !s.ValidTo.HasMaxedValue()).ToList();
+            }
         }
     }
 

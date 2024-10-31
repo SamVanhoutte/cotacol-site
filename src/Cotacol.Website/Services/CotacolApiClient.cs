@@ -163,7 +163,7 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<List<SegmentDataValidation>> GetSegmentListAsync()
     {
-        return await $"{_settings.ApiUrl}/segmentdata"
+        return await $"{_settings.ApiUrl}/segments"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<SegmentDataValidation>>();
     }

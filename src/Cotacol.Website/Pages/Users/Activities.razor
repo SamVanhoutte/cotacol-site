@@ -75,7 +75,14 @@
                                 <MudIconButton Icon="@Icons.Filled.Sync" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MudIconButton>
                                 @if (activitySyncResponse?.ActivityId == activity.ActivityId)
                                 {
-                                    <LoadingPatienceComponent WaitingMessage="Syncing..."/>
+                                    if(isSyncing)
+                                    {
+                                        <LoadingPatienceComponent WaitingMessage="Syncing..."/>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.caption">It can take a while.</MudText>    
+                                    }
                                 }
                             </MudTd>
                         </RowTemplate>
@@ -100,7 +107,7 @@
     private string SelectedUserId => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
     private ActivitySyncStatus activitySyncResponse;
     private UserProfile _userProfile;
-    
+    private bool isSyncing = false;
     private string searchString;
     private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
 
@@ -129,8 +136,17 @@
 
     private async Task PerformActivitySyncAsync(string activityId)
     {
-        var status = await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, activityId);
-        activitySyncResponse = new ActivitySyncStatus {ActivityId = activityId, Result = status};
+        try
+        {
+            isSyncing = true;
+            activitySyncResponse = new ActivitySyncStatus {ActivityId = activityId };
+            var status = await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, activityId);
+            activitySyncResponse.Result = status;
+        }
+        finally
+        {
+            isSyncing = false;
+        }
     }
 
 

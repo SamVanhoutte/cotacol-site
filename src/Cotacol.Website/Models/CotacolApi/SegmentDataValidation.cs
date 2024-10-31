@@ -13,5 +13,8 @@ namespace Cotacol.Website.Models.CotacolApi
         public DateTime SegmentUpdated { get; set; }
         public DateTime ClimbUpdated { get; set; }
         public double LengthDifference => SegmentLength==0 ? 0: Math.Abs(SegmentLength - CotacolLength);
+        public DateTime? ValidTo { get; set; }
+        public DateTime? ValidFrom { get; set; }
+        public bool? IsOfficial { get; set; }
     }
 }
