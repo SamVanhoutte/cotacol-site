@@ -77,7 +77,7 @@ jobs:
   #   steps:
   #   - uses: actions/checkout@master
 
-  #   - uses: actions/download-artifact@v2
+  #   - uses: actions/download-artifact@v3
   #     with:
   #       name: publish-artifact
   #       path: ${{env.DOTNET_ROOT}}/myapp 
@@ -206,7 +206,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
