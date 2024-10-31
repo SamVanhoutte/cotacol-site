@@ -32,7 +32,7 @@ jobs:
   #     working-directory: ${{env.working-directory}}
       
   #   - name: Upload published app
-  #     uses: actions/upload-artifact@v2
+  #     uses: actions/upload-artifact@v3
   #     with:
   #       name: publish-artifact
   #       path: ${{env.DOTNET_ROOT}}/myapp
@@ -59,7 +59,7 @@ jobs:
       working-directory: ${{env.working-directory}}
       
     - name: Upload published app
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
