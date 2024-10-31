@@ -5,10 +5,8 @@ namespace Cotacol.Website.Interfaces
 {
     public interface ICotacolUserClient
     {
-        Task<List<UserColAchievement>> GetColsAsync(string userId);
         Task<List<UserClimb>> GetClimbDataAsync(string userId);
         Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null, bool allActivities = false);
-        Task<bool> GetBookmarkClimbAsync(string climbId, string userId = null);
         Task<bool> BookmarkClimbAsync(string climbId, string userId = null);
         Task<bool> UnbookmarkClimbAsync(string climbId, string userId = null);
         Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false);
@@ -23,6 +21,5 @@ namespace Cotacol.Website.Interfaces
         Task<YearReview> GetYearReviewAsync(string userId, int year);
         Task<List<UserBadgeStatus>> GetBadgesAsync(string userId);
         Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId);
-        Task<List<BadgeSyncResult>> SynchronizeUserBadgesAsync(string userId);
     }
 }

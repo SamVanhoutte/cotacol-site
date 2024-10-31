@@ -277,7 +277,7 @@
         var userId = UserProfile.IsAuthenticated ? UserProfile.UserId : null;
         climbDetail = await CotacolClient.GetClimbDetailAsync(CotacolId, userId);
         comparableCols = await CotacolClient.GetComparableClimbsAsync(CotacolId, 5);
-        Layout.Title = $"#{@climbDetail.Id} - {@climbDetail.Name}";
+        Layout.Title = $"#{@climbDetail?.Id} - {@climbDetail?.Name}";
     }
 
     private string PrintActivityTitle(ColActivity activity)

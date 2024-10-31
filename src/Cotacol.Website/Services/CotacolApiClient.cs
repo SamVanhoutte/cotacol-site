@@ -93,7 +93,7 @@ public class CotacolApiClient : ICotacolClient
 
     public async Task<HomeStats> GetHomeStatsAsync()
     {
-        var stats = await $"{_settings.ApiUrl}/home/stats"
+        var stats = await $"{_settings.ApiUrl}/stats/home"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<HomeStats>();
 
@@ -113,12 +113,12 @@ public class CotacolApiClient : ICotacolClient
     {
         var url = string.IsNullOrEmpty(userId)
             ? $"{_settings.ApiUrl}/climbs/{cotacolId}"
-            : $"{_settings.ApiUrl}/climbs/{cotacolId}/{userId}";
-        var segmentData = await url
+            : $"{_settings.ApiUrl}/users/{userId}/climbs/{cotacolId}";
+        var cotacolDetail = await url
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<ClimbUserDetail>();
 
-        return segmentData;
+        return cotacolDetail;
     }
 
     public async Task<StravaSegment> FetchStravaSegmentAsync(string stravaSegmentId,
