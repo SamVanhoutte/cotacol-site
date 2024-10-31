@@ -28,6 +28,7 @@ namespace Cotacol.Website.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
             }
 
             try

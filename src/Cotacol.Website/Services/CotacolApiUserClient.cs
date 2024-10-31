@@ -39,7 +39,7 @@ public class CotacolApiUserClient : ICotacolUserClient
 
     public async Task<List<UserClimb>> GetClimbDataAsync(string userId)
     {
-        var userClimbs = await $"{_settings.ApiUrl}/cotacoldata/{userId}"
+        var userClimbs = await $"{_settings.ApiUrl}/users/{userId}/climbs-v2"
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<List<UserClimb>>();
 
@@ -47,14 +47,7 @@ public class CotacolApiUserClient : ICotacolUserClient
         return userClimbs;
     }
 
-    public async Task<List<UserColAchievement>> GetColsAsync(string userId)
-    {
-        var cols = await $"{_settings.ApiUrl}/user/{userId}/cols"
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<List<UserColAchievement>>();
 
-        return cols;
-    }
 
     public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null, bool allActivities = true)
     {
@@ -67,16 +60,6 @@ public class CotacolApiUserClient : ICotacolUserClient
         return cols;
     }
 
-    public async Task<bool> GetBookmarkClimbAsync(string climbId, string userId = null)
-    {
-        userId ??= currentUserId;
-
-        var isBookmarked = await $"{_settings.ApiUrl}/user/{userId}/bookmark/{climbId}"
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<bool>();
-
-        return isBookmarked;
-    }
 
     public async Task<bool> BookmarkClimbAsync(string climbId, string userId = null)
     {
@@ -273,20 +256,4 @@ public class CotacolApiUserClient : ICotacolUserClient
         return response;
     }
 
-    public async Task<List<BadgeSyncResult>> SynchronizeUserBadgesAsync(string userId)
-    {
-        _logger.LogInformation($"Sync request for user {userId} badges");
-        var response = await $"{_settings.ApiUrl}/user/{userId}/badges/sync"
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .AllowAnyHttpStatus()
-            .PostJsonAsync(new { });
-        _logger.LogInformation($"Sync requested for badges of user {userId} with status {response.StatusCode}");
-        var result = new List<BadgeSyncResult>();
-        if (response.StatusCode >= 200 && response.StatusCode < 300)
-        {
-            result = await response.ResponseMessage.Content.ReadFromJsonAsync<List<BadgeSyncResult>>();
-        }
-
-        return result;
-    }
 }
