@@ -1,33 +1,36 @@
-using Newtonsoft.Json;
+
+
+using System.Text.Json.Serialization;
+
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public class SystemStatus
     {
-        [JsonProperty("stravaCurrentDayCalls")]
+        [JsonPropertyName("stravaCurrentDayCalls")]
         public long StravaCurrentDayCalls { get; set; }
 
-        [JsonProperty("stravaCurrentIntervalCalls")]
+        [JsonPropertyName("stravaCurrentIntervalCalls")]
         public long StravaCurrentIntervalCalls { get; set; }
 
-        [JsonProperty("stravaThrottlingValue")]
+        [JsonPropertyName("stravaThrottlingValue")]
         public string StravaThrottlingValue { get; set; }
 
-        [JsonProperty("activityQueueDepth")]
+        [JsonPropertyName("activityQueueDepth")]
         public long ActivityQueueDepth { get; set; }
 
-        [JsonProperty("serverTime")]
+        [JsonPropertyName("serverTime")]
         public DateTimeOffset ServerTime { get; set; }
 
-        [JsonProperty("throttlingInterval")]
+        [JsonPropertyName("throttlingInterval")]
         public TimeSpan ThrottlingInterval { get; set; }
 
-        [JsonProperty("purgeOffset")]
+        [JsonPropertyName("purgeOffset")]
         public DateTimeOffset PurgeOffset { get; set; }
 
-        [JsonProperty("lastStatsUpdate")]
+        [JsonPropertyName("lastStatsUpdate")]
         public DateTimeOffset? LastStatsUpdate { get; set; }
-        [JsonProperty("listedUserCount")]
+        [JsonPropertyName("listedUserCount")]
         public long ListedUserCount { get; set; }
 
     }

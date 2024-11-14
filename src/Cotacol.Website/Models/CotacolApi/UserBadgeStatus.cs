@@ -1,36 +1,37 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public record UserBadgeStatus
     {
-        [JsonProperty("badgeId")] public string BadgeId { get; set; }
+        [JsonPropertyName("badgeId")] public string BadgeId { get; set; }
 
-        [JsonProperty("name")] public string Name { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
 
-        [JsonProperty("type")] public BadgeType BadgeType { get; set; }
+        [JsonPropertyName("type")] public string BadgeTypeName { get; set; }
+        public BadgeType BadgeType => Enum.Parse<BadgeType>(BadgeTypeName);
 
-        [JsonProperty("description")] public string Description { get; set; }
+        [JsonPropertyName("description")] public string Description { get; set; }
 
-        [JsonProperty("completed")] public bool Completed { get; set; }
+        [JsonPropertyName("completed")] public bool Completed { get; set; }
 
-        [JsonProperty("achievementDate")] public DateTime? AchievementDate { get; set; }
+        [JsonPropertyName("achievementDate")] public DateTime? AchievementDate { get; set; }
 
-        [JsonProperty("numberColsAchieved")] public long NumberColsAchieved { get; set; }
+        [JsonPropertyName("numberColsAchieved")] public long NumberColsAchieved { get; set; }
 
-        [JsonProperty("numberColsNeeded")] public long NumberColsNeeded { get; set; }
+        [JsonPropertyName("numberColsNeeded")] public long NumberColsNeeded { get; set; }
 
-        [JsonProperty("colsAchieved")] public IEnumerable<string> ColsAchieved { get; set; }
+        [JsonPropertyName("colsAchieved")] public IEnumerable<string> ColsAchieved { get; set; }
 
-        [JsonProperty("colsMissing")] public IEnumerable<string> ColsMissing { get; set; }
+        [JsonPropertyName("colsMissing")] public IEnumerable<string> ColsMissing { get; set; }
 
-        [JsonProperty("remark")] public string Remark { get; set; }
+        [JsonPropertyName("remark")] public string Remark { get; set; }
 
-        [JsonProperty("validFrom")] public DateTime? ValidFrom { get; set; }
+        [JsonPropertyName("validFrom")] public DateTime? ValidFrom { get; set; }
 
-        [JsonProperty("validTo")] public DateTime? ValidTo { get; set; }
+        [JsonPropertyName("validTo")] public DateTime? ValidTo { get; set; }
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public double Progress
         {
             get

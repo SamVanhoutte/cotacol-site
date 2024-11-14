@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
@@ -6,9 +7,9 @@ namespace Cotacol.Website.Models.CotacolApi
     
     public class UserListRecord
     {
-        [JsonProperty("profile")] public UserProfile Profile { get; set; }
-        [JsonProperty("health")] public UserHealth Health { get; set; }
-        [JsonProperty("stats")] public UserStats Stats { get; set; }
+        [JsonPropertyName("profile")] public UserProfile Profile { get; set; }
+        [JsonPropertyName("health")] public UserHealth Health { get; set; }
+        [JsonPropertyName("stats")] public UserStats Stats { get; set; }
 
     }
 
@@ -21,67 +22,67 @@ namespace Cotacol.Website.Models.CotacolApi
     }
     public class UserHealth
     {
-        [JsonProperty("userId")]
+        [JsonPropertyName("userId")]
         public long UserId { get; set; }
 
-        [JsonProperty("fullName")]
+        [JsonPropertyName("fullName")]
         public string FullName { get; set; }
 
-        [JsonProperty("lastSynced")]
+        [JsonPropertyName("lastSynced")]
         public DateTime LastSynced { get; set; }
 
-        [JsonProperty("status")]
+        [JsonPropertyName("status")]
         public string Status { get; set; }
 
-        [JsonProperty("updateActivityDescription")]
+        [JsonPropertyName("updateActivityDescription")]
         public bool UpdateActivityDescription { get; set; }
 
-        [JsonProperty("privateProfile")]
+        [JsonPropertyName("privateProfile")]
         public bool PrivateProfile { get; set; }
 
-        [JsonProperty("betaFeatures")]
+        [JsonPropertyName("betaFeatures")]
         public bool BetaFeatures { get; set; }
 
-        [JsonProperty("email")]
+        [JsonPropertyName("email")]
         public string Email { get; set; }
 
-        [JsonProperty("totalActivities")]
+        [JsonPropertyName("totalActivities")]
         public long TotalActivities { get; set; }
 
-        [JsonProperty("processedActivities")]
+        [JsonPropertyName("processedActivities")]
         public long ProcessedActivities { get; set; }
 
-        [JsonProperty("syncActive")]
+        [JsonPropertyName("syncActive")]
         public bool SyncActive { get; set; }
 
-        [JsonProperty("syncStatus")]
+        [JsonPropertyName("syncStatus")]
         public string SyncStatus { get; set; }
 
-        [JsonProperty("tokenExpired")]
+        [JsonPropertyName("tokenExpired")]
         public bool? TokenExpired { get; set; }
 
-        [JsonProperty("tokenExpiration")]
+        [JsonPropertyName("tokenExpiration")]
         public string TokenExpiration { get; set; }
 
-        [JsonProperty("tokenScope")]
+        [JsonPropertyName("tokenScope")]
         public string TokenScope { get; set; }
 
-        [JsonProperty("tokenRefresh")]
+        [JsonPropertyName("tokenRefresh")]
         public string TokenRefresh { get; set; }
 
-        [JsonProperty("achievedBadges")]
+        [JsonPropertyName("achievedBadges")]
         public long AchievedBadges { get; set; }
 
-        [JsonProperty("colsDone")]
+        [JsonPropertyName("colsDone")]
         public long ColsDone { get; set; }
 
-        [JsonProperty("totalPoints")]
+        [JsonPropertyName("totalPoints")]
         public long TotalPoints { get; set; }
 
-        [JsonProperty("persistenceService")]
+        [JsonPropertyName("persistenceService")]
         public string PersistenceService { get; set; }
         
-        [JsonProperty("testUser")]
+        [JsonPropertyName("testUser")]
         public bool TestUser { get; set; }
     }
 }

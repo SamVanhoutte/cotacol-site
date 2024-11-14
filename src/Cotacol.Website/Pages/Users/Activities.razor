@@ -36,7 +36,7 @@
                     </MudItem>
                 }
                 <MudItem xs="3" md="3">
-                    <MudSwitch T="bool" Label='Show all activities' Color="Color.Secondary" CheckedChanged="@(async (val) => { await LoadActivitiesAsync(val); })"/>
+                    <MudSwitch T="bool" Label='Show all activities' Color="Color.Secondary" ValueChanged="@(async (val) => { await LoadActivitiesAsync(val); })"/>
                 </MudItem>
                 <MudItem xs="1" md="5" />
                 <MudItem xs="8" md="4">
@@ -72,7 +72,7 @@
                             <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueCols.Number(belowZeroIsNull: true)</MudText></MudTd>
                             <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalPoints.Number(belowZeroIsNull:true)</MudText></MudTd>
                             <MudTd>
-                                <MudIconButton Icon="@Icons.Filled.Sync" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Sync" OnClick="@(async () => await PerformActivitySyncAsync(activity.ActivityId))"></MudIconButton>
                                 @if (activitySyncResponse?.ActivityId == activity.ActivityId)
                                 {
                                     if(isSyncing)

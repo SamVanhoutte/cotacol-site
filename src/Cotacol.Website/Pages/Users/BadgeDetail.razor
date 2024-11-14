@@ -45,7 +45,7 @@
                 </MudItem>
                 <MudItem xs="6"></MudItem>
                 <MudItem xs="12">
-                    <MudSwitch @bind-Checked="@mapMode" Label='@(mapMode ? "Map view" : "List view")' Color="Color.Secondary"/>
+                    <MudSwitch T="bool" @bind-Checked="@mapMode" Label='@(mapMode ? "Map view" : "List view")' Color="Color.Secondary"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.h2">Required cols</MudText>

@@ -1,19 +1,20 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public class HomeStats
     {
-        [JsonProperty("totalPoints")]
+        [JsonPropertyName("totalPoints")]
         public long TotalPoints { get; set; }
 
-        [JsonProperty("uniqueCols")]
+        [JsonPropertyName("uniqueCols")]
         public long UniqueCols { get; set; }
 
-        [JsonProperty("users")]
+        [JsonPropertyName("users")]
         public long Users { get; set; }
 
-        [JsonProperty("recentActivities")]
+        [JsonPropertyName("recentActivities")]
         public List<RecentActivity> RecentActivities { get; set; }
     }
 }

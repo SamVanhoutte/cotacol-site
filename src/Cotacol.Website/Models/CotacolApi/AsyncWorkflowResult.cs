@@ -1,28 +1,29 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public  class AsyncWorkflowResult
     {
-        [JsonProperty("status")]
+        [JsonPropertyName("status")]
         public int HttpStatus { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("statusQueryGetUri")]
+        [JsonPropertyName("statusQueryGetUri")]
         public string StatusQueryGetUri { get; set; }
 
-        [JsonProperty("sendEventPostUri")]
+        [JsonPropertyName("sendEventPostUri")]
         public string SendEventPostUri { get; set; }
 
-        [JsonProperty("terminatePostUri")]
+        [JsonPropertyName("terminatePostUri")]
         public string TerminatePostUri { get; set; }
 
-        [JsonProperty("purgeHistoryDeleteUri")]
+        [JsonPropertyName("purgeHistoryDeleteUri")]
         public string PurgeHistoryDeleteUri { get; set; }
 
-        [JsonProperty("restartPostUri")]
+        [JsonPropertyName("restartPostUri")]
         public string RestartPostUri { get; set; }
     }
 }

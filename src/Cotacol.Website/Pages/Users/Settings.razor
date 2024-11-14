@@ -28,7 +28,7 @@
     {
         <MudItem xs="12" lg="5">
             <MudText Typo="Typo.body1">It seems we need your Strava authorization at our backend. Please click the link below and come back to refresh, after you successfully authenticated against Strava.</MudText>
-            <MudButton Variant="Variant.Filled" OnClick="() => StravaAuthRequired = false" StartIcon="@Icons.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="() => StravaAuthRequired = false" StartIcon="@Icons.Material.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
             <MudText Typo="Typo.body1">After doing so, please log-off and log-on again. Apologies for this inconvenience.</MudText>
         </MudItem>
     }
@@ -67,7 +67,7 @@
                             <MudDivider></MudDivider>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
                         </MudItem>
                     }
                     else
@@ -79,7 +79,7 @@
                         <MudCheckBox T="bool" @bind-Checked="@confirmed">By deleting my account, I understand all data will be removed from the server.</MudCheckBox>
                         @if (confirmed)
                         {
-                            <MudButton Variant="Variant.Filled" OnClick="@(()=>confirmationDialogOpen=!confirmationDialogOpen)" StartIcon="@Icons.Filled.DeleteForever" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Warning">Delete data</MudButton>
+                            <MudButton Variant="Variant.Filled" OnClick="@(()=>confirmationDialogOpen=!confirmationDialogOpen)" StartIcon="@Icons.Material.Filled.DeleteForever" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Warning">Delete data</MudButton>
                         }
                     </MudItem>
                 </MudGrid>
@@ -99,25 +99,25 @@
                             <MudText Typo="Typo.h2" Color="Color.Secondary">Strava permission review</MudText>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudList Clickable="true" Dense="true">
-                                <MudListItem Icon='@(_stravaProfile.AuthorizationTokenValid ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.AuthorizationTokenValid ? Color.Success : Color.Error)'>
+                            <MudList T="string" Dense="true">
+                                <MudListItem Icon='@(_stravaProfile.AuthorizationTokenValid ? Icons.Material.Rounded.Check : Icons.Material.Rounded.Error)' IconColor='@(_stravaProfile.AuthorizationTokenValid ? Color.Success : Color.Error)'>
                                     <MudText Typo="Typo.body2">Strava token validity</MudText>
                                     <MudText Typo="Typo.body1">We @(_stravaProfile.AuthorizationTokenValid ? "do" : "don't") have a valid token</MudText>
                                 </MudListItem>
-                                <MudListItem Icon='@(_stravaProfile.ActivitiesCanBeRead ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.ActivitiesCanBeRead ? Color.Success : Color.Error)'>
+                                <MudListItem Icon='@(_stravaProfile.ActivitiesCanBeRead ? Icons.Material.Rounded.Check : Icons.Material.Rounded.Error)' IconColor='@(_stravaProfile.ActivitiesCanBeRead ? Color.Success : Color.Error)'>
                                     <MudText Typo="Typo.body2">Activity access</MudText>
                                     <MudText Typo="Typo.body1">We @(_stravaProfile.ActivitiesCanBeRead ? "can" : "can't") read your activities</MudText>
                                 </MudListItem>
                                 @if (_stravaProfile.UpdateDescriptionFlag)
                                 {
-                                    <MudListItem Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Icons.Rounded.Check : Icons.Rounded.Error)' IconColor='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Color.Success : Color.Error)'>
+                                    <MudListItem Icon='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Icons.Material.Rounded.Check : Icons.Material.Rounded.Error)' IconColor='@(_stravaProfile.ActivityDescriptionCanBeUpdated ? Color.Success : Color.Error)'>
                                         <MudText Typo="Typo.body2">Activity Description</MudText>
                                         <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "can" : "can't") update your activity descriptions</MudText>
                                     </MudListItem>
                                 }
                                 else
                                 {
-                                    <MudListItem Icon='@Icons.Rounded.Check' IconColor='@Color.Success'>
+                                    <MudListItem Icon='@Icons.Material.Rounded.Check' IconColor='@Color.Success'>
                                         <MudText Typo="Typo.body2">Activity Description</MudText>
                                         <MudText Typo="Typo.body1">We @(_stravaProfile.ActivityDescriptionCanBeUpdated ? "do" : "don't") update your activity descriptions, but you disabled that setting.</MudText>
                                     </MudListItem>
@@ -143,7 +143,7 @@
                             <MudText Typo="Typo.body2">If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</MudText>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
                         </MudItem>
                     </MudGrid>
                 }
@@ -160,7 +160,7 @@
                 </MudItem>
                     <MudItem xs="12">
                     <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Checked="@fullSync"></MudSwitch>
-                    <MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
                 </MudItem>
             </MudGrid>
         </MudItem>

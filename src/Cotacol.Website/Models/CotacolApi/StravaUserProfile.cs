@@ -1,43 +1,44 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public record StravaUserProfile
     {
-        [JsonProperty("authorizationTokenValid")]
+        [JsonPropertyName("authorizationTokenValid")]
         public bool AuthorizationTokenValid { get; set; }
 
-        [JsonProperty("activitiesCanBeRead")]
+        [JsonPropertyName("activitiesCanBeRead")]
         public bool ActivitiesCanBeRead { get; set; }
 
-        [JsonProperty("activityDescriptionCanBeUpdated")]
+        [JsonPropertyName("activityDescriptionCanBeUpdated")]
         public bool ActivityDescriptionCanBeUpdated { get; set; }
 
-        [JsonProperty("activityReadStatus")]
+        [JsonPropertyName("activityReadStatus")]
         public string ActivityReadStatus { get; set; }
 
-        [JsonProperty("activityDescriptionStatus")]
+        [JsonPropertyName("activityDescriptionStatus")]
         public string ActivityDescriptionStatus { get; set; }
 
-        [JsonProperty("exception")]
+        [JsonPropertyName("exception")]
         public object Exception { get; set; }
 
-        [JsonProperty("updateDescriptionFlag")]
+        [JsonPropertyName("updateDescriptionFlag")]
         public bool UpdateDescriptionFlag { get; set; }
 
-        [JsonProperty("stravaPermissions")]
+        [JsonPropertyName("stravaPermissions")]
         public object StravaPermissions { get; set; }
 
-        [JsonProperty("tokenLastRefreshed")]
+        [JsonPropertyName("tokenLastRefreshed")]
         public DateTimeOffset TokenLastRefreshed { get; set; }
 
-        [JsonProperty("tokenIsExpired")]
+        [JsonPropertyName("tokenIsExpired")]
         public bool TokenIsExpired { get; set; }
 
-        [JsonProperty("tokenExpiration")]
+        [JsonPropertyName("tokenExpiration")]
         public DateTimeOffset TokenExpiration { get; set; }
 
-        [JsonProperty("tokenScope")]
+        [JsonPropertyName("tokenScope")]
         public object TokenScope { get; set; }
     }
 }

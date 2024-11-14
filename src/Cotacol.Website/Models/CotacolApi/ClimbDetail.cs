@@ -1,41 +1,42 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public class ClimbDetail
     {
-        [JsonProperty("cotacolpoints")]
+        [JsonPropertyName("cotacolpoints")]
         public long Cotacolpoints { get; set; }
 
-        [JsonProperty("challenge")]
+        [JsonPropertyName("challenge")]
         public string Challenge { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("points")]
+        [JsonPropertyName("points")]
         public long Points { get; set; }
 
-        [JsonProperty("province")]
+        [JsonPropertyName("province")]
         public string Province { get; set; }
 
-        [JsonProperty("surface")]
+        [JsonPropertyName("surface")]
         public string Surface { get; set; }
-        [JsonProperty("bom_score")]
+        [JsonPropertyName("bom_score")]
         public int BomScore { get; set; }
 
-        [JsonProperty("polyline")]
+        [JsonPropertyName("polyline")]
         public string Polyline { get; set; }
 
-        [JsonProperty("segment_confidence")]
+        [JsonPropertyName("segment_confidence")]
         public string SegmentConfidence { get; set; }
 
-        [JsonProperty("segments")]
+        [JsonPropertyName("segments")]
         public List<SegmentDetail> Segments { get; set; }
-        [JsonProperty("distance", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("distance")]
         public long Distance { get; set; }
     }
 }

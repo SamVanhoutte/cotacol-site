@@ -22,15 +22,16 @@
         @if (UserProfile.IsAdmin)
         {
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
             </MudItem>
         }
+        @if(climbDetail!=null){
         <MudItem xs="3">
             <MudText Typo="Typo.h2" Color="Color.Secondary">Info</MudText>
             <MudText Typo="Typo.body1">@climbDetail.City, @climbDetail.Province</MudText>
             <MudGrid Spacing="1">
                 <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Filled.Numbers"></MudIcon>
+                    <MudIcon Icon="@Icons.Material.Filled.Numbers"></MudIcon>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Cotacol points">
@@ -53,7 +54,7 @@
                     <MudItem xs="6"/>
                 }
                 <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Filled.Height"></MudIcon>
+                    <MudIcon Icon="@Icons.Material.Filled.Height"></MudIcon>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Elevation">
@@ -61,7 +62,7 @@
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Outlined.StackedLineChart"></MudIcon>
+                    <MudIcon Icon="@Icons.Material.Filled.StackedLineChart"></MudIcon>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Average grade">
@@ -69,7 +70,7 @@
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Filled.HorizontalRule"></MudIcon>
+                    <MudIcon Icon="@Icons.Material.Filled.HorizontalRule"></MudIcon>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Length of the climb">
@@ -77,7 +78,7 @@
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Outlined.AddRoad"></MudIcon>
+                    <MudIcon Icon="@Icons.Material.Filled.AddRoad"></MudIcon>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Surface of the road">
@@ -90,14 +91,14 @@
                         <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSwitch @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
+                        <MudSwitch T="bool" @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
                         <MudSwitch T="bool" Label="Planned" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="false"/>
                     </MudItem>
                 }
                 @if (CotacolDone)
                 {
                     <MudItem xs="2">
-                        <MudIcon Icon="@Icons.Outlined.CalendarMonth"></MudIcon>
+                        <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth"></MudIcon>
                     </MudItem>
                     <MudItem xs="10">
                         <MudTooltip Text="First time you attempted this climb">
@@ -105,7 +106,7 @@
                         </MudTooltip>
                     </MudItem>
                     <MudItem xs="2">
-                        <MudIcon Icon="@Icons.Outlined.FlashOn"></MudIcon>
+                        <MudIcon Icon="@Icons.Material.Outlined.FlashOn"></MudIcon>
                     </MudItem>
                     <MudItem xs="10">
                         <MudTooltip Text="Your personal best">
@@ -113,7 +114,7 @@
                         </MudTooltip>
                     </MudItem>
                     <MudItem xs="2">
-                        <MudIcon Icon="@Icons.Outlined.Countertops"></MudIcon>
+                        <MudIcon Icon="@Icons.Material.Outlined.Countertops"></MudIcon>
                     </MudItem>
                     <MudItem xs="10">
                         <MudTooltip Text="Amount of your attempts">
@@ -136,7 +137,7 @@
                     foreach (var legend in climbDetail.Stats.LocalLegends)
                     {
                         <MudItem xs="2">
-                            <MudIcon Icon="@Icons.Filled.Star"></MudIcon>
+                            <MudIcon Icon="@Icons.Material.Filled.Star"></MudIcon>
                         </MudItem>
                         <MudItem xs="10">
                             <MudLink Href='@($"achievements/{legend.UserId}")'>@legend.UserName</MudLink>
@@ -146,16 +147,17 @@
 
             </MudGrid>
         </MudItem>
+        }
         @if (UserProfile.IsAuthenticated)
         {
             <MudItem xs="4">
                 <MudText Typo="Typo.h2" Color="Color.Secondary">Your attempts</MudText>
                 @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
                 {
-                    <MudList Clickable="true">
+                    <MudList T="string">
                         @foreach (var activity in climbDetail.UserColDetail.Activities)
                         {
-                            <MudListItem Icon="@(activity.Duration.Equals(BestDuration) ? Icons.Filled.FlashOn : Icons.Filled.Timelapse)" Dense="true" Href='@($"https://www.strava.com/activities/{activity.Id}")'>
+                            <MudListItem Icon="@(activity.Duration.Equals(BestDuration) ? Icons.Material.Filled.FlashOn : Icons.Material.Filled.Timelapse)" Dense="true" Href='@($"https://www.strava.com/activities/{activity.Id}")'>
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">@(TimeSpan.FromSeconds(activity.Duration).ToString("g")) - @(activity.StartTime.ToString("D"))</MudText>
                                 <MudText Typo="Typo.body1">@PrintActivityTitle(activity)</MudText>
                             </MudListItem>
@@ -269,7 +271,7 @@
 
     private string FirstAchievement => climbDetail.UserColDetail.Activities.Min(a => a.StartTime).ToShortDateString();
     private string BestTime => TimeSpan.FromSeconds(climbDetail.UserColDetail.Activities.Min(a => a.Duration)).ToString("g");
-    private long BestDuration => climbDetail.UserColDetail.Activities.OrderBy(a => a.Duration).First().Duration;
+    private double BestDuration => climbDetail.UserColDetail.Activities.OrderBy(a => a.Duration).First().Duration;
     private string TotalAttempts => climbDetail.UserColDetail.Activities.Count().ToString();
 
     protected override async Task OnInitializedAsync()

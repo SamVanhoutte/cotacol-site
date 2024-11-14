@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotacol.Website", "Cotacol.Website\Cotacol.Website.csproj", "{D5909AE9-64F1-4628-993D-425CAC41479A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AeroBlazor", "..\aeroblazor\src\AeroBlazor\AeroBlazor.csproj", "{7D732F95-A8E7-4DA2-96B0-F0A596CF7E29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5909AE9-64F1-4628-993D-425CAC41479A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D732F95-A8E7-4DA2-96B0-F0A596CF7E29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D732F95-A8E7-4DA2-96B0-F0A596CF7E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D732F95-A8E7-4DA2-96B0-F0A596CF7E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D732F95-A8E7-4DA2-96B0-F0A596CF7E29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -31,7 +31,8 @@ namespace Cotacol.Website.Services.Maps
         public async Task ClusterMarkersAsync(Map map1, IJSRuntime jsRuntime, bool fitMarkers = false)
         {
             MarkerCluster = await MarkerClustering.CreateAsync(jsRuntime, map1, await GetMarkersAsync());
-            if (fitMarkers) await MarkerCluster.FitMapToMarkers(0);
+            // TODO : fitmap to markers?
+            // if (fitMarkers) await MarkerCluster.  MarkerCluster.FitMapToMarkers(0);
         }
 
         private static async Task<MapTypeStyle[]> GetMapStylesAsync()

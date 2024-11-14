@@ -1,3 +1,4 @@
+using AeroBlazor.Theming;
 using Cotacol.Website.Interfaces;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
@@ -14,6 +15,7 @@ namespace Cotacol.Website.Services.Maps
 {
     public class MapListService : MapService, IMapService
     {
+        private readonly IThemeManager _themeManager;
         private MarkerList _markerList;
         private PolylineList _lineList;
         private ILogger<MapListService> _logger;
@@ -23,8 +25,10 @@ namespace Cotacol.Website.Services.Maps
             get;
             set;
         }
-        public MapListService(ILoggerFactory factory)
+        public MapListService(ILoggerFactory factory, IThemeManager themeManager)
         {
+            _themeManager = themeManager;
+
             _logger = factory.CreateLogger<MapListService>();
         }
 
@@ -172,7 +176,7 @@ namespace Cotacol.Website.Services.Maps
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Latitude, v.Longitude));
             var options = new PolylineOptions()
             {
-                StrokeColor = climb.Done ? MainLayout.CotacolTheme.Palette.Success.Value : MainLayout.CotacolTheme.Palette.Secondary.Value,
+                StrokeColor = climb.Done ? _themeManager.CurrentTheme.PaletteLight.Success.Value : _themeManager.CurrentTheme.PaletteLight.Secondary.Value,
                 Clickable = true,
                 Draggable = false,
                 Editable = false,

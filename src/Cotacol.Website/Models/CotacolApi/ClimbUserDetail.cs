@@ -1,52 +1,53 @@
-using Newtonsoft.Json;
+
+using System.Text.Json.Serialization;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public class ClimbUserDetail
     {
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("city")]
+        [JsonPropertyName("city")]
         public string City { get; set; }
 
-        [JsonProperty("province")]
+        [JsonPropertyName("province")]
         public string Province { get; set; }
 
-        [JsonProperty("cotacol_points")]
+        [JsonPropertyName("cotacol_points")]
         public int CotacolPoints { get; set; }
 
-        [JsonProperty("distance")]
+        [JsonPropertyName("distance")]
         public int Distance { get; set; }
 
-        [JsonProperty("elevation_diff")]
+        [JsonPropertyName("elevation_diff")]
         public int ElevationDiff { get; set; }
 
-        [JsonProperty("avg_grade")]
+        [JsonPropertyName("avg_grade")]
         public double AvgGrade { get; set; }
 
-        [JsonProperty("surface")]
+        [JsonPropertyName("surface")]
         public string Surface { get; set; }
-        [JsonProperty("bom_score")]
+        [JsonPropertyName("bom_score")]
         public int BomScore { get; set; }
 
-        [JsonProperty("strava_segment")]
+        [JsonPropertyName("strava_segment")]
         public string StravaSegment { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public Uri Url { get; set; }
 
-        [JsonProperty("polyline")]
+        [JsonPropertyName("polyline")]
         public string Polyline { get; set; }
 
-        [JsonProperty("user_col_detail")]
+        [JsonPropertyName("user_col_detail")]
         public UserColDetail UserColDetail { get; set; }
 
-        [JsonProperty("stats")]
+        [JsonPropertyName("stats")]
         public Stats Stats { get; set; }
     }
 }

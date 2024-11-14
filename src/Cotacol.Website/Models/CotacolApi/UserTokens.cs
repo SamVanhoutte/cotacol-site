@@ -1,28 +1,29 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public  class UserTokens
     {
-        [JsonProperty("userId")]
+        [JsonPropertyName("userId")]
         public string UserId { get; set; }
 
-        [JsonProperty("refreshToken")]
+        [JsonPropertyName("refreshToken")]
         public string RefreshToken { get; set; }
 
-        [JsonProperty("authorizationToken")]
+        [JsonPropertyName("authorizationToken")]
         public string AuthorizationToken { get; set; }
 
-        [JsonProperty("lastRefreshTime")]
+        [JsonPropertyName("lastRefreshTime")]
         public string LastRefreshTime { get; set; }
 
-        [JsonProperty("scope")]
+        [JsonPropertyName("scope")]
         public dynamic Scope { get; set; }
 
-        [JsonProperty("expiration")]
+        [JsonPropertyName("expiration")]
         public string Expiration { get; set; }
 
-        [JsonProperty("isExpired")]
+        [JsonPropertyName("isExpired")]
         public bool IsExpired { get; set; }
     }
 

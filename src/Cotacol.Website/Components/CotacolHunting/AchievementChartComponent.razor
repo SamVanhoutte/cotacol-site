@@ -1,8 +1,10 @@
 @using Cotacol.Website.Models.CotacolApi
 @using System.Drawing.Imaging
+@using AeroBlazor.Theming
 @using ScottPlot
 @using SkiaSharp
 @using Edge = ScottPlot.Edge
+@inject IThemeManager CotacolThemeManager
 @if (!string.IsNullOrEmpty(ImageContent))
 {
     <MudImage Src="@ImageContent" Style="max-width: 66vw; height: auto; width: auto;" />
@@ -35,7 +37,7 @@ else
 
     private ChartOptions ChartOptions => new ChartOptions
     {
-        DisableLegend = true,
+        ShowLegend = false,
         XAxisLines = false,
         YAxisLines = false,
         MaxNumYAxisTicks = 20
@@ -78,7 +80,7 @@ else
                     pointsScatter.MarkerStyle = new MarkerStyle(
                         shape: MarkerShape.FilledCircle,
                         size: 2,
-                        color: ScottPlot.Color.FromHex(MainLayout.CotacolTheme.Palette.Secondary.Value));
+                        color: ScottPlot.Color.FromHex(CotacolThemeManager.CurrentTheme.PaletteLight.Secondary.Value));
 
                     if (TwoAxises)
                     {
