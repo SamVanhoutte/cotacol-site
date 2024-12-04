@@ -2,62 +2,43 @@
 
 An attempt to learn Blazor, by setting up a Cotacol web site
 
-This web site has been published to https://www.cotacol.eu and can be used to register and link your Strava profile against the Cotacol Hunting backend.  This web site shares the same backend as the iOS app (and the Android app that is coming)
+This web site has been published to https://www.cotacol.cc and can be used to register and link your Strava profile against the Cotacol Hunting backend.  This web site shares the same backend as the iOS app (and the Android app that is coming)
 
+## Running the UI tests
 
+### Cypress
 
-# Troubleshooting & links
+Running cypress tests
 
-## Identity login
+```
+npx cypress open
+```
 
-1. Set up razor server app, with individual identiy
-1. Scaffolded two pages, based on this article: https://andrewlock.net/customising-aspnetcore-identity-without-editing-the-pagemodel/ 
-    - Account.Login, which enables the customization of the actual login page `dotnet aspnet-codegenerator identity -dc CotacolApp.Data.ApplicationDbContext --files "Account.Login"`
-    - Account.ExternalLogin, which enables the customization of the actual strava page `dotnet aspnet-codegenerator identity -dc CotacolApp.Data.ApplicationDbContext --files "Account.ExternalLogin"`
+The tests are located here: [spec.cy.js](tests/cypress/cypress/e2e/spec.cy.js)
 
-1. Add OAuth nuget package: `Microsoft.AspNetCore.Authentication.OAuth`
-1. Update Startup.cs to include Strava login
-    ```csharp
-    services.AddAuthentication().AddOAuth("Strava",
-        oAuthOptions =>
-        {
-            oAuthOptions.ClientId = "myappid"; 
-            oAuthOptions.ClientSecret = "myclientsecret";
-            oAuthOptions.Scope.Clear();        
-            oAuthOptions.Scope.Add("read");
-            oAuthOptions.CallbackPath = "/profile"; 
-            oAuthOptions.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
-            oAuthOptions.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
-            oAuthOptions.SignInScheme = IdentityConstants.ExternalScheme;
-            oAuthOptions.Events = new OAuthEvents()
-            {
-                OnRemoteFailure = loginFailureHandler =>
-                {
-                    Console.WriteLine("Remote Error");
-                    Console.WriteLine(loginFailureHandler.Failure.Message);
-                    return Task.FromResult(0);
-                }, 
-                OnAccessDenied = handler =>
-                {
-                    Console.WriteLine(handler.Response.StatusCode);
-                    return Task.FromResult(0);
-                }
-            };
-        });
-    ```
+[More information](https://blog.apify.com/how-to-record-test-cypress-recorder-extension/#:~:text=In%20the%20Chrome%20DevTools%20Panel,in%20the%20drop%2Ddown%20list.&text=In%20the%20Cypress%20Recorder%20panel,recording%20your%20actions%20in%20Chrome).
 
-1. Issue when logging on : `var info = await _signInManager.GetExternalLoginInfoAsync();` returns `null`. Similar issue found here : https://stackoverflow.com/questions/40227643/signinmanager-getexternallogininfoasync-always-returns-null-with-open-id-to-a
+### Playwright
 
-1. Issue when getting null in `GetExternalLoginInfoAsync` : https://stackoverflow.com/questions/46158462/instagram-oauth-getexternallogininfoasync-always-returns-null-in-net-core-2-0/55970100
+Running playwright tests
 
-## Access to tokens
+Initial setup (will generate tests folder)
 
-It is important to get access to the OAuth Tokens, since they have to be passed to the API Backend, where they will be refreshed on a daily basis.  The `SaveTokens` property  does not seem to work, initially, so here are some posts/threads:
+```
+npm init playwright@latest
+```
 
-1. Access tokens in asp.net core: https://blog.maartenballiauw.be/post/2020/01/13/making-api-calls-using-the-access-token-and-refresh-token-from-an-aspnet-core-authentication-handler.html
+Run with UI / Studio
+```
+npx playwright test --ui
+```
 
-1. https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/additional-claims?view=aspnetcore-5.0
+Command line running
+```
+npx playwright test
+npx playwright show-report
+```
 
+The tests are located here: [spec.cy.js](tests/cypress/cypress/e2e/spec.cy.js)
 
-
-InvalidOperationException: No authenticationScheme was specified, and there was no DefaultAuthenticateScheme found. The default schemes can be set using either AddAuthentication(string defaultScheme) or AddAuthentication(Action<AuthenticationOptions> configureOptions).
+[More information](https://playwright.dev/docs/intro).

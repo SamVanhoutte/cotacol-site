@@ -43,7 +43,7 @@
             </AeroFlexContainer>
         </MudTd>
         <MudTd style="max-width: 200px">
-            <MudLink Href='@($"cotacol/{context.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">
+            <MudLink Href='@($"cotacol/{context.Id}")' id='@($"cotacol-{context.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">
                     @context.Name
             </MudLink>
         </MudTd>

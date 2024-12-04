@@ -58,7 +58,7 @@
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Elevation">
-                        <MudText Typo="Typo.body1">@(climbDetail?.ElevationDiff.Number()) m</MudText>
+                        <MudText id="cotacolelevation" Typo="Typo.body1">@(climbDetail?.ElevationDiff.Number()) m</MudText>
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
@@ -66,7 +66,7 @@
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Average grade">
-                        <MudText Typo="Typo.body1">@(climbDetail?.AvgGrade.Percentage())</MudText>
+                        <MudText id="cotacolgrade" Typo="Typo.body1">@(climbDetail?.AvgGrade.Percentage())</MudText>
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
@@ -74,7 +74,7 @@
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Length of the climb">
-                        <MudText Typo="Typo.body1">@(climbDetail?.Distance.Number()) m</MudText>
+                        <MudText id="cotacoldistance" Typo="Typo.body1">@(climbDetail?.Distance.Number()) m</MudText>
                     </MudTooltip>
                 </MudItem>
                 <MudItem xs="2">
@@ -82,7 +82,7 @@
                 </MudItem>
                 <MudItem xs="4">
                     <MudTooltip Text="Surface of the road">
-                        <MudText Typo="Typo.body1">@(climbDetail?.Surface)</MudText>
+                        <MudText id="cotacolsurface" Typo="Typo.body1">@(climbDetail?.Surface)</MudText>
                     </MudTooltip>
                 </MudItem>
                 @if (UserProfile.IsAuthenticated)
@@ -91,7 +91,7 @@
                         <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSwitch T="bool" @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
+                        <MudSwitch T="bool" id="cotacoldone" @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
                         <MudSwitch T="bool" Label="Planned" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="false"/>
                     </MudItem>
                 }

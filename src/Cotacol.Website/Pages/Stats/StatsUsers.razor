@@ -55,7 +55,7 @@
                 </HeaderContent>
                 <RowTemplate Context="activity">
                     <MudTd>
-                        <MudText Typo="Typo.body1" Align="Align.Right">@activity.Position.Number()</MudText>
+                        <MudText Typo="Typo.body1" id="cotacoluser" Align="Align.Right">@activity.Position.Number()</MudText>
                     </MudTd>
                     <MudTd>
                         @if (activity.PrivateProfile ?? false)
