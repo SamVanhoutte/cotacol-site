@@ -50,11 +50,11 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        M365_PAGE_URL: ${{ inputs.M365_PAGE_URL }}
-        M365_USERNAME: ${{ inputs.M365_USERNAME }}
-        M365_PASSWORD: ${{ inputs.M365_PASSWORD }}
-        M365_OTP_SECRET: ${{ inputs.M365_OTP_SECRET }}
-        M365_WEBHOOK_URL: ${{ inputs.M365_WEBHOOK_URL }}
+        # M365_PAGE_URL: ${{ inputs.M365_PAGE_URL }}
+        # M365_USERNAME: ${{ inputs.M365_USERNAME }}
+        # M365_PASSWORD: ${{ inputs.M365_PASSWORD }}
+        # M365_OTP_SECRET: ${{ inputs.M365_OTP_SECRET }}
+        # M365_WEBHOOK_URL: ${{ inputs.M365_WEBHOOK_URL }}
         AZURE_STORAGE_URL: ${{ vars.AZURE_STORAGE_URL }}
         AZURE_STORAGE_SAS: ${{ secrets.AZURE_STORAGE_SAS }}
 
