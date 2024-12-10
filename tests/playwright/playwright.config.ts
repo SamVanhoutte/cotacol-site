@@ -22,7 +22,11 @@ const config: PlaywrightTestConfig<{}, {}> = {
   workers: process.env.CI ? 1 : undefined,
   snapshotDir: './snapshots',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [],
+  reporter: [
+    ['html'],
+    ['playwright-ctrf-json-reporter', {}]
+  ],
+  
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -78,37 +82,37 @@ const config: PlaywrightTestConfig<{}, {}> = {
   // },
 };
 
-if (config.reporter && config.reporter instanceof Array) {
-  let runUrl = "";
-  if (process.env.GITHUB_RUN_ID) {
-    const runId = process.env.GITHUB_RUN_ID;
-    const repo = process.env.GITHUB_REPOSITORY;
-    runUrl = `${process.env.GITHUB_SERVER_URL}/${repo}/actions/runs/${runId}`;
-  }
+// if (config.reporter && config.reporter instanceof Array) {
+//   let runUrl = "";
+//   if (process.env.GITHUB_RUN_ID) {
+//     const runId = process.env.GITHUB_RUN_ID;
+//     const repo = process.env.GITHUB_REPOSITORY;
+//     runUrl = `${process.env.GITHUB_SERVER_URL}/${repo}/actions/runs/${runId}`;
+//   }
 
-  if (process.env.NODE_ENV !== "development") {
-    config.reporter.push(["html"]);
-    config.reporter.push([
-      "@estruyf/github-actions-reporter",
-      {
-        showError: true,
-        azureStorageSAS: process.env.AZURE_STORAGE_SAS,
-        azureStorageUrl: process.env.AZURE_STORAGE_URL,
-      },
-    ]);
-    // config.reporter.push([
-    //   "playwright-msteams-reporter",
-    //   <MsTeamsReporterOptions>{
-    //     webhookUrl: process.env.M365_WEBHOOK_URL,
-    //     webhookType: "powerautomate",
-    //     linkToResultsUrl: runUrl,
-    //     mentionOnFailure: process.env.M365_USERNAME,
-    //   },
-    // ]);
-  } else {
-    config.reporter.push(["html"]);
-  }
-}
+//   if (process.env.NODE_ENV !== "development") {
+//     config.reporter.push(["html"]);
+//     config.reporter.push([
+//       "@estruyf/github-actions-reporter",
+//       {
+//         showError: true,
+//         azureStorageSAS: process.env.AZURE_STORAGE_SAS,
+//         azureStorageUrl: process.env.AZURE_STORAGE_URL,
+//       },
+//     ]);
+//     // config.reporter.push([
+//     //   "playwright-msteams-reporter",
+//     //   <MsTeamsReporterOptions>{
+//     //     webhookUrl: process.env.M365_WEBHOOK_URL,
+//     //     webhookType: "powerautomate",
+//     //     linkToResultsUrl: runUrl,
+//     //     mentionOnFailure: process.env.M365_USERNAME,
+//     //   },
+//     // ]);
+//   } else {
+//     config.reporter.push(["html"]);
+//   }
+// }
 
 /**
  * See https://playwright.dev/docs/test-configuration.
