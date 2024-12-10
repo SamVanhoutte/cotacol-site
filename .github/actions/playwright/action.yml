@@ -10,7 +10,12 @@ inputs:
     description: 'The environment to run the tests against'
     required: true
     default: 'dev'
-  
+  AZURE_STORAGE_URL:
+    description: 'The url where output will be stored'
+    required: true
+  AZURE_STORAGE_SAS:
+    description: 'The SAS token to access the url'
+    required: true
 runs:
   using: composite
   steps:
@@ -24,6 +29,11 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: npm ci
+
+    - name: Install CTRF reporter
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm install --save-dev playwright-ctrf-json-reporter
 
     - name: Store Playwright's Version
       shell: bash
@@ -46,23 +56,24 @@ runs:
       run: npx playwright install --with-deps chromium
 
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test --project='chromium'
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        M365_PAGE_URL: ${{ inputs.M365_PAGE_URL }}
-        M365_USERNAME: ${{ inputs.M365_USERNAME }}
-        M365_PASSWORD: ${{ inputs.M365_PASSWORD }}
-        M365_OTP_SECRET: ${{ inputs.M365_OTP_SECRET }}
-        M365_WEBHOOK_URL: ${{ inputs.M365_WEBHOOK_URL }}
-        AZURE_STORAGE_URL: ${{ vars.AZURE_STORAGE_URL }}
-        AZURE_STORAGE_SAS: ${{ secrets.AZURE_STORAGE_SAS }}
+        AZURE_STORAGE_URL: ${{ inputs.AZURE_STORAGE_URL }}
+        AZURE_STORAGE_SAS: ${{ inputs.AZURE_STORAGE_SAS }}
+
+    - name: Publish Test Summary Results
+      working-directory: ${{ inputs.working-directory }}
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: npx github-actions-ctrf ctrf/ctrf-report.json
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: snapshots-${{ inputs.environment }}
-        path: ${{ inputs.working-directory }}/tests/**/*-snapshots/
+        path: ${{ inputs.working-directory }}/**/screens/
         retention-days: 30
 
     - uses: actions/upload-artifact@v4
@@ -71,3 +82,4 @@ runs:
         name: report-${{ inputs.environment }}
         path: ${{ inputs.working-directory }}/playwright-report/
         retention-days: 30
+
