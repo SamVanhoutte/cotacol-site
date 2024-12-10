@@ -69,11 +69,6 @@ runs:
       shell: bash
       run: npx github-actions-ctrf ctrf/ctrf-report.json
 
-    - name: Tree
-      if: ${{ !cancelled() }}
-      shell: bash
-      run: tree
-
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

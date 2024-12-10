@@ -18,15 +18,15 @@ test('Col stats should return all cols', async ({ page }) => {
   await page.screenshot({ path: 'screens/colstats.png' });
 });
 
-// test('Leaderboard exists', async ({ page }) => {
-//   await page.goto('/stats');
+test('Leaderboard exists', async ({ page }) => {
+  await page.goto('/stats');
 
-//   // Count the number of elements with an id starting with 'cotacol'
-//   await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
-//   const cotacolElements = await page.locator('[id="cotacoluser"]').count();
-//   expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
-//   await page.screenshot({ path: 'stats.png' });
-// });
+  // Count the number of elements with an id starting with 'cotacol'
+  await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
+  const cotacolElements = await page.locator('[id="cotacoluser"]').count();
+  expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
+  await page.screenshot({ path: 'stats.png' });
+});
 
 test('Climbs list should work', async ({ page }) => {
   await page.goto('/climbs');
