@@ -63,6 +63,11 @@ runs:
         AZURE_STORAGE_URL: ${{ inputs.AZURE_STORAGE_URL }}
         AZURE_STORAGE_SAS: ${{ inputs.AZURE_STORAGE_SAS }}
 
+    - name: Publish Test Summary Results
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: npx github-actions-ctrf ctrf/ctrf-report.json
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -77,7 +82,3 @@ runs:
         path: ${{ inputs.working-directory }}/playwright-report/
         retention-days: 30
 
-    - name: Publish Test Summary Results
-      if: ${{ !cancelled() }}
-      shell: bash
-      run: npx github-actions-ctrf ctrf/ctrf-report.json
