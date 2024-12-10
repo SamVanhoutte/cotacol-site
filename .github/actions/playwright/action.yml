@@ -64,6 +64,7 @@ runs:
         AZURE_STORAGE_SAS: ${{ inputs.AZURE_STORAGE_SAS }}
 
     - name: Publish Test Summary Results
+      working-directory: ${{ inputs.working-directory }}
       if: ${{ !cancelled() }}
       shell: bash
       run: npx github-actions-ctrf ctrf/ctrf-report.json
