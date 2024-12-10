@@ -1,23 +1,17 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public class BadgeOfMonthData
     {
-        [JsonProperty("badgeType")] public string BadgeType { get; set; }
-
-        [JsonProperty("year")] public int Year { get; set; }
-
-        [JsonProperty("month")] public int Month { get; set; }
-        [JsonProperty("startTime")] public DateTime? StartTime { get; set; }
-        [JsonProperty("endTime")] public DateTime? EndTime { get; set; }
-
-
-        [JsonProperty("badgeName")] public string BadgeName { get; set; }
-
-        [JsonProperty("badgeDescription")] public string BadgeDescription { get; set; }
-
-        [JsonProperty("cotacolIds")] public List<int> CotacolIds { get; set; }
+        [JsonPropertyName("badgeType")] public string BadgeType { get; set; }
+        [JsonPropertyName("year")] public int Year { get; set; }
+        [JsonPropertyName("month")] public int Month { get; set; }
+        [JsonPropertyName("startTime")] public DateTime? StartTime { get; set; }
+        [JsonPropertyName("endTime")] public DateTime? EndTime { get; set; }
+        [JsonPropertyName("badgeName")] public string BadgeName { get; set; }
+        [JsonPropertyName("badgeDescription")] public string BadgeDescription { get; set; }
+        [JsonPropertyName("cotacolIds")] public List<int> CotacolIds { get; set; }
 
         public string MonthKey => $"{Year}-{Month:00}";
     }

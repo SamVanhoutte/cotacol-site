@@ -1,19 +1,20 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public partial class ColActivity
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("startTime")]
+        [JsonPropertyName("startTime")]
         public DateTime StartTime { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("duration")]
-        public long Duration { get; set; }
+        [JsonPropertyName("duration")]
+        public double Duration { get; set; }
     }
 }

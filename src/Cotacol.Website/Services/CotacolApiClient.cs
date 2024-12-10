@@ -114,11 +114,18 @@ public class CotacolApiClient : ICotacolClient
         var url = string.IsNullOrEmpty(userId)
             ? $"{_settings.ApiUrl}/climbs/{cotacolId}"
             : $"{_settings.ApiUrl}/users/{userId}/climbs/{cotacolId}";
-        var cotacolDetail = await url
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<ClimbUserDetail>();
+        try
+        {
+            var cotacolDetail = await url
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<ClimbUserDetail>();
+            return cotacolDetail;
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
 
-        return cotacolDetail;
     }
 
     public async Task<StravaSegment> FetchStravaSegmentAsync(string stravaSegmentId,

@@ -11,10 +11,10 @@ namespace Cotacol.Website.Interfaces
     {
         Task<MapOptions> GetLayoutAsync(bool miniView = false, double zoom = 9);
         Task ClusterMarkersAsync(Map map1, IJSRuntime jsRuntime, bool fitMarkers = false);
-
+    
         Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout);
-
+    
         Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route);
         Task ClearClimbsAsync();
         Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime, Polypoint position=null);

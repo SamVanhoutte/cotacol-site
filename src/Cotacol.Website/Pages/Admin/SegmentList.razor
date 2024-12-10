@@ -18,7 +18,7 @@
         {
             <MudGrid>
                 <MudItem xs="6">
-                    <MudSwitch T="bool" Label='Show tricky segments' Color="Color.Secondary" CheckedChanged="@(async (val) => { await LoadSegmentListAsync(val); })"/>
+                    <MudSwitch T="bool" Label='Show tricky segments' Color="Color.Secondary" ValueChanged="@(async (val) => { await LoadSegmentListAsync(val); })"/>
                 </MudItem>
                 <MudItem xs="6">
                     <MudText Typo="Typo.caption">@(segmentList.Count) segments listed</MudText>
@@ -120,7 +120,7 @@
                                 <MudTd>@segment.IsOfficial</MudTd>
                                 <MudTd>@segment.ValidTo</MudTd>
                                 <MudTd>
-                                    <MudIconButton Icon="@Icons.Filled.Refresh" OnClick="@(async () => await FetchSegmentAsync(segment.CotacolId, segment.SegmentId))"></MudIconButton>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await FetchSegmentAsync(segment.CotacolId, segment.SegmentId))"></MudIconButton>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>

@@ -1,0 +1,15 @@
+{
+  "name": "cotacol-site",
+  "version": "1.0.0",
+  "description": "An attempt to learn Blazor, by setting up a Cotacol web site",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

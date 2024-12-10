@@ -9,7 +9,7 @@
 {
     <MudGrid>
         <MudItem xs="6">
-            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" StartIcon="@Icons.Filled.Search" OnClick="async () => await LoadUserListAsync()">Load all users</MudButton>
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="async () => await LoadUserListAsync()">Load all users</MudButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField T="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user"></MudTextField>

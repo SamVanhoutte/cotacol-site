@@ -1,5 +1,8 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using AeroBlazor;
+using AeroBlazor.Configuration;
+using AeroBlazor.Theming;
 using Cotacol.Website.Interfaces;
 using Cotacol.Website.Models.Identity;
 using Cotacol.Website.Models.Settings;
@@ -7,12 +10,12 @@ using Cotacol.Website.Services;
 using Cotacol.Website.Services.Extensions;
 using Cotacol.Website.Services.Imaging;
 using Cotacol.Website.Services.Maps;
+using Cotacol.Website.Theming;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
-
 
 namespace Cotacol.Website
 {
@@ -31,6 +34,10 @@ namespace Cotacol.Website
 
             var stravaSettings = new StravaSettings();
             configuration.GetSection("strava").Bind(stravaSettings);
+
+            var mapsConfig = configuration.GetSection("Maps");
+            var mapsOptions = new MapOptions();
+            mapsConfig.Bind(mapsOptions);
 
 
             var builder = WebApplication.CreateBuilder(args);
@@ -123,7 +130,13 @@ namespace Cotacol.Website
                 .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options))
                 .Configure<KeyVaultSettings>(options => configuration.GetSection("keyvault").Bind(options));
 
-
+            builder.Services.AddAeroBlazorWebServices(options =>
+            {
+                options.EnableLocationServices = true;
+                mapsOptions.DefaultMarkerIcon = "images/sfinx-map-icon.png";
+                // options.ConfigureMaps(mapsOptions);
+            });
+            
             var app = builder.Build();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -157,6 +170,7 @@ namespace Cotacol.Website
             builder.Services.AddSingleton<ICotacolClient, CotacolApiClient>();
             builder.Services.AddScoped<IMapService, MapListService>();
             builder.Services.AddScoped<IYearImageGenerator, ImgSharpYearImageGenerator>();
+            builder.Services.AddSingleton<IThemeManager, CotacolThemeManager>();
         }
     }
 }

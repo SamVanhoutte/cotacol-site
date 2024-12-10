@@ -58,16 +58,22 @@
                         {
                             <MudText Typo="Typo.body1">These climbs are the climbs the user rode the most, the stars indicate the user is a local legend.</MudText>
                         }
-                        <MudList Clickable="true">
+                        <MudList T="string">
                             @foreach (var climb in _achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
                             {
                                 @if (_achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
                                 {
-                                    <MudListItem Href='@($"cotacol/{climb.CotacolId}")' IconColor="Color.Secondary" Avatar="@Icons.Filled.Star">@climb.CotacolName (@climb.Achievements.Count() attempts)</MudListItem>
+                                    <MudListItem Href='@($"cotacol/{climb.CotacolId}")'>
+                                        <AvatarContent><MudAvatar><MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Secondary"></MudIcon> </MudAvatar> </AvatarContent>
+                                        <ChildContent>@climb.CotacolName (@climb.Achievements.Count() attempts)</ChildContent>
+                                    </MudListItem>
                                 }
                                 else
                                 {
-                                    <MudListItem Href='@($"cotacol/{climb.CotacolId}")' Avatar="@Icons.Filled.ArrowUpward">@climb.CotacolName (@climb.Achievements.Count() attempts)</MudListItem>
+                                    <MudListItem Href='@($"cotacol/{climb.CotacolId}")'>
+                                        <AvatarContent><MudAvatar><MudIcon Icon="@Icons.Material.Filled.ArrowUpward"></MudIcon> </MudAvatar> </AvatarContent>
+                                        <ChildContent>@climb.CotacolName (@climb.Achievements.Count() attempts)</ChildContent>
+                                    </MudListItem>
                                 }
                             }
                         </MudList>
@@ -83,10 +89,17 @@
                                     <MudItem xs="12">
                                         <MudText Typo="Typo.h2" Color="Color.Tertiary">You're a local legend</MudText>
                                         <MudText Typo="Typo.body1">You are local legend if you did a col more than 5 times and no other user did more than you. These cols are owned by you, as a local legend:</MudText>
-                                        <MudList Clickable="true">
+                                        <MudList T="string">
                                             @foreach (var legend in _achievements.LocalLegends.OrderByDescending(cr => cr.Value))
                                             {
-                                                <MudListItem Avatar="@Icons.Filled.Star" IconColor="Color.Secondary" Href='@($"cotacol/{legend.Key}")'>@GetLegendString(legend.Key)</MudListItem>
+                                                <MudListItem Href='@($"cotacol/{legend.Key}")'>
+                                                    <AvatarContent>
+                                                        <MudAvatar>
+                                                            <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Secondary"></MudIcon>
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                    <ChildContent>@GetLegendString(legend.Key)</ChildContent>
+                                                </MudListItem>
                                                 <MudDivider DividerType="DividerType.Inset"/>
                                             }
                                         </MudList>
@@ -97,10 +110,17 @@
                                     <MudItem xs="12">
                                         <MudText Typo="Typo.h2" Color="Color.Tertiary">Ready to become a legend?</MudText>
                                         <MudText Typo="Typo.body1" Color="Color.Tertiary">These cols require few attempts for you to become Local Legend</MudText>
-                                        <MudList>
+                                        <MudList T="string">
                                             @foreach (var climb in _nearLegendClimbs)
                                             {
-                                                <MudListItem Avatar="@GetLegendIcon(climb.AttemptsNeededToLegend)" Href='@($"cotacol/{climb.Id}")'>@climb.Name (@climb.AttemptsNeededToLegend attempts needed)</MudListItem>
+                                                <MudListItem Href='@($"cotacol/{climb.Id}")'>
+                                                    <AvatarContent>
+                                                        <MudAvatar><MudIcon Icon="@GetLegendIcon(climb.AttemptsNeededToLegend)"></MudIcon></MudAvatar>
+                                                    </AvatarContent>
+                                                    <ChildContent>
+                                                        @climb.Name (@climb.AttemptsNeededToLegend attempts needed)
+                                                    </ChildContent>
+                                                </MudListItem>
                                                 <MudDivider DividerType="DividerType.Inset"/>
                                             }
                                         </MudList>
@@ -126,7 +146,7 @@
                             </MudGrid>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href='@($"badges/{UserIdToShow}")' EndIcon="@Icons.Filled.List">View all badges</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href='@($"badges/{UserIdToShow}")' EndIcon="@Icons.Material.Filled.List">View all badges</MudButton>
                         </MudItem>
                     }
                 }
@@ -150,15 +170,15 @@
         switch (colsNeeded)
         {
             case 1:
-                return Icons.Outlined.LooksOne;
+                return Icons.Material.Outlined.LooksOne;
             case 2:
-                return Icons.Outlined.LooksTwo;
+                return Icons.Material.Outlined.LooksTwo;
             case 3:
-                return Icons.Outlined.Looks3;
+                return Icons.Material.Outlined.Looks3;
             case 4:
-                return Icons.Outlined.Looks4;
+                return Icons.Material.Outlined.Looks4;
             default:
-                return Icons.Outlined.Favorite;
+                return Icons.Material.Outlined.Favorite;
         }
     }
 

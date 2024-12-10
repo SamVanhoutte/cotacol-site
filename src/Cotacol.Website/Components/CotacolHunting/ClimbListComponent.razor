@@ -17,7 +17,7 @@
         @if (!HideFilters)
         {
             <MudItem xs="12">
-                <MudChipSet MultiSelection="false" SelectedChipChanged="@(async (val) => await ApplyFilterAsync(val))">
+                <MudChipSet T="string" CheckMark="false" SelectedValueChanged="@(async (val) => await ApplyFilterAsync(val))">
                     <MudChip Text="All" Value='"NoFilter"'></MudChip>
                     @if (UserProfile.IsAuthenticated)
                     {
@@ -37,7 +37,7 @@
             </MudItem>
             <MudItem xs="12">
                 <MudHidden Breakpoint="Breakpoint.SmAndDown">
-                    <MudChipSet @ref="ProvinceFilter" MultiSelection="true" Filter="true" SelectedChipChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
+                    <MudChipSet T="string" @ref="ProvinceFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" SelectedValueChanged="@(async (val) => await ApplyProvinceFilterAsync(val))">
                         <MudChip Text="WFL" Value='"WestVlFilter"'></MudChip>
                         <MudChip Text="EFL" Value='"OostVlFilter"'></MudChip>
                         <MudChip Text="ANT" Value='"AntwerpenFilter"'></MudChip>
@@ -106,7 +106,7 @@
     private IEnumerable<UserClimb> _climbs;
     private string _filterMessage;
     internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
-    public MudChipSet ProvinceFilter { get; set; }
+    public MudChipSet<string> ProvinceFilter { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,7 +131,7 @@
         await FilterClimbsAsync();
     }
 
-    private async Task ApplyProvinceFilterAsync(MudChip filter)
+    private async Task ApplyProvinceFilterAsync(string filter)
     {
         if (filter == null)
         {
@@ -139,16 +139,16 @@
         }
         else
         {
-            _provinceFilters = ProvinceFilter.SelectedChips
-                .Select(chip => GetSystemName(chip.Value.ToString())).ToList();
+            _provinceFilters = ProvinceFilter.SelectedValues
+                .Select(chip => GetSystemName(chip)).ToList();
         }
         await FilterClimbsAsync();
     }
 
 
-    private async Task ApplyFilterAsync(MudChip filter)
+    private async Task ApplyFilterAsync(string filter)
     {
-        _currentFilter = filter.Value.ToString();
+        _currentFilter = filter;
         await FilterClimbsAsync();
     }
 

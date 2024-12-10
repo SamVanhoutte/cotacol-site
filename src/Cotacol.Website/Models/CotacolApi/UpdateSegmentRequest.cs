@@ -1,24 +1,25 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public  class UpdateSegmentRequest
     {
-        [JsonProperty("stravaSegmentId")]
+        [JsonPropertyName("stravaSegmentId")]
         public string StravaSegmentId { get; set; }
 
-        [JsonProperty("remark")]
+        [JsonPropertyName("remark")]
         public string Remark { get; set; }
 
-        [JsonProperty("userId")]
+        [JsonPropertyName("userId")]
         public string UserId { get; set; }
 
-        [JsonProperty("segmentConfidence", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("segmentConfidence")]
         public string SegmentConfidence { get; set; }
 
-        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)] public string Name { get; set; }
-        [JsonProperty("polyline", NullValueHandling = NullValueHandling.Ignore)] public string Polyline { get; set; }
-        [JsonProperty("distance", NullValueHandling = NullValueHandling.Ignore)]public long Distance { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("polyline")] public string Polyline { get; set; }
+        [JsonPropertyName("distance")]public long Distance { get; set; }
 
     }
 }

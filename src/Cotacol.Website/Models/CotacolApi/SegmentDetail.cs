@@ -1,37 +1,38 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public partial class SegmentDetail
     {
-        [JsonProperty("segmentid")]
+        [JsonPropertyName("segmentid")]
         public string? Segmentid { get; set; }
 
-        [JsonProperty("isofficial")]
+        [JsonPropertyName("isofficial")]
         public bool Isofficial { get; set; }
 
-        [JsonProperty("validfrom")]
+        [JsonPropertyName("validfrom")]
         public object Validfrom { get; set; }
 
-        [JsonProperty("validto")]
+        [JsonPropertyName("validto")]
         public DateTime? Validto { get; set; }
 
-        [JsonProperty("userid")]
+        [JsonPropertyName("userid")]
         public string? Userid { get; set; }
 
-        [JsonProperty("remark")]
+        [JsonPropertyName("remark")]
         public string Remark { get; set; }
 
-        [JsonProperty("confidence")]
+        [JsonPropertyName("confidence")]
         public string Confidence { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("polyline")]
+        [JsonPropertyName("polyline")]
         public string Polyline { get; set; }
 
-        [JsonProperty("distance")]
+        [JsonPropertyName("distance")]
         public long Distance { get; set; }
     }
 }

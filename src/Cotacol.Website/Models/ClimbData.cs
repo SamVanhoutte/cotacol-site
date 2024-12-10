@@ -1,62 +1,61 @@
+using System.Text.Json.Serialization;
 using Cotacol.Website.Models.CotacolApi;
-using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models
 {
     public class ClimbData
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("city")]
+        [JsonPropertyName("city")]
         public string City { get; set; }
 
-        [JsonProperty("province")]
+        [JsonPropertyName("province")]
         public string Province { get; set; }
 
-        [JsonProperty("cotacol_points")]
+        [JsonPropertyName("cotacol_points")]
         public int CotacolPoints { get; set; }
 
-        [JsonProperty("distance")]
+        [JsonPropertyName("distance")]
         public int Distance { get; set; }
 
-        [JsonProperty("elevation_diff")]
+        [JsonPropertyName("elevation_diff")]
         public int ElevationDiff { get; set; }
 
-        [JsonProperty("bom_score")]
+        [JsonPropertyName("bom_score")]
         public int BomScore { get; set; }
         
-        [JsonIgnore]
         public string BombPrinted => BomScore > 0 ? BomScore.ToString() : "-";
 
-        [JsonProperty("avg_grade")]
+        [JsonPropertyName("avg_grade")]
         public double AvgGrade { get; set; }
 
-        [JsonProperty("surface")]
+        [JsonPropertyName("surface")]
         public string Surface { get; set; }
 
-        [JsonProperty("aliases")]
+        [JsonPropertyName("aliases")]
         public List<dynamic> Aliases { get; set; }
 
-        [JsonProperty("strava_segment")]
+        [JsonPropertyName("strava_segment")]
         public string StravaSegment { get; set; }
         
         
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public Uri Url { get; set; }
 
-        [JsonProperty("polyline")]
+        [JsonPropertyName("polyline")]
         public string Polyline { get; set; }
         
-        [JsonProperty("unique_users")]
+        [JsonPropertyName("unique_users")]
         public int UniqueUsers { get; set; }
-        [JsonProperty("total_attempts")]
+        [JsonPropertyName("total_attempts")]
         public int TotalAttempts { get; set; }
-        [JsonProperty("local_legends")]
+        [JsonPropertyName("local_legends")]
         public List<LocalLegend> LocalLegends { get; set; }
         public int CurrentLegendLimit => LocalLegends?.FirstOrDefault()?.Attempts ?? 5;
     }

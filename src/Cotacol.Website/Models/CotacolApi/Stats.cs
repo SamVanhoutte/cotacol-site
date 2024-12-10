@@ -1,28 +1,29 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public partial class Stats
     {
-        [JsonProperty("cotacolId")]
-        public long CotacolId { get; set; }
+        [JsonPropertyName("cotacolId")]
+        public string CotacolId { get; set; }
 
-        [JsonProperty("cotacolName")]
+        [JsonPropertyName("cotacolName")]
         public string CotacolName { get; set; }
 
-        [JsonProperty("uniqueUsers")]
+        [JsonPropertyName("uniqueUsers")]
         public long UniqueUsers { get; set; }
 
-        [JsonProperty("totalAttempts")]
+        [JsonPropertyName("totalAttempts")]
         public int TotalAttempts { get; set; }
 
-        [JsonProperty("maximumUserAttempts")]
+        [JsonPropertyName("maximumUserAttempts")]
         public long MaximumUserAttempts { get; set; }
 
-        [JsonProperty("localLegends")]
+        [JsonPropertyName("localLegends")]
         public List<LocalLegend> LocalLegends { get; set; }
 
-        [JsonProperty("userList")]
+        [JsonPropertyName("userList")]
         public List<LocalLegend> UserList { get; set; }
     }
 }

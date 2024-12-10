@@ -46,7 +46,7 @@
                     <MudTd>
                         <MudLink Href='@($"cotacol/{activity.CotacolId}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">@activity.CotacolName</MudLink>
                     </MudTd>
-                    <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@activity.UniqueUsers.Number()</MudText></MudTd>
+                    <MudTd><MudText Typo="Typo.body1" Align="Align.Right" id="cotacolitem">@activity.UniqueUsers.Number()</MudText></MudTd>
                     <MudTd>
                         <MudText Typo="Typo.body1" Align="Align.Right">@activity.TotalAttempts.Number(belowZeroIsNull: true)</MudText>
                     </MudTd>

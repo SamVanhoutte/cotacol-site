@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -5,16 +6,16 @@ namespace Cotacol.Website.Models.CotacolApi
 {
     public class UserStateDetail
     {
-            [JsonProperty("tokens")]
+            [JsonPropertyName("tokens")]
             public UserTokens UserTokens { get; set; }
 
-            [JsonProperty("state")]
+            [JsonPropertyName("state")]
             public JObject State { get; set; }
             
-            [JsonProperty("syncStatus")]
+            [JsonPropertyName("syncStatus")]
             public FullSyncStatus SyncStatus { get; set; }
             
-            [JsonProperty("audit")]
+            [JsonPropertyName("audit")]
             public ActionHistory Audit { get; set; }
     }
 }

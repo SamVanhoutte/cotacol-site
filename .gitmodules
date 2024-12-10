@@ -1,0 +1,3 @@
+[submodule "aeroblazor"]
+	path = aeroblazor
+	url = https://github.com/samvanhoutte/aeroblazor

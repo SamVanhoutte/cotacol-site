@@ -1,31 +1,32 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
     public record BadgeSyncResult
     {
-        [JsonProperty("badgeId")]
+        [JsonPropertyName("badgeId")]
         public string BadgeId { get; set; }
 
-        [JsonProperty("completed")]
+        [JsonPropertyName("completed")]
         public bool Completed { get; set; }
 
-        [JsonProperty("remark")]
+        [JsonPropertyName("remark")]
         public string Remark { get; set; }
 
-        [JsonProperty("achievementDate")]
+        [JsonPropertyName("achievementDate")]
         public DateTimeOffset? AchievementDate { get; set; }
 
-        [JsonProperty("numberColsAchieved")]
+        [JsonPropertyName("numberColsAchieved")]
         public long NumberColsAchieved { get; set; }
 
-        [JsonProperty("numberColsNeeded")]
+        [JsonPropertyName("numberColsNeeded")]
         public long NumberColsNeeded { get; set; }
 
-        [JsonProperty("colsAchieved")]
+        [JsonPropertyName("colsAchieved")]
         public string[] ColsAchieved { get; set; }
 
-        [JsonProperty("colsMissing")]
+        [JsonPropertyName("colsMissing")]
         public string[] ColsMissing { get; set; }
     }
 }
