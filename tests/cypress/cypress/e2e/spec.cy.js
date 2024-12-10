@@ -32,4 +32,14 @@ describe('Cotacol information', () => {
       .its('length')
       .should('be.gte', 50)
   });
+
+  /* ==== Test Created with Cypress Studio ==== */
+  it('ESPC Live test', function() {
+    /* ==== Generated with Cypress Studio ==== */
+    cy.visit('https://localhost:7259/map');
+    cy.get(':nth-child(1) > .mud-chipset > :nth-child(4) > .mud-chip-content').click();
+    cy.get(':nth-child(2) > .mud-chipset > :nth-child(1) > .mud-chip-content').click();
+    cy.get('[style="z-index: 3; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; touch-action: pan-x pan-y;"]').click();
+    /* ==== End Cypress Studio ==== */
+  });
 })

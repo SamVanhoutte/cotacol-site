@@ -11,6 +11,7 @@ test('Col stats should return all cols', async ({ page }) => {
   await page.goto('/colstats');
 
   // Count the number of elements with an id starting with 'cotacol'
+  await page.waitForSelector('[id="cotacolitem"]', { timeout: 10000 });
   const cotacolElements = await page.locator('[id="cotacolitem"]').count();
   expect(cotacolElements).toBe(1000); // Verify the count is 1000
 });
@@ -19,6 +20,7 @@ test('Leaderboard exists', async ({ page }) => {
   await page.goto('/stats');
 
   // Count the number of elements with an id starting with 'cotacol'
+  await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
   const cotacolElements = await page.locator('[id="cotacoluser"]').count();
   expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
 });

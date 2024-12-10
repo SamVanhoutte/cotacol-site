@@ -1,0 +1,12 @@
+<RunSettings>
+    <TestRunParameters>
+        <Parameter name="BaseUrl" value="http://localhost:5000" />
+    </TestRunParameters>
+    <Playwright>
+        <BrowserType>chromium</BrowserType>
+        <LaunchOptions>
+            <Headless>false</Headless>
+            <SlowMo>500</SlowMo>
+        </LaunchOptions>
+    </Playwright>
+</RunSettings>

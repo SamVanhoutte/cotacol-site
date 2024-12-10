@@ -41,7 +41,7 @@
 /*}*/
 
 .page {
-    position: relative;
+    /*position: relative;*/
     display: flex;
     flex-direction: column;
 }
@@ -52,7 +52,7 @@
 
 .sidebar {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-    min-width: 250px;
+    min-width: 220px;
 }
 
 .top-row-left {
