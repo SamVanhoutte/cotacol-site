@@ -78,5 +78,6 @@ runs:
         retention-days: 30
 
     - name: Publish Test Summary Results
+      if: ${{ !cancelled() }}
       shell: bash
       run: npx github-actions-ctrf ctrf/ctrf-report.json

@@ -24,7 +24,10 @@ const config: PlaywrightTestConfig<{}, {}> = {
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
-    ['playwright-ctrf-json-reporter', {}]
+    ['playwright-ctrf-json-reporter', {
+      outputFile: 'ctrf-report.json', // Optional: Output file name. Defaults to 'ctrf-report.json'.
+      outputDir: 'ctrf',
+    }]
   ],
   
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
