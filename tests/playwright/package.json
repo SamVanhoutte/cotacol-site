@@ -1,14 +1,26 @@
 {
-  "name": "playwright",
+  "name": "m365-playwright-demo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "test": "NODE_ENV=development npx playwright test",
+    "test:ui": "NODE_ENV=development npx playwright test --ui --update-snapshots",
+    "test:update": "NODE_ENV=development npx playwright test --update-snapshots",
+    "debug": "NODE_ENV=development npx playwright test --debug"
+  },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
-    "@types/node": "^22.10.1"
+    "@playwright/test": "^1.43.1",
+    "@types/node": "^20.16.11",
+    "dotenv": "^16.0.3"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@estruyf/github-actions-reporter": "^1.10.0-beta.1128978",
+    "otpauth": "^9.3.4",
+    "playwright-msteams-reporter": "^0.0.11"
   }
 }
