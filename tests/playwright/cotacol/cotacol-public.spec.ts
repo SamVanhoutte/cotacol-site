@@ -5,6 +5,7 @@ test('Verify page title', async ({ page }) => {
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle("Cotacol.cc");
+  await page.screenshot({ path: 'stats.png' });
 });
 
 test('Col stats should return all cols', async ({ page }) => {
@@ -14,6 +15,7 @@ test('Col stats should return all cols', async ({ page }) => {
   await page.waitForSelector('[id="cotacolitem"]', { timeout: 10000 });
   const cotacolElements = await page.locator('[id="cotacolitem"]').count();
   expect(cotacolElements).toBe(1000); // Verify the count is 1000
+  await page.screenshot({ path: 'colstats.png' });
 });
 
 // test('Leaderboard exists', async ({ page }) => {
@@ -23,6 +25,7 @@ test('Col stats should return all cols', async ({ page }) => {
 //   await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
 //   const cotacolElements = await page.locator('[id="cotacoluser"]').count();
 //   expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
+//   await page.screenshot({ path: 'stats.png' });
 // });
 
 test('Climbs list should work', async ({ page }) => {
@@ -34,6 +37,7 @@ test('Climbs list should work', async ({ page }) => {
 
   // Generate a random number between 1 and 1000
   const randomNumber = Math.floor(Math.random() * 1000) + 1;
+  await page.screenshot({ path: 'climbs.png' });
 
   // Click the element with id 'cotacol-{randomnumber}'
   await page.locator(`#cotacol-${randomNumber}`).click();
@@ -49,4 +53,6 @@ test('Col list to random detail', async ({ page }) => {
   await expect(page.locator('#cotacolsurface')).toBeVisible(); // Assert that the element is visible
   await expect(page.locator('#cotacoldone')).toHaveCount(0); // Assert that the element is visible
   await expect(page.locator('#map1')).toBeVisible(); // Assert that the element is visible
+  await page.screenshot({ path: 'climbdetail.png' });
+
 });
