@@ -1,5 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
-
+import { PlaywrightTestConfig, defineConfig, devices } from "@playwright/test";
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -11,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+const config: PlaywrightTestConfig<{}, {}> = {
   testDir: './cotacol',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -77,4 +76,41 @@ export default defineConfig({
   //   url: 'http://127.0.0.1:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
-});
+};
+
+if (config.reporter && config.reporter instanceof Array) {
+  let runUrl = "";
+  if (process.env.GITHUB_RUN_ID) {
+    const runId = process.env.GITHUB_RUN_ID;
+    const repo = process.env.GITHUB_REPOSITORY;
+    runUrl = `${process.env.GITHUB_SERVER_URL}/${repo}/actions/runs/${runId}`;
+  }
+
+  if (process.env.NODE_ENV !== "development") {
+    config.reporter.push(["html"]);
+    config.reporter.push([
+      "@estruyf/github-actions-reporter",
+      {
+        showError: true,
+        azureStorageSAS: process.env.AZURE_STORAGE_SAS,
+        azureStorageUrl: process.env.AZURE_STORAGE_URL,
+      },
+    ]);
+    // config.reporter.push([
+    //   "playwright-msteams-reporter",
+    //   <MsTeamsReporterOptions>{
+    //     webhookUrl: process.env.M365_WEBHOOK_URL,
+    //     webhookType: "powerautomate",
+    //     linkToResultsUrl: runUrl,
+    //     mentionOnFailure: process.env.M365_USERNAME,
+    //   },
+    // ]);
+  } else {
+    config.reporter.push(["html"]);
+  }
+}
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig(config);
