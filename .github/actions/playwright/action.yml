@@ -75,6 +75,13 @@ runs:
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
+        name: snapshots-${{ inputs.environment }}
+        path: /**/snapshots/
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
         name: report-${{ inputs.environment }}
         path: ${{ inputs.working-directory }}/playwright-report/
         retention-days: 30
