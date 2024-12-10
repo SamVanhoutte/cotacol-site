@@ -1,17 +1,38 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Run Cypress front end tests 
+name: Playwright front end tests 
 
 on:
   workflow_call:
     
   workflow_dispatch:
 
+
 jobs:
-  cypress-run:
+  playwright-run:
+    name: Perform Playwright tests
+    timeout-minutes: 60
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./tests/playwright
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Run the frontend tests
+        uses: ./.github/actions/playwright
+        # with:
+        #   # Variables
+        #   M365_PAGE_URL: ${{ vars.M365_PAGE_URL }}
+        #   M365_WEBHOOK_URL: ${{ vars.M365_WEBHOOK_URL }}
+        #   # Secrets
+        #   M365_USERNAME: ${{ secrets.M365_USERNAME }}
+        #   M365_PASSWORD: ${{ secrets.M365_PASSWORD }}
+        #   M365_OTP_SECRET: ${{ secrets.M365_OTP_SECRET }}
+        #   # Screenshots
+        #   AZURE_STORAGE_URL: ${{ vars.AZURE_STORAGE_URL }}
+        #   AZURE_STORAGE_SAS: ${{ secrets.AZURE_STORAGE_SAS }}

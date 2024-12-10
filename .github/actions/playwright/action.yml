@@ -1,0 +1,73 @@
+name: Frontend tests
+description: Runs the playwright scripts
+
+inputs:
+  working-directory:
+    description: 'The directory where the tests are located'
+    required: false
+    default: './tests/playwright'
+  environment:
+    description: 'The environment to run the tests against'
+    required: true
+    default: 'dev'
+  
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+        cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm ci
+
+    - name: Store Playwright's Version
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        PLAYWRIGHT_VERSION=$(npm ls @playwright/test --depth=0 | grep @playwright | sed 's/.*@//')
+        echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+        echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+
+    - name: Cache Playwright Browsers for Playwright's Version
+      id: cache-playwright-browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+
+    - name: Install Playwright Browsers
+      shell: bash
+      if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+      run: npx playwright install --with-deps chromium
+
+    - name: Run Playwright tests
+      run: npx playwright test
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        M365_PAGE_URL: ${{ inputs.M365_PAGE_URL }}
+        M365_USERNAME: ${{ inputs.M365_USERNAME }}
+        M365_PASSWORD: ${{ inputs.M365_PASSWORD }}
+        M365_OTP_SECRET: ${{ inputs.M365_OTP_SECRET }}
+        M365_WEBHOOK_URL: ${{ inputs.M365_WEBHOOK_URL }}
+        AZURE_STORAGE_URL: ${{ vars.AZURE_STORAGE_URL }}
+        AZURE_STORAGE_SAS: ${{ secrets.AZURE_STORAGE_SAS }}
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: snapshots-${{ inputs.environment }}
+        path: ${{ inputs.working-directory }}/tests/**/*-snapshots/
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: report-${{ inputs.environment }}
+        path: ${{ inputs.working-directory }}/playwright-report/
+        retention-days: 30
