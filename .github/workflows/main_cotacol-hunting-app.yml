@@ -13,6 +13,7 @@ on:
       
 jobs:
   buildSite:
+    name: Build app
     runs-on: windows-latest
     env:
       working-directory: src/Cotacol.Website
@@ -41,6 +42,14 @@ jobs:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
 
+  deployTestSite:
+    name: Deploy test app
+    runs-on: windows-latest
+    needs: buildSite
+    env:
+      working-directory: src/Cotacol.Website
+
+    steps:
     - id: deploy-test-app
       name: Deploy to Azure Test Web App
       uses: ./.github/actions/deployapp
@@ -56,12 +65,22 @@ jobs:
         admins: ${{secrets.AdminUsers}}
         stravaClientId: ${{secrets.StravaClientId}}
         stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
-  
+    outputs:
+      webapp-url: ${{ steps.deploy-test-app.outputs.webapp-url }}
+
+  testTestSite:
+    name: Run tests on test site
+    runs-on: windows-latest
+    env:
+      working-directory: src/Cotacol.Website
+    needs: deployTestSite
+    steps:
+      
     - name: Run the frontend tests
       uses: ./.github/actions/playwright
       with:
         #Variables
-        BaseUrl: ${{ steps.deploy-test-app.outputs.webappUrl }}
+        BaseUrl: ${{ needs.deployTestSite.outputs.webapp-url }}
 
 # H  deployprdSite:
 #     needs: buildSite
