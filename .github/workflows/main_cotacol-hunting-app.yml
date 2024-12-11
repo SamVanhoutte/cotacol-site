@@ -50,6 +50,10 @@ jobs:
       working-directory: src/Cotacol.Website
 
     steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
     - id: deploy-test-app
       name: Deploy to Azure Test Web App
       uses: ./.github/actions/deployapp
@@ -75,7 +79,10 @@ jobs:
       working-directory: src/Cotacol.Website
     needs: deployTestSite
     steps:
-      
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
     - name: Run the frontend tests
       uses: ./.github/actions/playwright
       with:
