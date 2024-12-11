@@ -70,7 +70,7 @@ runs:
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: snapshots-${{ inputs.environment }}
+        name: ctrf
         path: ${{ inputs.working-directory }}/ctrf/
         retention-days: 30
 
