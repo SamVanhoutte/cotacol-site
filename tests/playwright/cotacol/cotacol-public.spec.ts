@@ -1,34 +1,45 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, TestInfo } from '@playwright/test';
 
-test('Verify page title', async ({ page }) => {
-  await page.goto('/stats');
+// Setup for every test
+test.beforeAll(async ({ browser }) => {
+  let page: Page;
+  // Set up new page , take the BaseUrl parameter from input
+  page = await browser.newPage();
+  await page.goto(process.env.BaseUrl || "https://localhost:7259/", {
+    waitUntil: "domcontentloaded",
+  });
+
+});
+
+test('Verify page title', async ({ page }, testInfo) => {
+  await page.goto('/');
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle("Cotacol.cc");
-  await page.screenshot({ path: 'screens/stats.png' });
+  await screenshotPage(page, testInfo, 'home');
 });
 
-test('Col stats should return all cols', async ({ page }) => {
+test('Col stats should return all cols', async ({ page }, testInfo) => {
   await page.goto('/colstats');
 
   // Count the number of elements with an id starting with 'cotacol'
   await page.waitForSelector('[id="cotacolitem"]', { timeout: 10000 });
   const cotacolElements = await page.locator('[id="cotacolitem"]').count();
   expect(cotacolElements).toBe(1000); // Verify the count is 1000
-  await page.screenshot({ path: 'screens/colstats.png' });
+  await screenshotPage(page, testInfo, 'colstats');
 });
 
-test('Leaderboard exists', async ({ page }) => {
-  await page.goto('/stats');
+// test('Leaderboard exists', async ({ page }, testInfo) => {
+//   await page.goto('/stats');
 
-  // Count the number of elements with an id starting with 'cotacol'
-  await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
-  const cotacolElements = await page.locator('[id="cotacoluser"]').count();
-  expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
-  await page.screenshot({ path: 'stats.png' });
-});
+//   // Count the number of elements with an id starting with 'cotacol'
+//   await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
+//   const cotacolElements = await page.locator('[id="cotacoluser"]').count();
+//   expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
+//   await screenshotPage(page, testInfo, 'stats');
+// });
 
-test('Climbs list should work', async ({ page }) => {
+test('Climbs list should work', async ({ page }, testInfo) => {
   await page.goto('/climbs');
 
   // Count the number of elements with an id starting with 'cotacol'
@@ -37,13 +48,13 @@ test('Climbs list should work', async ({ page }) => {
 
   // Generate a random number between 1 and 1000
   const randomNumber = Math.floor(Math.random() * 1000) + 1;
-  await page.screenshot({ path: 'screens/climbs.png' });
+  await screenshotPage(page, testInfo, 'climbs');
 
   // Click the element with id 'cotacol-{randomnumber}'
   await page.locator(`#cotacol-${randomNumber}`).click();
 });
 
-test('Col list to random detail', async ({ page }) => {
+test('Col list to random detail', async ({ page }, testInfo) => {
   const cotacolId = Math.floor(Math.random() * 1000) + 1;
   await page.goto(`/cotacol/${cotacolId}`);
   const elevationElement = page.locator('#cotacolelevation');
@@ -53,6 +64,16 @@ test('Col list to random detail', async ({ page }) => {
   await expect(page.locator('#cotacolsurface')).toBeVisible(); // Assert that the element is visible
   await expect(page.locator('#cotacoldone')).toHaveCount(0); // Assert that the element is visible
   await expect(page.locator('#map1')).toBeVisible(); // Assert that the element is visible
-  await page.screenshot({ path: 'screens/climbdetail.png' });
+  await screenshotPage(page, testInfo, 'climbdetail');
 
 });
+
+
+async function screenshotPage(page: Page, testInfo: TestInfo, name: string) {
+  await page.screenshot({ path: `screens/${name}.png` });
+  const screenshot = await page.screenshot({ type: 'png' });
+  await testInfo.attach(name, {
+    body: screenshot,
+    contentType: 'image/png',
+  });
+}

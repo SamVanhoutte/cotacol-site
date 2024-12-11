@@ -4,6 +4,8 @@
 name: Playwright front end tests 
 
 on:
+  schedule:
+    - cron: "30 17 * * *" # Run at 5:30PM every day
   workflow_call:
     
   workflow_dispatch:
@@ -26,13 +28,5 @@ jobs:
       - name: Run the frontend tests
         uses: ./.github/actions/playwright
         with:
-          # Variables
-          # M365_PAGE_URL: ${{ vars.M365_PAGE_URL }}
-          # M365_WEBHOOK_URL: ${{ vars.M365_WEBHOOK_URL }}
-          # Secrets
-          # M365_USERNAME: ${{ secrets.M365_USERNAME }}
-          # M365_PASSWORD: ${{ secrets.M365_PASSWORD }}
-          # M365_OTP_SECRET: ${{ secrets.M365_OTP_SECRET }}
-          # Screenshots
-          AZURE_STORAGE_URL: ${{ vars.AZURE_STORAGE_URL }}
-          AZURE_STORAGE_SAS: ${{ secrets.AZURE_STORAGE_SAS }}
+          #Variables
+          BaseUrl: ${{ vars.BaseUrl }}

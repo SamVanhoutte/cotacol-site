@@ -10,11 +10,8 @@ inputs:
     description: 'The environment to run the tests against'
     required: true
     default: 'dev'
-  AZURE_STORAGE_URL:
-    description: 'The url where output will be stored'
-    required: true
-  AZURE_STORAGE_SAS:
-    description: 'The SAS token to access the url'
+  baseUrl: 
+    description: 'The url that is used for the web site'
     required: true
 runs:
   using: composite
@@ -60,20 +57,26 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        AZURE_STORAGE_URL: ${{ inputs.AZURE_STORAGE_URL }}
-        AZURE_STORAGE_SAS: ${{ inputs.AZURE_STORAGE_SAS }}
+        BaseUrl : ${{ inputs.BaseUrl }}
 
     - name: Publish Test Summary Results
       working-directory: ${{ inputs.working-directory }}
       if: ${{ !cancelled() }}
       shell: bash
-      run: npx github-actions-ctrf ctrf/ctrf-report.json
+      run: npx github-actions-ctrf ctrf/ctrf-output.json
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: snapshots-${{ inputs.environment }}
         path: ${{ inputs.working-directory }}/**/screens/
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: ctrf
+        path: ${{ inputs.working-directory }}/ctrf/
         retention-days: 30
 
     - uses: actions/upload-artifact@v4

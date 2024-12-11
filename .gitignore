@@ -7,6 +7,10 @@
 .DS_Store
 src/CotacolApp/app.db
 appsettings.dev.json
+tests/playwright/ctrf/ctrf-output.json
+tests/playwright/screens
+ctrf
+screens
 
 # User-specific files
 *.rsuser
