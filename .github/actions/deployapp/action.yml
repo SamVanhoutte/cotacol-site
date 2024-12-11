@@ -14,7 +14,7 @@ inputs:
   applicationInsightsInstrumentationKey:
     description: "The instrumentation key for Application Insights"
     required: true
-
+  
 runs:
   using: composite
   steps:
@@ -33,7 +33,8 @@ runs:
         publish-profile: ${{inputs.publishProfile}}
         package: ${{env.DOTNET_ROOT}}/mysite
 
-    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+    - shell: bash
+      run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
 
     - name: Login to Azure
       uses: azure/login@v1
