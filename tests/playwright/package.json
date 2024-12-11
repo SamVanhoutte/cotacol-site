@@ -11,5 +11,9 @@
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.1",
     "playwright-ctrf-json-reporter": "^0.0.18"
+  },
+  "dependencies": {
+    "playwright": "^1.49.1",
+    "sharp": "^0.33.5"
   }
 }

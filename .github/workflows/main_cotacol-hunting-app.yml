@@ -88,6 +88,7 @@ jobs:
       with:
         #Variables
         BaseUrl: ${{ needs.deployTestSite.outputs.webappUrl }}
+        environment: 'test'
 
 
   deployProdSite:
@@ -136,6 +137,7 @@ jobs:
       with:
         #Variables
         BaseUrl: ${{ needs.deployProdSite.outputs.webappUrl }}
+        environment: 'prod'
 # H  deployprdSite:
 #     needs: buildSite
 #     runs-on: windows-latest
