@@ -13,6 +13,7 @@ on:
       
 jobs:
   buildSite:
+    name: Build app
     runs-on: windows-latest
     env:
       working-directory: src/Cotacol.Website
@@ -41,6 +42,18 @@ jobs:
         name: publish-artifact
         path: ${{env.DOTNET_ROOT}}/mysite
 
+  deployTestSite:
+    name: Deploy test app
+    runs-on: windows-latest
+    needs: buildSite
+    env:
+      working-directory: src/Cotacol.Website
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
     - id: deploy-test-app
       name: Deploy to Azure Test Web App
       uses: ./.github/actions/deployapp
@@ -48,15 +61,83 @@ jobs:
         #Variables
         appName: cotacol-hunting-app
         slotName: test
-        publishProfile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        publishProfile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }} 
         applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}
-  
+        azureCredentials: ${{secrets.AZURE_CREDENTIALS}}
+        cotacolApiSecret: ${{secrets.CotacolApiSecret}}
+        googleMapKey: ${{secrets.GoogleMapsKey}}
+        admins: ${{secrets.AdminUsers}}
+        stravaClientId: ${{secrets.StravaClientId}}
+        stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
+    outputs:
+      webappUrl: ${{ steps.deploy-test-app.outputs.webappUrl }}
+
+  testTestSite:
+    name: Run tests on test site
+    runs-on: windows-latest
+    env:
+      working-directory: src/Cotacol.Website
+    needs: deployTestSite
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
     - name: Run the frontend tests
       uses: ./.github/actions/playwright
       with:
         #Variables
-        BaseUrl: ${{ steps.deploy-test-app.outputs.webappUrl }}
+        BaseUrl: ${{ needs.deployTestSite.outputs.webappUrl }}
+        environment: 'test'
 
+
+  deployProdSite:
+    name: Deploy production app
+    runs-on: windows-latest
+    needs: testTestSite
+    env:
+      working-directory: src/Cotacol.Website
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
+    - id: deploy-prod-app
+      name: Deploy to Azure Production Web App
+      uses: ./.github/actions/deployapp
+      with:
+        #Variables
+        appName: cotacol-hunting-app
+        slotName: production
+        publishProfile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}
+        azureCredentials: ${{secrets.AZURE_CREDENTIALS}}
+        cotacolApiSecret: ${{secrets.CotacolApiSecret}}
+        googleMapKey: ${{secrets.GoogleMapsKey}}
+        admins: ${{secrets.AdminUsers}}
+        stravaClientId: ${{secrets.StravaClientId}}
+        stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
+    outputs:
+      webappUrl: ${{ steps.deploy-prod-app.outputs.webappUrl }}
+
+  testProdSite:
+    name: Run tests on production site
+    runs-on: windows-latest
+    needs: deployProdSite
+    env:
+      working-directory: src/Cotacol.Website
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive 
+
+    - name: Run the frontend tests
+      uses: ./.github/actions/playwright
+      with:
+        #Variables
+        BaseUrl: 'https://www.cotacol.cc'
+        environment: 'prod'
 # H  deployprdSite:
 #     needs: buildSite
 #     runs-on: windows-latest

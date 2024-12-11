@@ -68,21 +68,21 @@ runs:
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: snapshots-${{ inputs.environment }}
-        path: ${{ inputs.working-directory }}/**/screens/
+        name: ${{ inputs.environment }}-snapshots
+        path: ${{ inputs.working-directory }}/**/${{ inputs.environment }}-screens/
         retention-days: 30
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: ctrf
-        path: ${{ inputs.working-directory }}/ctrf/
+        name: ${{ inputs.environment }}-ctrf
+        path: ${{ inputs.working-directory }}/${{ inputs.environment }}-ctrf/
         retention-days: 30
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: report-${{ inputs.environment }}
-        path: ${{ inputs.working-directory }}/playwright-report/
+        name: ${{ inputs.environment }}-report
+        path: ${{ inputs.working-directory }}/${{ inputs.environment }}-playwright-report/
         retention-days: 30
 

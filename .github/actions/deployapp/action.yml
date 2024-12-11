@@ -14,6 +14,29 @@ inputs:
   applicationInsightsInstrumentationKey:
     description: "The instrumentation key for Application Insights"
     required: true
+  azureCredentials:
+    description: "The credentials for Azure"
+    required: true
+  cotacolApiSecret:
+    description: "The secret for the Cotacol API"
+    required: true
+  googleMapKey:
+    description: "The key for Google Maps"
+    required: true
+  admins:
+    description: "The admin users"
+    required: true
+  stravaClientId: 
+    description: "The client id for Strava"
+    required: true
+  stravaOAuthSecret: 
+    description: "The secret for Strava Oauth"
+    required: true
+
+outputs:
+  webappUrl:
+    description: 'The URL of the deployed web app'
+    value: ${{ steps.settings.outputs.webapp-url }}
 
 runs:
   using: composite
@@ -33,12 +56,13 @@ runs:
         publish-profile: ${{inputs.publishProfile}}
         package: ${{env.DOTNET_ROOT}}/mysite
 
-    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+    - shell: bash
+      run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
 
     - name: Login to Azure
       uses: azure/login@v1
       with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        creds: '${{ inputs.azureCredentials }}'
 
     - name: Configure Azure Web App
       uses: azure/appservice-settings@v1
@@ -49,7 +73,7 @@ runs:
         app-settings-json: '[
                               {
                                 "name": "api:sharedkeyvalue",
-                                "value": "${{ secrets.CotacolApiSecret }}",
+                                "value": "${{ inputs.cotacolApiSecret }}",
                                 "slotSetting": false
                               },
                               {
@@ -73,28 +97,13 @@ runs:
                                 "slotSetting": true
                               },
                               {
-                                "name": "keyvault:keyvaultname",
-                                "value": "cotacol-hunting",
-                                "slotSetting": false
-                              },
-                              {
-                                "name": "keyvault:KeySasBlobUri2",
-                                "value": "${{ secrets.KeySasBlobUri }}",
-                                "slotSetting": false
-                              },
-                              {
                                 "name": "maps:googlemapkey",
-                                "value": "${{ secrets.GoogleMapsKey }}",
+                                "value": "${{ inputs.googleMapsKey }}",
                                 "slotSetting": false
                               },
                               {
                                 "name": "admin:admins",
-                                "value": "${{ secrets.AdminUsers }}",
-                                "slotSetting": false
-                              },
-                              {
-                                "name": "keyvault:KeyKeyvaultUri",
-                                "value": "${{ secrets.KeyKeyvaultUri }}",
+                                "value": "${{ inputs.admins }}",
                                 "slotSetting": false
                               },
                               {
@@ -104,12 +113,12 @@ runs:
                               },
                               {
                                 "name": "strava:clientId",
-                                "value": "${{ secrets.StravaClientId }}",
+                                "value": "${{ inputs.stravaClientId }}",
                                 "slotSetting": false
                               },
                               {
                                 "name": "strava:clientOauthSecret",
-                                "value": "${{ secrets.StravaOAuthSecret }}",
+                                "value": "${{ inputs.StravaOAuthSecret }}",
                                 "slotSetting": false
                               },
                               {
@@ -130,7 +139,3 @@ runs:
                             ]'
 
 
-outputs:
-  webappUrl:
-    description: 'The URL of the deployed web app'
-    value: ${{ steps.set-webapp-url.outputs.webapp-url }}
