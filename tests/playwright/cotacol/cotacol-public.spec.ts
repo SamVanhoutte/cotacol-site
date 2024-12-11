@@ -1,16 +1,11 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, TestInfo } from '@playwright/test';
 
 test('Verify page title', async ({ page }, testInfo) => {
   await page.goto('/stats');
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle("Cotacol.cc");
-  const screenshot = await page.screenshot({ type: 'png' })
-  await testInfo.attach('screenshot', {
-    body: screenshot,
-    contentType: 'image/png',
-  })
-  //await page.screenshot({ path: 'screens/stats.png' });
+  await screenshotPage(page, testInfo, 'stats');
 });
 
 // test('Col stats should return all cols', async ({ page }) => {
@@ -61,3 +56,13 @@ test('Verify page title', async ({ page }, testInfo) => {
 //   await page.screenshot({ path: 'screens/climbdetail.png' });
 
 // });
+
+
+async function screenshotPage(page: Page, testInfo: TestInfo, name: string) {
+  await page.screenshot({ path: `screens/${name}.png` });
+  const screenshot = await page.screenshot({ type: 'png' });
+  await testInfo.attach(name, {
+    body: screenshot,
+    contentType: 'image/png',
+  });
+}
