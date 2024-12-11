@@ -1,0 +1,136 @@
+name: Deploy Cotacol
+description: Deploy cotacol app to Azure
+
+inputs:
+  appName:
+    description: "The name of the web app in Azure"
+    required: true
+  slotName:
+    description: "The name of the slot in Azure"
+    required: true
+  publishProfile:
+    description: "The publish profile for the web app"
+    required: true
+  applicationInsightsInstrumentationKey:
+    description: "The instrumentation key for Application Insights"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@master
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: publish-artifact
+        path: ${{env.DOTNET_ROOT}}/mysite
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{inputs.appName}}
+        slot-name: ${{inputs.slotName}}
+        publish-profile: ${{inputs.publishProfile}}
+        package: ${{env.DOTNET_ROOT}}/mysite
+
+    - run: echo "The webapp-url is ${{ steps.settings.outputs.webapp-url }}"
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+    - name: Configure Azure Web App
+      uses: azure/appservice-settings@v1
+      id: settings
+      with:
+        app-name: ${{inputs.appName}}
+        slot-name: ${{inputs.slotName}}
+        app-settings-json: '[
+                              {
+                                "name": "api:sharedkeyvalue",
+                                "value": "${{ secrets.CotacolApiSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:sharedkeyheadername",
+                                "value": "x-api-subscription-key",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:apiurl",
+                                "value": "https://cotacol-hunting.azure-api.net/api/v1",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "api:redirectdomain",
+                                "value": "cotacol-hunting-app.azurewebsites.net",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "api:loginUrl",
+                                "value": "https://cotacol-hunting-app.azurewebsites.net/account/signin",
+                                "slotSetting": true
+                              },
+                              {
+                                "name": "keyvault:keyvaultname",
+                                "value": "cotacol-hunting",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeySasBlobUri2",
+                                "value": "${{ secrets.KeySasBlobUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "maps:googlemapkey",
+                                "value": "${{ secrets.GoogleMapsKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "admin:admins",
+                                "value": "${{ secrets.AdminUsers }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "keyvault:KeyKeyvaultUri",
+                                "value": "${{ secrets.KeyKeyvaultUri }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "logging:ApplicationInsightsInstrumentationKey",
+                                "value": "${{ inputs.applicationInsightsInstrumentationKey }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientId",
+                                "value": "${{ secrets.StravaClientId }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:clientOauthSecret",
+                                "value": "${{ secrets.StravaOAuthSecret }}",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "strava:AccessTokenUrl",
+                                "value": "https://www.strava.com/api/v3/oauth/token",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "Development",
+                                "slotSetting": false
+                              },
+                              {
+                                "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                                "value": "6.9.1",
+                                "slotSetting": false
+                              }
+                            ]'
+
+
+outputs:
+  webappUrl:
+    description: 'The URL of the deployed web app'
+    value: ${{ steps.set-webapp-url.outputs.webapp-url }}

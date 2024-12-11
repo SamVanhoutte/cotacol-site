@@ -4,6 +4,8 @@
 name: Playwright front end tests 
 
 on:
+  schedule:
+    - cron: "30 17 * * *" # Run at 5:30PM every day
   workflow_call:
     
   workflow_dispatch:
