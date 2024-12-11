@@ -5,7 +5,7 @@ test('Verify page title', async ({ page }, testInfo) => {
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle("Cotacol.cc");
-  const screenshot = await page.screenshot({ quality: 50, type: 'png' })
+  const screenshot = await page.screenshot({ type: 'png' })
   await testInfo.attach('screenshot', {
     body: screenshot,
     contentType: 'image/png',
