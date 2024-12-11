@@ -58,7 +58,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       if: ${{ !cancelled() }}
       shell: bash
-      run: npx github-actions-ctrf ctrf/ctrf-report.json
+      run: npx github-actions-ctrf ctrf/ctrf-output.json
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}

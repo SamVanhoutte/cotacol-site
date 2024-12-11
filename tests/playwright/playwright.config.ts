@@ -25,7 +25,7 @@ const config: PlaywrightTestConfig<{}, {}> = {
   reporter: [
     ['html'],
     ['playwright-ctrf-json-reporter', {
-      outputFile: 'ctrf-report.json', // Optional: Output file name. Defaults to 'ctrf-report.json'.
+      outputFile: 'ctrf-output.json', // Optional: Output file name. Defaults to 'ctrf-report.json'.
       outputDir: 'ctrf',
       screenshot: true
     }]
