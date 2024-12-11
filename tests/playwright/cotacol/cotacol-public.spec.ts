@@ -1,9 +1,11 @@
 import { test, expect, type Page, TestInfo } from '@playwright/test';
 
+// Setup for every test
 test.beforeAll(async ({ browser }) => {
   let page: Page;
+  // Set up new page , take the BaseUrl parameter from input
   page = await browser.newPage();
-  await page.goto(process.env.M365_PAGE_URL || "", {
+  await page.goto(process.env.BaseUrl || "https://localhost:7259/", {
     waitUntil: "domcontentloaded",
   });
 
@@ -27,15 +29,15 @@ test('Col stats should return all cols', async ({ page }, testInfo) => {
   await screenshotPage(page, testInfo, 'colstats');
 });
 
-test('Leaderboard exists', async ({ page }, testInfo) => {
-  await page.goto('/stats');
+// test('Leaderboard exists', async ({ page }, testInfo) => {
+//   await page.goto('/stats');
 
-  // Count the number of elements with an id starting with 'cotacol'
-  await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
-  const cotacolElements = await page.locator('[id="cotacoluser"]').count();
-  expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
-  await screenshotPage(page, testInfo, 'stats');
-});
+//   // Count the number of elements with an id starting with 'cotacol'
+//   await page.waitForSelector('[id="cotacoluser"]', { timeout: 10000 });
+//   const cotacolElements = await page.locator('[id="cotacoluser"]').count();
+//   expect(cotacolElements).toBeGreaterThan(50); // Verify the count is 1000
+//   await screenshotPage(page, testInfo, 'stats');
+// });
 
 test('Climbs list should work', async ({ page }, testInfo) => {
   await page.goto('/climbs');

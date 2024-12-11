@@ -25,6 +25,6 @@ jobs:
       
       - name: Run the frontend tests
         uses: ./.github/actions/playwright
-        #with:
-          # Variables
-          # Base url: ${{ vars.BaseUrl }}
+        with:
+          #Variables
+          BaseUrl: ${{ vars.BaseUrl }}
