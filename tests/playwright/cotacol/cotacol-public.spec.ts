@@ -1,5 +1,14 @@
 import { test, expect, type Page, TestInfo } from '@playwright/test';
 
+test.beforeAll(async ({ browser }) => {
+  let page: Page;
+  page = await browser.newPage();
+  await page.goto(process.env.M365_PAGE_URL || "", {
+    waitUntil: "domcontentloaded",
+  });
+
+});
+
 test('Verify page title', async ({ page }, testInfo) => {
   await page.goto('/');
 
