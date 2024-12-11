@@ -61,7 +61,7 @@ jobs:
         #Variables
         appName: cotacol-hunting-app
         slotName: test
-        publishProfile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }} #${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
+        publishProfile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }} 
         applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}
         azureCredentials: ${{secrets.AZURE_CREDENTIALS}}
         cotacolApiSecret: ${{secrets.CotacolApiSecret}}
@@ -124,9 +124,9 @@ jobs:
   testProdSite:
     name: Run tests on production site
     runs-on: windows-latest
+    needs: deployProdSite
     env:
       working-directory: src/Cotacol.Website
-    needs: deployProdSite
     steps:
     - uses: actions/checkout@v2
       with:
@@ -136,7 +136,7 @@ jobs:
       uses: ./.github/actions/playwright
       with:
         #Variables
-        BaseUrl: ${{ needs.deployProdSite.outputs.webappUrl }}
+        BaseUrl: 'https://www.cotacol.cc'
         environment: 'prod'
 # H  deployprdSite:
 #     needs: buildSite
