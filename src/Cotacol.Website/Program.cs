@@ -127,8 +127,7 @@ namespace Cotacol.Website
                 .Configure<CotacolApiSettings>(options => configuration.GetSection("api").Bind(options))
                 .Configure<StravaSettings>(options => configuration.GetSection("strava").Bind(options))
                 .Configure<MapSettings>(options => configuration.GetSection("maps").Bind(options))
-                .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options))
-                .Configure<KeyVaultSettings>(options => configuration.GetSection("keyvault").Bind(options));
+                .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options));
 
             builder.Services.AddAeroBlazorWebServices(options =>
             {

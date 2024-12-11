@@ -50,6 +50,12 @@ jobs:
         slotName: test
         publishProfile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
         applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}
+        azureCredentials: ${{secrets.AZURE_CREDENTIALS}}
+        cotacolApiSecret: ${{secrets.CotacolApiSecret}}
+        googleMapKey: ${{secrets.GoogleMapsKey}}
+        admins: ${{secrets.AdminUsers}}
+        stravaClientId: ${{secrets.StravaClientId}}
+        stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
   
     - name: Run the frontend tests
       uses: ./.github/actions/playwright
