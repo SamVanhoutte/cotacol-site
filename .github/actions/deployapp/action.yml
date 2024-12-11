@@ -32,6 +32,12 @@ inputs:
   stravaOAuthSecret: 
     description: "The secret for Strava Oauth"
     required: true
+
+outputs:
+  webappUrl:
+    description: 'The URL of the deployed web app'
+    value: ${{ steps.settings.outputs.webapp-url }}
+
 runs:
   using: composite
   steps:
@@ -133,7 +139,3 @@ runs:
                             ]'
 
 
-outputs:
-  webappUrl:
-    description: 'The URL of the deployed web app'
-    value: ${{ steps.set-webapp-url.outputs.webapp-url }}
