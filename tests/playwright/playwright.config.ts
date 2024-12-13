@@ -52,8 +52,6 @@ const config: PlaywrightTestConfig<{}, {}> = {
       name: 'chromium',
       // dependencies: ["setup"],
       use: { ...devices['Desktop Chrome'] ,
-        // Use prepared auth state.
-          storageState: 'tests/playwright/.auth/user.json'
         },
     },
 
@@ -61,16 +59,12 @@ const config: PlaywrightTestConfig<{}, {}> = {
     //   name: 'firefox',
     //   dependencies: ["setup"],
     //   use: { ...devices['Desktop Firefox'] ,
-    //     // Use prepared auth state.
-    //    storageState: 'tests/playwright/.auth/user.json'
     // },
 
     // {
     //   name: 'webkit',
     //   dependencies: ["setup"],
     //   use: { ...devices['Desktop Safari'] ,
-    //     // Use prepared auth state.
-    //     storageState: 'tests/playwright/.auth/user.json'
     // },
   ],
 };
