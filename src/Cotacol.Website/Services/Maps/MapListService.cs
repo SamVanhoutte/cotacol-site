@@ -1,4 +1,5 @@
-using AeroBlazor.Theming;
+// using AeroBlazor.Theming;
+
 using Cotacol.Website.Interfaces;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
@@ -7,25 +8,24 @@ using Columbae;
 using Columbae.World;
 using Cotacol.Website.Models;
 using Cotacol.Website.Shared;
+using Cotacol.Website.Theming;
 using MudBlazor;
 using MouseEvent = GoogleMapsComponents.Maps.MouseEvent;
+using Polyline = Columbae.Polyline;
 using Route = Columbae.World.Route;
-    
+
 namespace Cotacol.Website.Services.Maps
 {
     public class MapListService : MapService, IMapService
     {
-        private readonly IThemeManager _themeManager;
-        private MarkerList _markerList;
-        private PolylineList _lineList;
+        private readonly CotacolThemeManager _themeManager;
+        private MarkerList? _markerList;
+        private PolylineList? _lineList;
         private ILogger<MapListService> _logger;
 
-        public Route RouteToPlot
-        {
-            get;
-            set;
-        }
-        public MapListService(ILoggerFactory factory, IThemeManager themeManager)
+        public Route RouteToPlot { get; set; }
+
+        public MapListService(ILoggerFactory factory, CotacolThemeManager themeManager)
         {
             _themeManager = themeManager;
 
@@ -38,7 +38,7 @@ namespace Cotacol.Website.Services.Maps
         }
 
 
-        public async Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route)
+        public async Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route, bool zoomToRoute = false)
         {
             var color = "green";
             RouteToPlot = route;
@@ -48,36 +48,42 @@ namespace Cotacol.Website.Services.Maps
                 StrokeColor = color,
                 Clickable = false,
                 Draggable = false,
-                Editable = false, StrokeOpacity = 0f,
+                Editable = false, StrokeOpacity = 2f,
                 Map = map1, Path = path
             };
-            options.Icons = new[]
-            {
-                new IconSequence
-                {
-                    Icon = new Symbol
-                    {
-                        Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f,
-                        FillColor = color
-                    },
-                    Offset = "0%", Repeat = "10px"
-                },
-                new IconSequence
-                {
-                    Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color},
-                    Offset = "25%"
-                },
-                new IconSequence
-                {
-                    Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color},
-                    Offset = "75%"
-                },
-            };
+            // options.Icons = new[]
+            // {
+            //     new IconSequence
+            //     {
+            //         Icon = new Symbol
+            //         {
+            //             Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f,
+            //             FillColor = color
+            //         },
+            //         Offset = "0%", Repeat = "10px"
+            //     },
+            //     new IconSequence
+            //     {
+            //         Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
+            //         Offset = "25%"
+            //     },
+            //     new IconSequence
+            //     {
+            //         Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
+            //         Offset = "75%"
+            //     },
+            // };
             if (_lineList == null)
             {
                 _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
             }
-            await _lineList.AddMultipleAsync(new Dictionary<string, PolylineOptions> {{"route", options}});
+
+            await _lineList.AddMultipleAsync(new Dictionary<string, PolylineOptions> { { "route", options } });
+            if(zoomToRoute)
+            {
+                await ZoomToClimbAsync(map1, new Polyline(route.Vertices));
+            }
+
         }
 
         public async Task ClearClimbsAsync()
@@ -96,14 +102,13 @@ namespace Cotacol.Website.Services.Maps
         public async Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout)
         {
-            await ShowClimbsAsync(map1, jsRuntime, new List<UserClimb> {climb}, mapLayout);
+            await ShowClimbsAsync(map1, jsRuntime, new List<UserClimb> { climb }, mapLayout);
         }
 
         public async Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> climbs,
             MapLayout mapLayout, Action<MouseEvent, string> handleClick = null)
         {
             _logger.LogInformation($"Showing multiple climbs {climbs.Count()}");
-
             var climbsToShow = climbs.Where(c => !string.IsNullOrEmpty(c.Polyline));
 
             if (mapLayout.ShowPolylines == false) await RemoveLinesAsync();
@@ -130,13 +135,15 @@ namespace Cotacol.Website.Services.Maps
                     await _lineList.AddListeners(_markerList.Markers.Keys, "click", handleClick);
                 }
             }
-
+            
             if (climbs.Count.Equals(1))
             {
-                var l = Columbae.Polyline.ParsePolyline(climbs.First().Polyline);
+                Console.WriteLine(climbs.Single().Polyline);
+                var l = Columbae.Polyline.ParsePolyline(climbs.Single().Polyline);
+                
                 await ZoomToClimbAsync(map1, l);
             }
-
+            
             if (RouteToPlot != null)
             {
                 await PlotRoute(map1, jsRuntime, RouteToPlot);
@@ -176,32 +183,35 @@ namespace Cotacol.Website.Services.Maps
             var path = polyline.Vertices.Select(v => new LatLngLiteral(v.Latitude, v.Longitude));
             var options = new PolylineOptions()
             {
-                StrokeColor = climb.Done ? _themeManager.CurrentTheme.PaletteLight.Success.Value : _themeManager.CurrentTheme.PaletteLight.Secondary.Value,
-                Clickable = true,
+                StrokeColor = climb.Done
+                    ? _themeManager.CurrentTheme.PaletteLight.Success.Value
+                    : _themeManager.CurrentTheme.PaletteLight.Secondary.Value,
+                Clickable = false,
                 Draggable = false,
                 Editable = false,
                 Map = map1, Path = path
             };
             if (showArrow)
             {
-                options.Icons = new[]
-                {
-                    new IconSequence
-                    {
-                        Icon = new Symbol {Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "green"},
-                        Offset = "0%"
-                    },
-                    new IconSequence
-                    {
-                        Icon = new Symbol {Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red"},
-                        Offset = "100%"
-                    },
-                    // new IconSequence
-                    // {
-                    //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
-                    //     Offset = "50%"
-                    // },
-                };
+                // TODO : fix as per bug https://github.com/rungwiroon/BlazorGoogleMaps/issues/392
+                // options.Icons = new[]
+                // {
+                //     new IconSequence
+                //     {
+                //         Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "green" },
+                //         Offset = "0%"
+                //     },
+                //     // new IconSequence
+                //     // {
+                //     //     Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red" },
+                //     //     Offset = "100%"
+                //     // },
+                //     // new IconSequence
+                //     // {
+                //     //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
+                //     //     Offset = "50%"
+                //     // },
+                // };
             }
 
             return options;

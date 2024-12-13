@@ -11,7 +11,9 @@ import { PlaywrightTestConfig, defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 const config: PlaywrightTestConfig<{}, {}> = {
+  //globalSetup: ".lib/global-setup.ts",
   testDir: './cotacol',
+  //timeout: 5000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -26,7 +28,7 @@ const config: PlaywrightTestConfig<{}, {}> = {
     ['html'],
     ['playwright-ctrf-json-reporter', {
       outputFile: 'ctrf-output.json', // Optional: Output file name. Defaults to 'ctrf-report.json'.
-      outputDir: 'ctrf',
+      outputDir: 'tests/playwright/ctrf',
       screenshot: true,
       annotations: true
     }]
@@ -35,56 +37,42 @@ const config: PlaywrightTestConfig<{}, {}> = {
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://www.cotacol.cc/',
+    baseURL: 'https://localhost:7259/', //'https://www.cotacol.cc/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    actionTimeout: 15000, // Timeout for individual actions (e.g., click, fill)
+    navigationTimeout: 20000, // Timeout for navigation actions (e.g., goto, waitForURL)
   },
 
   /* Configure projects for major browsers */
   projects: [
+    // { name: 'setup', testMatch: 'auth.setup.ts' },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      // dependencies: ["setup"],
+      use: { ...devices['Desktop Chrome'] ,
+        // Use prepared auth state.
+          storageState: 'tests/playwright/.auth/user.json'
+        },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
     // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
+    //   name: 'firefox',
+    //   dependencies: ["setup"],
+    //   use: { ...devices['Desktop Firefox'] ,
+    //     // Use prepared auth state.
+    //    storageState: 'tests/playwright/.auth/user.json'
     // },
 
-    /* Test against branded browsers. */
     // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    //   name: 'webkit',
+    //   dependencies: ["setup"],
+    //   use: { ...devices['Desktop Safari'] ,
+    //     // Use prepared auth state.
+    //     storageState: 'tests/playwright/.auth/user.json'
     // },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 };
 
 export default defineConfig(config);

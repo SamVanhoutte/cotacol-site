@@ -98,7 +98,7 @@ runs:
                               },
                               {
                                 "name": "maps:googlemapkey",
-                                "value": "${{ inputs.googleMapsKey }}",
+                                "value": "${{ inputs.googleMapKey }}",
                                 "slotSetting": false
                               },
                               {

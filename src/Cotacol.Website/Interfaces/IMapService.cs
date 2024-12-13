@@ -15,7 +15,7 @@ namespace Cotacol.Website.Interfaces
         Task ShowClimbAsync(Map map1, IJSRuntime jsRuntime, UserClimb climb,
             MapLayout mapLayout);
     
-        Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route);
+        Task PlotRoute(Map map1, IJSRuntime jsRuntime, Route route, bool zoomToRoute = false);
         Task ClearClimbsAsync();
         Task<InfoWindow> CreateInfoWindowAsync(ClimbData climb, IJSRuntime jsRuntime, Polypoint position=null);
         Task ShowClimbsAsync(Map map1, IJSRuntime jsRuntime, List<UserClimb> toList, MapLayout layout, Action<MouseEvent, string> handleClick = null);

@@ -119,14 +119,22 @@ namespace Cotacol.Website.Services
         public string GetLoginLink()
         {
             var redirectUrl = "account/signin";
-
-            if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
+            try
             {
-                if (!_contextAccessor.HttpContext.Request.Host.Host
-                        .Equals(_apiSettings.RedirectDomain, StringComparison.InvariantCultureIgnoreCase))
+
+                if (!string.IsNullOrEmpty(_apiSettings?.RedirectDomain))
                 {
-                    redirectUrl = _apiSettings.LoginUrl;
+                    if (!_contextAccessor.HttpContext.Request.Host.Host
+                            .Equals(_apiSettings.RedirectDomain, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        redirectUrl = _apiSettings.LoginUrl;
+                    }
                 }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
 
             return redirectUrl;

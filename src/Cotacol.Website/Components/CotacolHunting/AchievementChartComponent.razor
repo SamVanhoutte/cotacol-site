@@ -1,10 +1,9 @@
 @using Cotacol.Website.Models.CotacolApi
 @using System.Drawing.Imaging
-@using AeroBlazor.Theming
 @using ScottPlot
 @using SkiaSharp
 @using Edge = ScottPlot.Edge
-@inject IThemeManager CotacolThemeManager
+@inject CotacolThemeManager CotacolThemeManager
 @if (!string.IsNullOrEmpty(ImageContent))
 {
     <MudImage Src="@ImageContent" Style="max-width: 66vw; height: auto; width: auto;" />
