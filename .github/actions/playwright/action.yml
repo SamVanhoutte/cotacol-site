@@ -32,6 +32,11 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: npm install --save-dev playwright-ctrf-json-reporter
 
+    - name: Install Sharp library
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm install sharp
+
     - name: Store Playwright's Version
       shell: bash
       working-directory: ${{ inputs.working-directory }}

@@ -1,10 +1,9 @@
-using AeroBlazor.Theming;
 using MudBlazor;
 using MudBlazor.Utilities;
 
 namespace Cotacol.Website.Theming;
 
-public class CotacolThemeManager : IThemeManager
+public class CotacolThemeManager //: IThemeManager
 {
     public string PageTitle { get; set; } = "Rental manager";
     

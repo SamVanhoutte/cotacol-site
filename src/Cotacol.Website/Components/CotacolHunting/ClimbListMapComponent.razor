@@ -14,18 +14,18 @@
 <MudGrid>
     @if (Climbs != null)
     {
-        <MudHidden Breakpoint="Breakpoint.MdAndDown">
             <MudItem xs="8"></MudItem>
             <MudItem xs="4">
                 <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await PlotGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
                                @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
-                    <ButtonTemplate>
+                    <ActivatorContent>
                         <MudPaper Height="50px" Outlined="true" Class="@DragClass">
                             <MudText Typo="Typo.body1">Show route on map (click or drag your gpx here)</MudText>
                         </MudPaper>
-                    </ButtonTemplate>
+                    </ActivatorContent>
                 </MudFileUpload>
             </MudItem>
+            <MudHidden Breakpoint="Breakpoint.MdAndDown">
         </MudHidden>
         <MudItem xs="12">
             <div @ref="@_mapElementRef" id="map1" style="height: 100vh;"></div>
@@ -135,7 +135,7 @@
     private MapLayout CheckMapRequirements(bool firstRender, double currentzoom)
     {
         var layout = new MapLayout();
-    // Redraw map, on first render, when map1 was reset or when data was changed
+        // Redraw map, on first render, when map1 was reset or when data was changed
         layout.ShowStartFinish = currentzoom > _arrowTreshold;
         layout.ShowPolylines = currentzoom >= _polylineTreshold;
         layout.ShowMarkers = currentzoom <= _polylineTreshold;
@@ -188,8 +188,9 @@
             {
                 Console.WriteLine("Route found");
                 _routeToPlot = routes.First();
-                await MapService.PlotRoute(_map1, JsRuntime, _routeToPlot);
+                await MapService.PlotRoute(_map1, JsRuntime, _routeToPlot, true);
                 Console.WriteLine("Route plotted");
+                StateHasChanged();
             }
         }
         catch (Exception e)

@@ -1,14 +1,10 @@
 import { test, expect, type Page, TestInfo } from '@playwright/test';
-
+import sharp from 'sharp';
 // Setup for every test
-test.beforeAll(async ({ browser }) => {
-  let page: Page;
-  // Set up new page , take the BaseUrl parameter from input
-  page = await browser.newPage();
+test.beforeAll(async ({ page }) => {
   await page.goto(process.env.BaseUrl || "https://localhost:7259/", {
     waitUntil: "domcontentloaded",
   });
-
 });
 
 test('Verify page title', async ({ page }, testInfo) => {
@@ -54,6 +50,42 @@ test('Climbs list should work', async ({ page }, testInfo) => {
   await page.locator(`#cotacol-${randomNumber}`).click();
 });
 
+// test('Climbdetail should show track on map', async ({ page }, testInfo) => {
+//   const randomNumber = Math.floor(Math.random() * 1000) + 1;
+//   await page.goto(`/cotacol/${randomNumber}`);
+
+//   // Count the number of elements with an id starting with 'cotacol'
+//   const iframeElement = await page.frameLocator('iframe');
+
+//   // Locate the element inside the iframe
+//   const elementInsideIframe = iframeElement.locator('body');
+//   await elementInsideIframe.waitFor();
+
+//   // Take a screenshot of the element inside the iframe
+//   await elementInsideIframe.screenshot({ path: 'screens/mapdetail.png' });
+
+//   expect(await elementInsideIframe.screenshot()).toBeTruthy();
+//   imageShouldContainColor('screens/mapdetail.png', { r: 225, g: 243, b: 243 });
+// });
+
+// test('YearWrappedShouldContainText', async ({ page }, testInfo) => {
+//   const randomNumber = Math.floor(Math.random() * 1000) + 1;
+//   await page.goto(`/cotacol/${randomNumber}`);
+
+//   // Count the number of elements with an id starting with 'cotacol'
+//   const iframeElement = await page.frameLocator('iframe');
+
+//   // Locate the element inside the iframe
+//   const elementInsideIframe = iframeElement.locator('body');
+//   await elementInsideIframe.waitFor();
+
+//   // Take a screenshot of the element inside the iframe
+//   await elementInsideIframe.screenshot({ path: 'screens/mapdetail.png' });
+
+//   expect(await elementInsideIframe.screenshot()).toBeTruthy();
+//   imageShouldContainColor('screens/mapdetail.png', { r: 225, g: 243, b: 243 });
+// });
+
 test('Col list to random detail', async ({ page }, testInfo) => {
   const cotacolId = Math.floor(Math.random() * 1000) + 1;
   await page.goto(`/cotacol/${cotacolId}`);
@@ -70,10 +102,11 @@ test('Col list to random detail', async ({ page }, testInfo) => {
 
 
 async function screenshotPage(page: Page, testInfo: TestInfo, name: string) {
-  await page.screenshot({ path: `screens/${name}.png` });
+  await page.screenshot({ path: `tests/playwright/screens/${name}.png` });
   const screenshot = await page.screenshot({ type: 'png' });
   await testInfo.attach(name, {
     body: screenshot,
     contentType: 'image/png',
   });
 }
+

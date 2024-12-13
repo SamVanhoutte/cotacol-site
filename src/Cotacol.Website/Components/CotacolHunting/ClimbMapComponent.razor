@@ -8,7 +8,8 @@
 
 @if (_cotacol != null)
 {
-    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()" Height="@Height"></GoogleMap>
+    <GoogleMap @ref="@_googleMap" Id="map1" Options="@_mapOptions" OnAfterInit="async () => await OnAfterMapInit()" Height="@Height">
+    </GoogleMap>
 }
 else
 {
@@ -54,6 +55,7 @@ else
     {
         if (_googleMap != null && _cotacol != null && JsRuntime != null)
         {
+            Console.WriteLine("Rendering climb map");
             await MapService.ShowClimbAsync(_googleMap.InteropObject, JsRuntime, _cotacol, new MapLayout
             {
                 CenterMap = true, RedrawNeeded = true,

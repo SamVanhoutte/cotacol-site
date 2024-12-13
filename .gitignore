@@ -9,8 +9,9 @@ src/CotacolApp/app.db
 appsettings.dev.json
 tests/playwright/ctrf/ctrf-output.json
 tests/playwright/screens
+tests/playwright/.auth
 ctrf
-screens
+**/screens
 
 # User-specific files
 *.rsuser
