@@ -29,4 +29,4 @@ jobs:
         uses: ./.github/actions/playwright
         with:
           #Variables
-          BaseUrl: ${{ vars.BaseUrl }}
+          BaseUrl: 'www.cotacol.cc'
