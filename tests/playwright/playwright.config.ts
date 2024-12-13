@@ -37,7 +37,7 @@ const config: PlaywrightTestConfig<{}, {}> = {
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://localhost:7259/', //'https://www.cotacol.cc/',
+    baseURL: 'https://www.cotacol.cc/', //'https://localhost:7259/', //'https://www.cotacol.cc/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -52,8 +52,6 @@ const config: PlaywrightTestConfig<{}, {}> = {
       name: 'chromium',
       // dependencies: ["setup"],
       use: { ...devices['Desktop Chrome'] ,
-        // Use prepared auth state.
-          storageState: 'tests/playwright/.auth/user.json'
         },
     },
 
@@ -61,16 +59,12 @@ const config: PlaywrightTestConfig<{}, {}> = {
     //   name: 'firefox',
     //   dependencies: ["setup"],
     //   use: { ...devices['Desktop Firefox'] ,
-    //     // Use prepared auth state.
-    //    storageState: 'tests/playwright/.auth/user.json'
     // },
 
     // {
     //   name: 'webkit',
     //   dependencies: ["setup"],
     //   use: { ...devices['Desktop Safari'] ,
-    //     // Use prepared auth state.
-    //     storageState: 'tests/playwright/.auth/user.json'
     // },
   ],
 };

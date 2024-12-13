@@ -1,7 +1,7 @@
 import { test, expect, type Page, TestInfo } from '@playwright/test';
 import sharp from 'sharp';
 // Setup for every test
-test.beforeAll(async ({ page }) => {
+test.beforeEach(async ({ page }) => {
   await page.goto(process.env.BaseUrl || "https://localhost:7259/", {
     waitUntil: "domcontentloaded",
   });
