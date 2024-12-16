@@ -30,13 +30,13 @@ namespace Cotacol.Website.Models.CotacolApi
         public object StravaPermissions { get; set; }
 
         [JsonPropertyName("tokenLastRefreshed")]
-        public DateTimeOffset TokenLastRefreshed { get; set; }
+        public DateTimeOffset? TokenLastRefreshed { get; set; }
 
         [JsonPropertyName("tokenIsExpired")]
-        public bool TokenIsExpired { get; set; }
+        public bool? TokenIsExpired { get; set; }
 
         [JsonPropertyName("tokenExpiration")]
-        public DateTimeOffset TokenExpiration { get; set; }
+        public DateTimeOffset? TokenExpiration { get; set; }
 
         [JsonPropertyName("tokenScope")]
         public object TokenScope { get; set; }

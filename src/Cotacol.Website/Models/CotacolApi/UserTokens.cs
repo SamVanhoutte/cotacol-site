@@ -26,21 +26,4 @@ namespace Cotacol.Website.Models.CotacolApi
         [JsonPropertyName("isExpired")]
         public bool IsExpired { get; set; }
     }
-
-    public class ActionHistory
-    {
-        public DateTime? IOSLogin { get; set; }
-        public DateTime? AndroidLogin { get; set; }
-        public DateTime? WebLogin { get; set; }
-        public DateTime? FullSync { get; set; }
-        public DateTime? ActivityWebhookSync { get; set; }
-    }
-    public class FullSyncStatus
-    {
-        public bool Succeeded { get; set; }
-        public DateTime SyncTime { get; set; }
-        public string ErrorDescription { get; set; }
-        public string Trigger { get; set; }
-        public string ErrorCode { get; set; }
-    }
 }

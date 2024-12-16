@@ -37,4 +37,8 @@
         <EmbeddedResource Include="wwwroot\fonts\cooper_black_regular.ttf"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\aeroblazor\src\AeroBlazor\AeroBlazor.csproj" />
+    </ItemGroup>
+
 </Project>

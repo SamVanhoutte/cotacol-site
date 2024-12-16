@@ -1,5 +1,6 @@
 @page "/settings"
 @page "/settings/{UserId}"
+@using AeroBlazor.Extensions
 @using Cotacol.Website.Models.CotacolApi
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
@@ -130,11 +131,11 @@
                                     </MudListItem>
                                     <MudListItem>
                                         <MudText Typo="Typo.body2">Token last refreshed</MudText>
-                                        <MudText Typo="Typo.body1">@(_stravaProfile.TokenLastRefreshed.ToString("g"))</MudText>
+                                        <MudText Typo="Typo.body1">@(_stravaProfile.TokenLastRefreshed.PrintHistoricalTime())</MudText>
                                     </MudListItem>
                                     <MudListItem>
                                         <MudText Typo="Typo.body2">Token expiration</MudText>
-                                        <MudText Typo="Typo.body1">@(_stravaProfile.TokenExpiration.ToString("g"))</MudText>
+                                        <MudText Typo="Typo.body1">@(_stravaProfile.TokenExpiration.PrintHistoricalTime())</MudText>
                                     </MudListItem>
                                 }
                             </MudList>
