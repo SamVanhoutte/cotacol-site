@@ -48,31 +48,31 @@ namespace Cotacol.Website.Services.Maps
                 StrokeColor = color,
                 Clickable = false,
                 Draggable = false,
-                Editable = false, StrokeOpacity = 2f,
+                Editable = false, StrokeOpacity = 0f,
                 Map = map1, Path = path
             };
-            // options.Icons = new[]
-            // {
-            //     new IconSequence
-            //     {
-            //         Icon = new Symbol
-            //         {
-            //             Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f,
-            //             FillColor = color
-            //         },
-            //         Offset = "0%", Repeat = "10px"
-            //     },
-            //     new IconSequence
-            //     {
-            //         Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
-            //         Offset = "25%"
-            //     },
-            //     new IconSequence
-            //     {
-            //         Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
-            //         Offset = "75%"
-            //     },
-            // };
+            options.Icons = new[]
+            {
+                new IconSequence
+                {
+                    Icon = new Symbol
+                    {
+                        Path = SymbolPath.CIRCLE, Scale = 2f, StrokeColor = color, StrokeOpacity = 1f, FillOpacity = 1f,
+                        FillColor = color
+                    },
+                    Offset = "0%", Repeat = "10px"
+                },
+                new IconSequence
+                {
+                    Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
+                    Offset = "25%"
+                },
+                new IconSequence
+                {
+                    Icon = new Symbol { Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 2f, StrokeColor = color },
+                    Offset = "75%"
+                },
+            };
             if (_lineList == null)
             {
                 _lineList = await PolylineList.CreateAsync(jsRuntime, new Dictionary<string, PolylineOptions>());
@@ -193,25 +193,24 @@ namespace Cotacol.Website.Services.Maps
             };
             if (showArrow)
             {
-                // TODO : fix as per bug https://github.com/rungwiroon/BlazorGoogleMaps/issues/392
-                // options.Icons = new[]
-                // {
-                //     new IconSequence
-                //     {
-                //         Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "green" },
-                //         Offset = "0%"
-                //     },
-                //     // new IconSequence
-                //     // {
-                //     //     Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red" },
-                //     //     Offset = "100%"
-                //     // },
-                //     // new IconSequence
-                //     // {
-                //     //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
-                //     //     Offset = "50%"
-                //     // },
-                // };
+                options.Icons = new[]
+                {
+                    new IconSequence
+                    {
+                        Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "green" },
+                        Offset = "0%"
+                    },
+                    new IconSequence
+                    {
+                        Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red" },
+                        Offset = "100%"
+                    },
+                    new IconSequence
+                    {
+                        Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
+                        Offset = "50%"
+                    },
+                };
             }
 
             return options;

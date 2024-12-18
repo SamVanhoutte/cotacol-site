@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="AspNet.Security.OAuth.Strava" Version="6.0.15"/>
-        <PackageReference Include="BlazorGoogleMaps" Version="4.9.1" />
+        <PackageReference Include="BlazorGoogleMaps" Version="4.9.2" />
         <PackageReference Include="Columbae" Version="2.3.0"/>
         <PackageReference Include="Flurl.Http" Version="4.0.2" />
         <PackageReference Include="Guard.Net" Version="3.0.0"/>
