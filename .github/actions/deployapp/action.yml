@@ -32,7 +32,9 @@ inputs:
   stravaOAuthSecret: 
     description: "The secret for Strava Oauth"
     required: true
-
+  apiUrl:
+    description: "The URL for the API"
+    required: true
 outputs:
   webappUrl:
     description: 'The URL of the deployed web app'
@@ -83,7 +85,7 @@ runs:
                               },
                               {
                                 "name": "api:apiurl",
-                                "value": "https://cotacol-hunting.azure-api.net/api/v1",
+                                "value": "${{ inputs.apiUrl }}",
                                 "slotSetting": false
                               },
                               {
@@ -93,7 +95,7 @@ runs:
                               },
                               {
                                 "name": "api:loginUrl",
-                                "value": "https://cotacol-hunting-app.azurewebsites.net/account/signin",
+                                "value": "${{ steps.settings.outputs.webapp-url }}/account/signin",
                                 "slotSetting": true
                               },
                               {

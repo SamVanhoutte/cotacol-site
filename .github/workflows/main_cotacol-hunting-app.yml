@@ -69,6 +69,7 @@ jobs:
         admins: ${{secrets.AdminUsers}}
         stravaClientId: ${{secrets.StravaClientId}}
         stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
+        apiUrl: 'https://cotacol-hunting.azure-api.net/backend/test/api/v1'
     outputs:
       webappUrl: ${{ steps.deploy-test-app.outputs.webappUrl }}
 
@@ -118,6 +119,7 @@ jobs:
         admins: ${{secrets.AdminUsers}}
         stravaClientId: ${{secrets.StravaClientId}}
         stravaOAuthSecret: ${{secrets.StravaOAuthSecret}}
+        apiUrl: 'https://cotacol-hunting.azure-api.net/backend/prod/api/v1'
     outputs:
       webappUrl: ${{ steps.deploy-prod-app.outputs.webappUrl }}
 
