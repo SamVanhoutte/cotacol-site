@@ -1,11 +1,11 @@
 @* @using AeroBlazor.Theming *@
-@using Cotacol.Website.Interfaces
+@using AeroBlazor.Theming
 @using Cotacol.Website.Models
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
 @inject ILogger<ClimbListTableComponent> Logger
-@inject CotacolThemeManager CotacolThemeManager
+@inject IThemeManager CotacolThemeManager
 <MudTable FixedHeader="true" Height="70vh"
           LoadingProgressColor="Color.Secondary"
           Filter="new Func<UserClimb, bool>(FilterClimb)" Items="@Climbs" RowsPerPage="2000" Style="width: 80vw; background-color: transparent">
@@ -14,15 +14,15 @@
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Id)"><MudText Typo="Typo.subtitle1">#</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Id)"><MudText Typo="Typo.subtitle1"></MudText></MudTableSortLabel></MudTh>
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Name)"><MudText Typo="Typo.subtitle1">Name</MudText></MudTableSortLabel></MudTh>
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Province)"><MudText Typo="Typo.subtitle1">Province</MudText></MudTableSortLabel></MudTh>
         <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Surface)"><MudText Typo="Typo.subtitle1">Surface</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.CotacolPoints)"><MudText Typo="Typo.subtitle1">Points</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1">Length</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.ElevationDiff)"><MudText Typo="Typo.subtitle1">Elevation</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.AvgGrade)"><MudText Typo="Typo.subtitle1">Grade</MudText></MudTableSortLabel></MudTh>
-        <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.BomScore)"><MudText Typo="Typo.subtitle1">Bomb#</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.CotacolPoints)"><MudText Typo="Typo.subtitle1">Points</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1">Length</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.ElevationDiff)"><MudText Typo="Typo.subtitle1">Elevation</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.AvgGrade)"><MudText Typo="Typo.subtitle1">Grade</MudText></MudTableSortLabel></MudTh>
+        <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<UserClimb, object>(x=>x.BomScore)"><MudText Typo="Typo.subtitle1">Bomb#</MudText></MudTableSortLabel></MudTh>
         @if (UserProfile.IsAuthenticated)
         {
             <MudTh Style="@HeaderStyle"><MudText Typo="Typo.subtitle1">Plan</MudText></MudTh>
@@ -31,16 +31,9 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            @* <AeroFlexContainer CenterAlign="true"> *@
-            @if (context.Done)
-            {
-                <MudAvatar Color="Color.Success"><MudText>@context.Id</MudText></MudAvatar>
-            }
-            else
-            {
-                <MudText Typo="Typo.body1">@context.Id</MudText>
-            }
-            @* </AeroFlexContainer> *@
+            <AeroFlexContainer CenterAlign="true">
+                    <MudAvatar Color="@(context.Done ? Color.Success : Color.Transparent)"><MudText>@context.Id</MudText></MudAvatar>
+            </AeroFlexContainer>
         </MudTd>
         <MudTd style="max-width: 200px">
             <MudLink Href='@($"cotacol/{context.Id}")' id='@($"cotacol-{context.Id}")' Typo="Typo.body1" Color="Color.Secondary" Style="font-weight: bold">
@@ -57,10 +50,10 @@
             <MudText Typo="Typo.body1">@context.CotacolPoints</MudText>
         </MudTd>
         <MudTd style="text-align: right">
-            <MudText Typo="Typo.body1">@context.Distance.Number() m</MudText>
+            <MudText Typo="Typo.body1">@context.Distance.Number(suffix: "m")</MudText>
         </MudTd>
         <MudTd style="text-align: right">
-            <MudText Typo="Typo.body1">@context.ElevationDiff m</MudText>
+            <MudText Typo="Typo.body1">@context.ElevationDiff.Number(suffix: "m")</MudText>
         </MudTd>
         <MudTd style="text-align: right">
             <MudText Typo="Typo.body1">@context.AvgGrade.Percentage()</MudText>
@@ -115,6 +108,7 @@
     }
 
     private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderRightStyle => "background-color: #dcd5cb; font-weight: bold; text-align: right";
 
     [Parameter]
     public EventCallback<IEnumerable<UserClimb>> ClimbsChanged { get; set; }

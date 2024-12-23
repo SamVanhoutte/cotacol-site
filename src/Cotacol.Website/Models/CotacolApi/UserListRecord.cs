@@ -1,6 +1,4 @@
-using System;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {

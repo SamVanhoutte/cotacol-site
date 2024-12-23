@@ -19,7 +19,7 @@
             @if (_badgeDetail == null)
             {
                 <MudItem xs="12">
-                    <LoadingPatienceComponent WaitingMessage="Retrieving the badge details..."/>
+                    <AeroLoader WaitingMessage="Retrieving the badge details..."/>
                 </MudItem>
             }
             else
@@ -48,7 +48,7 @@
                     <MudSwitch T="bool" @bind-Checked="@mapMode" Label='@(mapMode ? "Map view" : "List view")' Color="Color.Secondary"/>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.h2">Required cols</MudText>
+                    <AeroSubtitle>Required cols</AeroSubtitle>
                 </MudItem>
                 <MudItem xs="12">
                     <ClimbListComponent HideFilters="true" Mode="@ViewMode" CotacolIds="@GetColIds()" UserId="@UserId"></ClimbListComponent>

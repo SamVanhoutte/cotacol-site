@@ -1,15 +1,11 @@
 // using AeroBlazor.Theming;
 
+using AeroBlazor.Theming;
 using Cotacol.Website.Interfaces;
 using GoogleMapsComponents.Maps;
 using GoogleMapsComponents.Maps.Extension;
 using Microsoft.JSInterop;
-using Columbae;
-using Columbae.World;
 using Cotacol.Website.Models;
-using Cotacol.Website.Shared;
-using Cotacol.Website.Theming;
-using MudBlazor;
 using MouseEvent = GoogleMapsComponents.Maps.MouseEvent;
 using Polyline = Columbae.Polyline;
 using Route = Columbae.World.Route;
@@ -18,14 +14,14 @@ namespace Cotacol.Website.Services.Maps
 {
     public class MapListService : MapService, IMapService
     {
-        private readonly CotacolThemeManager _themeManager;
+        private readonly IThemeManager _themeManager;
         private MarkerList? _markerList;
         private PolylineList? _lineList;
         private ILogger<MapListService> _logger;
 
         public Route RouteToPlot { get; set; }
 
-        public MapListService(ILoggerFactory factory, CotacolThemeManager themeManager)
+        public MapListService(ILoggerFactory factory, IThemeManager themeManager)
         {
             _themeManager = themeManager;
 

@@ -1,9 +1,9 @@
 @using Cotacol.Website.Models.CotacolApi
-@using System.Drawing.Imaging
+@using AeroBlazor.Theming
 @using ScottPlot
 @using SkiaSharp
 @using Edge = ScottPlot.Edge
-@inject CotacolThemeManager CotacolThemeManager
+@inject IThemeManager CotacolThemeManager
 @if (!string.IsNullOrEmpty(ImageContent))
 {
     <MudImage Src="@ImageContent" Style="max-width: 66vw; height: auto; width: auto;" />
@@ -12,7 +12,7 @@ else
 {
     if (string.IsNullOrEmpty(Error))
     {
-        <LoadingPatienceComponent WaitingMessage="Loading chart..."/>
+        <AeroLoader WaitingMessage="Loading chart..."/>
     }
     else
     {

@@ -9,7 +9,7 @@
         @if (_systemStatus == null)
         {
             <MudItem xs="12">
-                <LoadingPatienceComponent WaitingMessage="Fetching backend status"></LoadingPatienceComponent>
+                <AeroLoader WaitingMessage="Fetching backend status"></AeroLoader>
             </MudItem>
         }
         else
@@ -18,7 +18,7 @@
                 <MudGrid>
                     <MudItem xs="6">
                         <MudItem xs="12">
-                            <MudText Typo="Typo.h2" Color="Color.Secondary">Strava API throttling status</MudText>
+                            <AeroSubtitle>Strava API throttling status</AeroSubtitle>
                         </MudItem>
                         <MudItem xs="4">
                             <MudText Typo="Typo.body1">
@@ -52,7 +52,7 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudItem xs="12">
-                            <MudText Typo="Typo.h2" Color="Color.Secondary">Server activity</MudText>
+                            <AeroSubtitle>Server activity</AeroSubtitle>
                         </MudItem>
                         <MudItem xs="4">
                             <MudText Typo="Typo.body1">

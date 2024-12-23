@@ -1,6 +1,6 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿@using AeroBlazor.Theming
+@using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options
-@using Cotacol.Website.Interfaces
 @using Cotacol.Website.Models.Settings
 @inject ICotacolUserClient CotacolUserClient
 @inject IUserProfileManager UserProfile
@@ -8,26 +8,29 @@
 @inject IHttpContextAccessor HttpContextAccessor
 <AuthorizeView>
     <Authorized>
-        @if (uniqueCols > 0)
-        {
-            <span>
-                <MudIcon Icon="@Icons.Material.Filled.BarChart"></MudIcon>
-            </span>
-            <span>
-                <MudText Typo="Typo.body1">@uniqueCols cols</MudText>
-            </span>
-            <span>
-                <MudIcon Icon="@Icons.Material.Filled.Numbers"></MudIcon>
-            </span>
-            <span>
-                <MudText Typo="Typo.body1">@totalPoints.Number() pts</MudText>
-            </span>
-        }
-        <MudLink Href="settings" Color="Color.Secondary" Typo="Typo.body1">Settings</MudLink>
-        <MudLink Href="signout" Color="Color.Secondary" Typo="Typo.body1">Log out</MudLink>
+        <AeroFlexContainer RightAlign="true">
+            @if (uniqueCols > 0)
+            {
+                <span>
+                    <MudIcon Icon="@Icons.Material.Filled.BarChart"></MudIcon>
+                </span>
+                <span>
+                    <MudText Typo="Typo.body1">@uniqueCols cols</MudText>
+                </span>
+                <span>
+                    <MudIcon Icon="@Icons.Material.Filled.Numbers"></MudIcon>
+                </span>
+                <span>
+                    <MudText Typo="Typo.body1">@totalPoints.Number() pts</MudText>
+                </span>
+            }
+            <AeroDivider Minimal="true" Type="AeroDividerType.Horizontal"></AeroDivider>
+            <MudLink Href="settings" Color="Color.Secondary" Typo="Typo.body1">Settings</MudLink>
+            <MudLink Href="signout" Color="Color.Secondary" Typo="Typo.body1">Log out</MudLink>
+        </AeroFlexContainer>
     </Authorized>
     <NotAuthorized>
-        <StravaLogin />
+        <StravaLogin/>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -51,6 +54,7 @@
                 Console.WriteLine(e.ToString());
             }
         }
+
         await base.OnInitializedAsync();
     }
 

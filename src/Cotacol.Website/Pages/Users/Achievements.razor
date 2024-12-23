@@ -26,7 +26,7 @@
                 @if (_achievements == null)
                 {
                     <MudItem xs="12">
-                        <LoadingPatienceComponent WaitingMessage="We're retrieving the results , please be patient..."/>
+                        <AeroLoader WaitingMessage="We're retrieving the results , please be patient..."/>
                     </MudItem>
                 }
                 else
@@ -35,21 +35,21 @@
                         <UserAdminLinks UserId="@UserId"/>
                     </MudItem>
                     <MudItem xs="12" md="6">
-                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Your year in a Pic</MudText>
+                        <AeroSubtitle>Your year in a Pic</AeroSubtitle>
                         <MudLink Href='@($"img/year/{UserIdToShow}")' Target="_blank">
                             <MudImage id="cotacolwrapped" Src='@($"img/year/{UserIdToShow}")' Width="350"></MudImage>
                         </MudLink>
                         <MudText Typo="Typo.body1">Share you achievements with your friends on social media!</MudText>
                     </MudItem>
                     <MudItem xs="12" md="6">
-                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Evolution</MudText>
+                        <AeroSubtitle>Evolution</AeroSubtitle>
                         <MudText Typo="Typo.body1">Total points: @_achievements.TotalScore.Number()</MudText>
                         <MudText Typo="Typo.body1">Unique cols: @_achievements.UniqueCols.Number()</MudText>
                         <AchievementChartComponent Achievements="@_achievements"/>
                     </MudItem>
 
                     <MudItem xs="12" md="6">
-                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Your most popular climbs</MudText>
+                        <AeroSubtitle>Your most popular climbs</AeroSubtitle>
                         @if (string.IsNullOrEmpty(UserId))
                         {
                             <MudText Typo="Typo.body1">These climbs are the climbs you ride the most, the stars indicate you're local legend.</MudText>
@@ -61,20 +61,10 @@
                         <MudList T="string">
                             @foreach (var climb in _achievements.ColResults.OrderByDescending(cr => cr.Achievements.Count()).Take(10))
                             {
-                                @if (_achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)))
-                                {
                                     <MudListItem Href='@($"cotacol/{climb.CotacolId}")'>
-                                        <AvatarContent><MudAvatar><MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Secondary"></MudIcon> </MudAvatar> </AvatarContent>
+                                        <AvatarContent><MudAvatar><MudIcon Icon="@(_achievements.LocalLegends.Any(leg => leg.Key.Equals(climb.CotacolId)) ? Icons.Material.Filled.Star : Icons.Material.Filled.ArrowUpward)" Color="Color.Secondary"></MudIcon></MudAvatar></AvatarContent>
                                         <ChildContent>@climb.CotacolName (@climb.Achievements.Count() attempts)</ChildContent>
                                     </MudListItem>
-                                }
-                                else
-                                {
-                                    <MudListItem Href='@($"cotacol/{climb.CotacolId}")'>
-                                        <AvatarContent><MudAvatar><MudIcon Icon="@Icons.Material.Filled.ArrowUpward"></MudIcon> </MudAvatar> </AvatarContent>
-                                        <ChildContent>@climb.CotacolName (@climb.Achievements.Count() attempts)</ChildContent>
-                                    </MudListItem>
-                                }
                             }
                         </MudList>
                     </MudItem>
@@ -87,7 +77,7 @@
                                 @if (_achievements.LocalLegends.Any())
                                 {
                                     <MudItem xs="12">
-                                        <MudText Typo="Typo.h2" Color="Color.Tertiary">You're a local legend</MudText>
+                                        <AeroSubtitle>You're a local legend</AeroSubtitle>
                                         <MudText Typo="Typo.body1">You are local legend if you did a col more than 5 times and no other user did more than you. These cols are owned by you, as a local legend:</MudText>
                                         <MudList T="string">
                                             @foreach (var legend in _achievements.LocalLegends.OrderByDescending(cr => cr.Value))
@@ -108,7 +98,7 @@
                                 @if (_nearLegendClimbs.Any())
                                 {
                                     <MudItem xs="12">
-                                        <MudText Typo="Typo.h2" Color="Color.Tertiary">Ready to become a legend?</MudText>
+                                        <AeroSubtitle>Ready to become a legend?</AeroSubtitle>
                                         <MudText Typo="Typo.body1" Color="Color.Tertiary">These cols require few attempts for you to become Local Legend</MudText>
                                         <MudList T="string">
                                             @foreach (var climb in _nearLegendClimbs)
@@ -132,7 +122,7 @@
                     @if (UserProfile.IsAdmin)
                     {
                         <MudItem xs="12">
-                            <MudText Typo="Typo.h2" Color="Color.Tertiary">Completed badges</MudText>
+                            <AeroSubtitle>Completed badges</AeroSubtitle>
                             <br/>
                         </MudItem>
                         <MudItem xs="12">

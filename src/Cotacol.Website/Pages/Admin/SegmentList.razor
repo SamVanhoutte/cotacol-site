@@ -7,12 +7,13 @@
 
 @if (UserProfile.IsAdmin)
 {
-    <MudGrid>
         @if (segmentList == null)
         {
+            <MudGrid>
             <MudItem xs="12">
-                <LoadingPatienceComponent WaitingMessage="Fetching from the backend..."></LoadingPatienceComponent>
+                <AeroLoader WaitingMessage="Fetching from the backend..."></AeroLoader>
             </MudItem>
+            </MudGrid>
         }
         else
         {
@@ -24,8 +25,7 @@
                     <MudText Typo="Typo.caption">@(segmentList.Count) segments listed</MudText>
                 </MudItem>
                 <MudItem xs="12">
-
-                    <div style="overflow-y: scroll; height:100vh;">
+                    <div style="overflow-y: scroll; height:80vh;">
                         <MudTable FixedHeader="true" Height="100%"
                                   LoadingProgressColor="Color.Secondary"
                                   Filter="new Func<SegmentDataValidation, bool>(FilterSegment)" Items="@segmentList" RowsPerPage="50" Style="width: 100%; background-color: transparent">
@@ -128,7 +128,6 @@
                 </MudItem>
             </MudGrid>
         }
-    </MudGrid>
 }
 else
 {

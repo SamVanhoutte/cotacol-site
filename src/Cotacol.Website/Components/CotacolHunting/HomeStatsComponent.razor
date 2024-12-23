@@ -1,14 +1,11 @@
-@using System.Xml
 @using System.Text
-@using System.ComponentModel
-@using Cotacol.Website.Interfaces
 @using Cotacol.Website.Models.CotacolApi
 @inject ILogger<HomeStatsComponent> Logger
 <MudGrid Spacing="0">
     @if (Stats?.RecentActivities != null)
     {
         <MudItem xs="12">
-            <MudText Typo="Typo.h2" Color="Color.Tertiary">Combined achievements</MudText>
+            <AeroSubtitle>Combined achievements</AeroSubtitle>
         </MudItem>
         <MudItem xs="12" Class="d-flex">
             <MudIcon Icon="@Icons.Material.Filled.PersonAdd"></MudIcon>

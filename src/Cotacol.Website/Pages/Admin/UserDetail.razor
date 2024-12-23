@@ -13,10 +13,10 @@
         <MudItem xs="6" md="4">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.h2" Color="Color.Secondary">Trigger full sync</MudText>
+                    <AeroSubtitle>Trigger full sync</AeroSubtitle>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Checked="@fullSync"></MudSwitch>
+                    <AeroToggle Label="Sync ALL activities" @bind-Value="@fullSync"></AeroToggle>
                     <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
                 </MudItem>
             </MudGrid>
@@ -24,7 +24,7 @@
         <MudItem xs="6" md="4">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.h2" Color="Color.Secondary">Trigger activity sync</MudText>
+                    <AeroSubtitle>Trigger activity sync</AeroSubtitle>
                 </MudItem>
                 <MudItem xs="10">
                     <MudTextField T="string" @bind-Value="@activityId" Label="Activity ID" HelperText="Enter the activity ID you want to sync"></MudTextField>
@@ -39,11 +39,11 @@
             <MudDivider></MudDivider>
         </MudItem>
         <MudItem xs="6" md="4">
-            <MudButton StartIcon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await RefreshDataAsync())" Variant="Variant.Filled" Color="Color.Secondary">Refresh all</MudButton>
+            <AeroButton StartIcon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await RefreshDataAsync())">Refresh all</AeroButton>
         </MudItem>
         <MudItem xs="6" md="4">
             <div style="width:100%; text-align: right">
-                <MudButton StartIcon="@Icons.Material.Filled.PersonRemove" OnClick="@(async () => await DeleteUserAsync())" Variant="Variant.Filled" Color="Color.Warning">Delete user</MudButton>
+                <AeroButton StartIcon="@Icons.Material.Filled.PersonRemove" OnClick="@(async () => await DeleteUserAsync())" Mode="AeroButton.ButtonMode.Warning">Delete user</AeroButton>
             </div>
         </MudItem>
         <MudItem xs="0" md="4"></MudItem>
@@ -51,7 +51,7 @@
             <MudDivider></MudDivider>
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Sync status</MudText>
+            <AeroSubtitle>Sync status</AeroSubtitle>
             @if (syncStatus != null)
             {
                 <MudList T="string">
@@ -150,11 +150,11 @@
             }
             else
             {
-                <LoadingPatienceComponent WaitingMessage="Retrieving sync status"/>
+                <AeroLoader WaitingMessage="Retrieving sync status"/>
             }
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Audit history</MudText>
+            <AeroSubtitle>Audit history</AeroSubtitle>
             @if (userDetail.Audit != null)
             {
                 <MudList T="string">
@@ -217,11 +217,11 @@
             }
             else
             {
-                <LoadingPatienceComponent WaitingMessage="Retrieving audit info"/>
+                <AeroLoader WaitingMessage="Retrieving audit info"/>
             }
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Strava token</MudText>
+            <AeroSubtitle>Strava token</AeroSubtitle>
             @if (userDetail.UserTokens != null)
             {
                 <MudList T="string">
@@ -299,11 +299,11 @@
             }
             else
             {
-                <LoadingPatienceComponent WaitingMessage="Retrieving strava token info"/>
+                <AeroLoader WaitingMessage="Retrieving strava token info"/>
             }
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">User state</MudText>
+            <AeroSubtitle>User state</AeroSubtitle>
             <MudTextField T="string" Label="User state" Variant="Variant.Outlined" Lines="20" Text="@userStateJson"></MudTextField>
         </MudItem>
     }

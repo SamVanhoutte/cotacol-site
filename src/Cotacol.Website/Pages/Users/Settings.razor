@@ -29,7 +29,7 @@
     {
         <MudItem xs="12" lg="5">
             <MudText Typo="Typo.body1">It seems we need your Strava authorization at our backend. Please click the link below and come back to refresh, after you successfully authenticated against Strava.</MudText>
-            <MudButton Variant="Variant.Filled" OnClick="() => StravaAuthRequired = false" StartIcon="@Icons.Material.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+            <AeroButton OnClick="() => StravaAuthRequired = false" StartIcon="@Icons.Material.Filled.Link" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</AeroButton>
             <MudText Typo="Typo.body1">After doing so, please log-off and log-on again. Apologies for this inconvenience.</MudText>
         </MudItem>
     }
@@ -46,7 +46,7 @@
                     @if (_userProfile != null)
                     {
                         <MudItem xs="12">
-                            <MudText Typo="Typo.h2" Color="Color.Secondary">Your settings</MudText>
+                            <AeroSubtitle>Your settings</AeroSubtitle>
                         </MudItem>
                         @if (!string.IsNullOrEmpty(StatusMessage))
                         {
@@ -55,32 +55,33 @@
                             </MudItem>
                         }
                         <MudItem xs="12">
-                            <MudTextField T="string" @bind-Text="@_userProfile.EmailAddress" FullWidth="true" HelperText="Email" Label="Email address"></MudTextField>
+                            <AeroTextField T="string" @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Can be used for notifications" Label="Email address"></AeroTextField>
+                            @* <MudTextField T="string" HelperText="Email" Label="Email address"></MudTextField> *@
                         </MudItem>
                         <MudItem xs="12">
-                            <MudSwitch T="bool" Color="Color.Secondary" Label="Join beta feature" @bind-Checked="@_userProfile.Settings.EnableBetaFeatures"></MudSwitch>
+                            <AeroToggle @bind-Value="@_userProfile.Settings.EnableBetaFeatures" Label="Join beta features"></AeroToggle>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudSwitch T="bool" Color="Color.Secondary" Label="Update activity descriptions" @bind-Checked="@_userProfile.Settings.UpdateActivityDescription"></MudSwitch>
+                            <AeroToggle @bind-Value="@_userProfile.Settings.UpdateActivityDescription" Label="Update activity descriptions"></AeroToggle>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudSwitch T="bool" Color="Color.Secondary" Label="Hide profile from stats" @bind-Checked="@_userProfile.Settings.PrivateProfile"></MudSwitch>
-                            <MudDivider></MudDivider>
+                            <AeroToggle @bind-Value="@_userProfile.Settings.PrivateProfile" Label="Hide profile from stats"></AeroToggle>
+                            <AeroDivider></AeroDivider>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="async () => await SaveSettingsAsync()">Save</MudButton>
+                            <AeroButton StartIcon="@Icons.Material.Filled.Save" OnClick="async () => await SaveSettingsAsync()">Save</AeroButton>
                         </MudItem>
                     }
                     else
                     {
-                        <LoadingPatienceComponent WaitingMessage="Loading settings..."/>
+                        <AeroLoader WaitingMessage="Loading settings..."/>
                     }
                     <MudItem xs="12">
-                        <MudText Typo="Typo.h2" Color="Color.Secondary">Danger zone</MudText>
-                        <MudCheckBox T="bool" @bind-Checked="@confirmed">By deleting my account, I understand all data will be removed from the server.</MudCheckBox>
+                        <AeroSubtitle>Danger zone</AeroSubtitle>
+                        <MudCheckBox T="bool" @bind-Value="@confirmed">By deleting my account, I understand all data will be removed from the server.</MudCheckBox>
                         @if (confirmed)
                         {
-                            <MudButton Variant="Variant.Filled" OnClick="@(()=>confirmationDialogOpen=!confirmationDialogOpen)" StartIcon="@Icons.Material.Filled.DeleteForever" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Warning">Delete data</MudButton>
+                            <AeroButton Mode="AeroButton.ButtonMode.Warning" OnClick="@(()=>confirmationDialogOpen=!confirmationDialogOpen)" StartIcon="@Icons.Material.Filled.DeleteForever">Delete data</AeroButton>
                         }
                     </MudItem>
                 </MudGrid>
@@ -97,7 +98,7 @@
                 {
                     <MudGrid>
                         <MudItem xs="12">
-                            <MudText Typo="Typo.h2" Color="Color.Secondary">Strava permission review</MudText>
+                            <AeroSubtitle>Strava permission review</AeroSubtitle>
                         </MudItem>
                         <MudItem xs="12">
                             <MudList T="string" Dense="true">
@@ -144,24 +145,26 @@
                             <MudText Typo="Typo.body2">If you want to update and re-authorize Strava, using the right permissions, click the button below. You will be redirected to a new tab that you can easily close afterwards.</MudText>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Link" DisableElevation="true" ButtonType="ButtonType.Button" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</MudButton>
+                            <AeroButton StartIcon="@Icons.Material.Filled.Link" Color="Color.Secondary" Target="_blank" Href="http://www.strava.com/oauth/authorize?client_id=4987&response_type=code&redirect_uri=https://cotacol-hunting-workers.azurewebsites.net/api/StravaTokenHttpTrigger&approval_prompt=force&state=cotacolll&scope=read,read_all,activity:read_all,activity:read,activity:write,profile:write">Re-Authorize Strava</AeroButton>
                         </MudItem>
                     </MudGrid>
                 }
                 else
                 {
-                    <LoadingPatienceComponent WaitingMessage="Loading strava permissions..."/>
+                    <AeroLoader WaitingMessage="Loading strava permissions..."/>
                 }
             }
         </MudItem>
         <MudItem xs="6" md="4">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.h2" Color="Color.Secondary">Sync Strava</MudText>
+                    <AeroSubtitle>Sync Strava</AeroSubtitle>
                 </MudItem>
-                    <MudItem xs="12">
-                    <MudSwitch T="bool" Color="Color.Secondary" Label="Sync ALL activities" @bind-Checked="@fullSync"></MudSwitch>
-                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
+                <MudItem xs="12">
+                    <AeroFlexContainer>
+                        <AeroToggle @bind-Value="@fullSync" Label="Sync ALL"></AeroToggle>
+                        <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
+                    </AeroFlexContainer>
                 </MudItem>
             </MudGrid>
         </MudItem>
@@ -178,8 +181,8 @@
         <MudText Typo="Typo.body1" Color="Color.Warning">This action is irriversable, Sure you want to remove the user?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(async () => await CotacolUserClient.RemoveUserAsync(UserId))">Delete user</MudButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(e => { confirmationDialogOpen = false; })">Cancel</MudButton>
+        <AeroButton OnClick="@(async () => await CotacolUserClient.RemoveUserAsync(UserId))">Delete user</AeroButton>
+        <AeroButton Mode="AeroButton.ButtonMode.Subtle" OnClick="@(e => { confirmationDialogOpen = false; })">Cancel</AeroButton>
     </DialogActions>
 </MudDialog>
 @code {

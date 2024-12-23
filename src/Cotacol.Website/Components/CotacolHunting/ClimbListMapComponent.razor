@@ -1,11 +1,7 @@
-@using GoogleMapsComponents
 @using GoogleMapsComponents.Maps
 @using System.IO
 @using Columbae.World
-@using Cotacol.Website.Interfaces
 @using Cotacol.Website.Models
-@using Cotacol.Website.Services.Maps
-@using Microsoft.AspNetCore.Builder.Extensions
 @using MapLayout = Cotacol.Website.Services.Maps.MapLayout
 @using MapOptions = GoogleMapsComponents.Maps.MapOptions
 @inject ILogger<ClimbListMapComponent> Logger
@@ -34,7 +30,7 @@
     else
     {
         <MudItem xs="12">
-            <LoadingPatienceComponent WaitingMessage="Loading map"/>
+            <AeroLoader WaitingMessage="Loading map"/>
         </MudItem>
     }
 </MudGrid>

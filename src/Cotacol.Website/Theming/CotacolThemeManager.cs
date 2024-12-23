@@ -1,9 +1,10 @@
+using AeroBlazor.Theming;
 using MudBlazor;
 using MudBlazor.Utilities;
 
 namespace Cotacol.Website.Theming;
 
-public class CotacolThemeManager //: IThemeManager
+public class CotacolThemeManager : IThemeManager
 {
     public string PageTitle { get; set; } = "Rental manager";
     
@@ -17,7 +18,8 @@ public class CotacolThemeManager //: IThemeManager
             Tertiary = new MudColor("#999999"),
             Info = new MudColor("#FC4C02"),
             Background = new MudColor("F9F1E6"),
-            Success = new MudColor("#078727")
+            Success = new MudColor("#078727"),
+            Warning = new MudColor("#FC4C02")
         },
         Typography = DefaultTypography
     };

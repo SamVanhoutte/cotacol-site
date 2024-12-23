@@ -1,6 +1,4 @@
 @page "/cotacol/{CotacolId}"
-@using Columbae.World
-@using System.Text
 @using Cotacol.Website.Models
 @using Cotacol.Website.Models.CotacolApi
 @inject ICotacolClient CotacolClient
@@ -14,7 +12,7 @@
             <MudText Typo="Typo.h1" Color="Color.Tertiary">Cotacol details</MudText>
         </MudItem>
         <MudItem xs="12">
-            <LoadingPatienceComponent WaitingMessage="Loading details..."/>
+            <AeroLoader WaitingMessage="Loading details..."/>
         </MudItem>
     }
     else
@@ -22,12 +20,12 @@
         @if (UserProfile.IsAdmin)
         {
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</MudButton>
+                <AeroButton StartIcon="@Icons.Material.Filled.PersonPin" Href="@($"admin/segments/{CotacolId}")">Admin access</AeroButton>
             </MudItem>
         }
         @if(climbDetail!=null){
         <MudItem xs="3">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Info</MudText>
+            <AeroSubtitle>Info</AeroSubtitle>
             <MudText Typo="Typo.body1">@climbDetail.City, @climbDetail.Province</MudText>
             <MudGrid Spacing="1">
                 <MudItem xs="2">
@@ -91,8 +89,8 @@
                         <MudDivider DividerType="DividerType.Middle" Light="false"></MudDivider>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSwitch T="bool" id="cotacoldone" @bind-Checked="@CotacolDone" Label="Done" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="true"/>
-                        <MudSwitch T="bool" Label="Planned" LabelPosition="LabelPosition.Start" Color="Color.Secondary" ReadOnly="false"/>
+                        <AeroToggle id="cotacoldone" @bind-Value="@CotacolDone" Label="Done" ReadOnly="true"/>
+                        <AeroToggle Label="Planned" @bind-Value="@CotacolPlanned" ReadOnly="false"/>
                     </MudItem>
                 }
                 @if (CotacolDone)
@@ -131,7 +129,7 @@
                 @if (climbDetail.Stats?.LocalLegends?.Any() ?? false)
                 {
                     <MudItem xs="12">
-                        <MudText Typo="Typo.h2" Color="Color.Secondary">Local legends</MudText>
+                        <AeroSubtitle>Local legends</AeroSubtitle>
                         <MudText Typo="Typo.body1">@climbDetail.Stats.MaximumUserAttempts attempts</MudText>
                     </MudItem>
                     foreach (var legend in climbDetail.Stats.LocalLegends)
@@ -151,7 +149,7 @@
         @if (UserProfile.IsAuthenticated)
         {
             <MudItem xs="4">
-                <MudText Typo="Typo.h2" Color="Color.Secondary">Your attempts</MudText>
+                <AeroSubtitle>Your attempts</AeroSubtitle>
                 @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
                 {
                     <MudList T="string">
@@ -193,7 +191,7 @@
             }
         </MudItem>
         <MudItem xs="12">
-            <MudText Typo="Typo.h2" Color="Color.Secondary">Comparable cotacols</MudText>
+            <AeroSubtitle>Comparable cotacols</AeroSubtitle>
             @if (comparableCols != null)
             {
                 <MudTable FixedHeader="true" Height="100%"

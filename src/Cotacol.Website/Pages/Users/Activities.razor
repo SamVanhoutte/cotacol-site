@@ -4,7 +4,6 @@
 @inject IUserProfileManager UserProfile
 @inject NavigationManager NavManager
 @using Cotacol.Website.Models.CotacolApi
-@using Microsoft.AspNetCore.Components
 <AuthorizeView>
     <NotAuthorized>
         @if (true)
@@ -24,7 +23,7 @@
             @if (_activities == null)
             {
                 <MudItem xs="12">
-                    <LoadingPatienceComponent WaitingMessage="Loading your activities..."/>
+                    <AeroLoader WaitingMessage="Loading your activities..."></AeroLoader>
                 </MudItem>
             }
             else
@@ -36,7 +35,7 @@
                     </MudItem>
                 }
                 <MudItem xs="3" md="3">
-                    <MudSwitch T="bool" Label='Show all activities' Color="Color.Secondary" ValueChanged="@(async (val) => { await LoadActivitiesAsync(val); })"/>
+                    <AeroToggle Value="@showAllActivities" ValueChanged="@(async (val) => { await LoadActivitiesAsync(val); })" Label="Show all activities"></AeroToggle>
                 </MudItem>
                 <MudItem xs="1" md="5" />
                 <MudItem xs="8" md="4">
@@ -56,15 +55,15 @@
                         <HeaderContent>
                             <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.ActivityDate)"><MudText Typo="Typo.subtitle1">Date</MudText></MudTableSortLabel></MudTh>
                             <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.ActivityName)"><MudText Typo="Typo.subtitle1">Activity</MudText></MudTableSortLabel></MudTh>
-                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Distance</MudText></MudTableSortLabel></MudTh>
-                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Elevation)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Elevation</MudText></MudTableSortLabel></MudTh>
-                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.UniqueCols)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Cols</MudText></MudTableSortLabel></MudTh>
-                            <MudTh Style="@HeaderStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.TotalPoints)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Points</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Distance)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Distance</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.Elevation)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Elevation</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.UniqueCols)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Cols</MudText></MudTableSortLabel></MudTh>
+                            <MudTh Style="@HeaderRightStyle"><MudTableSortLabel SortBy="new Func<CotacolActivity, object>(x=>x.TotalPoints)"><MudText Typo="Typo.subtitle1" Align="Align.Right">Points</MudText></MudTableSortLabel></MudTh>
                             <MudTh Style="@HeaderStyle"><MudText Typo="Typo.subtitle1">Sync</MudText></MudTh>
                         </HeaderContent>
                         <RowTemplate Context="activity">
                             <MudTd Style="min-width: 240px">
-                                <StravaLink Link="@activity.ActivityUrl" Text="@activity.ActivityDate.ToString("D")"></StravaLink>
+                                <AeroLabel CopyValue="@activity.ActivityId" AllowCopy="true" ForeColor="Color.Warning" Value="@activity.ActivityDate.ToString("D")" Href="@activity.ActivityUrl"></AeroLabel>
                             </MudTd>
                             <MudTd><MudText Typo="Typo.body1">@(activity.ActivityName ?? $"Activity id: {activity.ActivityId}")</MudText></MudTd>
                             <MudTd><MudText Typo="Typo.body1" Align="Align.Right">@((activity.Distance / 1000).Number(" km", true))</MudText></MudTd>
@@ -77,7 +76,7 @@
                                 {
                                     if(isSyncing)
                                     {
-                                        <LoadingPatienceComponent WaitingMessage="Syncing..."/>
+                                        <AeroLoader WaitingMessage="Syncing..."/>
                                     }
                                     else
                                     {
@@ -110,6 +109,8 @@
     private bool isSyncing = false;
     private string searchString;
     private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderRightStyle => "background-color: #dcd5cb; font-weight: bold; text-align: right"; 
+    private bool showAllActivities = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,8 +130,9 @@
         }
     }
 
-    private async Task LoadActivitiesAsync(bool showAllActivities)
+    private async Task LoadActivitiesAsync(bool? allActivities)
     {
+        showAllActivities = allActivities ?? false;
         _activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, showAllActivities);
     }
 

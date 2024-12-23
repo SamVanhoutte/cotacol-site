@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using AeroBlazor;
+using AeroBlazor.Theming;
 // using AeroBlazor;
 // using AeroBlazor.Configuration;
 // using AeroBlazor.Theming;
@@ -11,7 +13,6 @@ using Cotacol.Website.Services.Extensions;
 using Cotacol.Website.Services.Imaging;
 using Cotacol.Website.Services.Maps;
 using Cotacol.Website.Theming;
-using GoogleMapsComponents;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -130,23 +131,17 @@ namespace Cotacol.Website
                 .Configure<MapSettings>(options => configuration.GetSection("maps").Bind(options))
                 .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options));
 
-            // builder.Services.AddAeroBlazorWebServices(options =>
-            // {
-            //     // options.EnableLocationServices = true;
-            //     // mapsOptions.DefaultMarkerIcon = "images/sfinx-map-icon.png";
-            //     // options.ConfigureMaps(mapsOptions);
-            // });
-            // builder.Services.AddBlazorGoogleMaps(mapsOptions.GoogleMapKey);
-            //     new GoogleMapsComponents.Maps.MapApiLoadOptions(mapsOptions.GoogleMapKey)
-            // {
-            //     Version = "beta",
-            //     Libraries = "places,visualization,drawing,marker",
-            // });
+            builder.Services.AddAeroBlazorWebServices(options =>
+            {
+                // options.EnableLocationServices = true;
+                // mapsOptions.DefaultMarkerIcon = "images/sfinx-map-icon.png";
+                // options.ConfigureMaps(mapsOptions);
+            });
             var app = builder.Build();
             app.UseAuthentication();
             app.UseAuthorization();
 
-// Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -175,7 +170,7 @@ namespace Cotacol.Website
             builder.Services.AddSingleton<ICotacolClient, CotacolApiClient>();
             builder.Services.AddScoped<IMapService, MapListService>();
             builder.Services.AddScoped<IYearImageGenerator, ImgSharpYearImageGenerator>();
-            builder.Services.AddSingleton<CotacolThemeManager, CotacolThemeManager>();
+            builder.Services.AddSingleton<IThemeManager, CotacolThemeManager>();
         }
     }
 }

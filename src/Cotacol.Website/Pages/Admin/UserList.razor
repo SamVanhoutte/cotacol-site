@@ -1,5 +1,4 @@
 @page "/admin/users"
-@using Newtonsoft.Json
 @using Cotacol.Website.Models.CotacolApi
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
@@ -9,7 +8,7 @@
 {
     <MudGrid>
         <MudItem xs="6">
-            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="async () => await LoadUserListAsync()">Load all users</MudButton>
+            <AeroButton Mode="AeroButton.ButtonMode.Subtle" StartIcon="@Icons.Material.Filled.Search" OnClick="async () => await LoadUserListAsync()">Load all users</AeroButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField T="string" ValueChanged="@((val) => NavigateUser(val))" HelperText="Enter the user Id" Label="Go to user"></MudTextField>
@@ -27,7 +26,7 @@
     @if (queryLaunched && userList == null)
     {
         <MudItem xs="12">
-            <LoadingPatienceComponent WaitingMessage="Loading users"></LoadingPatienceComponent>
+            <AeroLoader WaitingMessage="Loading users"></AeroLoader>
         </MudItem>
     }
     <hr/>
@@ -89,7 +88,7 @@
             </HeaderContent>
             <RowTemplate Context="user">
                 <MudTd>
-                    <MudLink Href='@($"admin/users/{user.Profile.UserId}")' Typo="Typo.body1" Color="Color.Secondary">@user.Profile.UserId</MudLink>
+                    <AeroLabel Href='@($"admin/users/{user.Profile.UserId}")' ForeColor="Color.Secondary" AllowCopy="true" Value="@user.Profile.UserId"></AeroLabel>
                 </MudTd>
                 <MudTd>@user.Profile.FullName</MudTd>
                 <MudTd>@user.Health.TokenExpired</MudTd>

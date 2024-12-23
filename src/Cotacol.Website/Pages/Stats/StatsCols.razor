@@ -1,19 +1,18 @@
 @page "/colstats"
 @using Cotacol.Website.Models.CotacolApi
-@using Microsoft.AspNetCore.Components
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
 <MudGrid Spacing="1">
     @if (stats == null)
     {
         <MudItem xs="12">
-            <LoadingPatienceComponent WaitingMessage="Crunching numbers..."/>
+            <AeroLoader WaitingMessage="Crunching numbers..."/>
         </MudItem>
     }
     else
     {
-        <MudItem xs="11" md="8">
-            <MudTable FixedHeader="true" Height="100%"
+        <MudItem xs="11" md="9">
+            <MudTable FixedHeader="true" Height="100%" 
                       LoadingProgressColor="Color.Secondary"
                       Filter="new Func<CotacolClimb, bool>(FilterCol)" Items="@stats.Cotacols" RowsPerPage="50" Style="width: 100%; background-color: transparent">
                 <ToolBarContent>
@@ -63,7 +62,7 @@
                 </RowTemplate>
             </MudTable>
         </MudItem>
-        <MudItem xs="1" md="4"></MudItem>
+        <MudItem xs="1" md="3"></MudItem>
     }
 </MudGrid>
 

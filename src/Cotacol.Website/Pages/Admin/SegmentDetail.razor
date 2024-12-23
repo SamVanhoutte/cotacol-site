@@ -34,16 +34,16 @@
         @if (climbDetail == null)
         {
             <MudItem xs="12">
-                <LoadingPatienceComponent WaitingMessage="Loading details from the backend"></LoadingPatienceComponent>
+                <AeroLoader WaitingMessage="Loading details from the backend"></AeroLoader>
             </MudItem>
         }
         else
         {
             <MudItem xs="12">
-                <MudText Typo="Typo.h2" Color="Color.Secondary">#@CotacolId: @climbDetail.Name</MudText>
+                <AeroSubtitle>#@CotacolId: @climbDetail.Name</AeroSubtitle>
             </MudItem>
             <MudItem xs="6" md="3">
-                <b>Length:</b> @climbDetail.Distance.Number() m
+                <b>Length:</b> @climbDetail.Distance.Number(suffix:"m")
             </MudItem>
             <MudItem xs="6" md="3">
                 <b>Points:</b> @climbDetail.Cotacolpoints

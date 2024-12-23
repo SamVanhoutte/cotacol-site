@@ -1,6 +1,7 @@
+@using System.Globalization
 <MudGrid>
     <MudItem xs="12">
-        <MudText Typo="Typo.caption" Color="Color.Secondary">@Timestamp.ToString("D")</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@issueDate.ToString("D")</MudText>
         <MudText Typo="Typo.h2" Color="Color.Secondary">@Title</MudText>
     </MudItem>
     <MudItem xs="8" md="5">
@@ -28,7 +29,7 @@
     public string Severity { get; set; }
 
     [Parameter]
-    public DateTime Timestamp { get; set; }
+    public string Timestamp { get; set; }
 
     [Parameter]
     public string Description { get; set; }
@@ -38,5 +39,7 @@
 
     [Parameter]
     public string Resolution { get; set; }
+    
+    private DateTime issueDate => DateTime.ParseExact(Timestamp, "dd-MM-yyyy", CultureInfo.InvariantCulture);
 
 }

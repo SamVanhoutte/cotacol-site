@@ -1,5 +1,3 @@
-@using System.IO
-@using Cotacol.Website.Interfaces
 @using Cotacol.Website.Models
 @inject ICotacolClient CotacolClient
 @inject ICotacolUserClient CotacolUserClient
@@ -9,7 +7,7 @@
     @if (_climbs == null)
     {
         <MudItem xs="12">
-            <LoadingPatienceComponent WaitingMessage="Retrieving the cotacol list"/>
+            <AeroLoader WaitingMessage="Retrieving the cotacol list"/>
         </MudItem>
     }
     else

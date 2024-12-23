@@ -1,45 +1,39 @@
 ﻿@* @using AeroBlazor.Theming *@
-@using MudBlazor.Utilities
+@using AeroBlazor.Theming
 @inherits LayoutComponentBase
-@inject CotacolThemeManager ThemeManager
-<style>
-    .sticky-bottom-div {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        /*width: 100%; !* Ensuring it spans the full width of the viewport *!*/
-        /*background-color: #fff; !* Or any color you prefer *!*/
-        z-index: 1000; /* To ensure it stays on top of other content */
-    }
-</style>
+@inject IThemeManager ThemeManager
 <CascadingValue Value="this">
     <MudThemeProvider DefaultScrollbar="true" IsDarkMode="false" Theme="@ThemeManager.CurrentTheme"/>
     <MudDialogProvider/>
     <MudSnackbarProvider/>
-    <MudPopoverProvider />
+    <MudPopoverProvider/>
     <PageTitle>Cotacol.cc</PageTitle>
 
     <div class="page">
         <div class="sidebar">
             <NavMenu/>
             <div class="sticky-bottom-div">
-                <MudIconButton Color="Color.Tertiary" Href="/about" Icon="@Icons.Material.Filled.Info"></MudIconButton>
-                <MudIconButton Color="Color.Info" Href="/support" Icon="@Icons.Material.Filled.SupportAgent"></MudIconButton>
+                <AeroFlexContainer Stretch="true" FullWidth="true">
+                    <MudIconButton Color="Color.Tertiary" Href="/about"
+                                   Icon="@Icons.Material.Filled.Info"></MudIconButton>
+                    <MudIconButton Color="Color.Info" Href="/support"
+                                   Icon="@Icons.Material.Filled.SupportAgent"></MudIconButton>
+                </AeroFlexContainer>
             </div>
         </div>
 
         <main>
-            <MudGrid Spacing="0">
-                <MudItem md="6" xs="12">
-                    <div class="top-row-left">
+            <div class="top-row pl-4 navbar navbar-dark">
+                <MudGrid Spacing="0">
+                    <MudItem md="6" xs="12">
                         <MudText Typo="Typo.h1" Align="Align.Left">@Title</MudText>
-                    </div>
-                </MudItem>
-                <MudItem md="6" xs="12">
-                    <div class="top-row px-4">
+                    </MudItem>
+                    <MudItem md="6" xs="12">
                         <LoginDisplay/>
-                    </div>
-                </MudItem>
+                    </MudItem>
+                </MudGrid>
+            </div>
+            <MudGrid Spacing="0">
                 <MudItem xs="12">
                     <div style="width: 100%; margin-left:20px;margin-right:20px;">
                         <article class="content px-4">
@@ -48,7 +42,6 @@
                     </div>
                 </MudItem>
             </MudGrid>
-
         </main>
     </div>
 </CascadingValue>
@@ -66,4 +59,5 @@
             InvokeAsync(() => StateHasChanged());
         }
     }
+
 }

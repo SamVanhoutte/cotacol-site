@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Cotacol.Website.Models.CotacolApi
 {
@@ -33,6 +32,6 @@ namespace Cotacol.Website.Models.CotacolApi
         public string Polyline { get; set; }
 
         [JsonPropertyName("distance")]
-        public long Distance { get; set; }
+        public double Distance { get; set; }
     }
 }
