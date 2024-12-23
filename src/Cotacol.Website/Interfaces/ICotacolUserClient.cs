@@ -12,6 +12,7 @@ namespace Cotacol.Website.Interfaces
         Task<UserAchievements> GetAchievementsAsync(string userId, bool includeLocalLegends = false);
         Task<UserProfile> GetProfileAsync(string userId=null);
         Task<StravaUserProfile> GetStravaUserConfigurationAsync(string userId=null);
+        Task<StravaActivitiesResponse> GetStravaActivitiesAsync(string userId = null, int maxActivities = 0);
         Task UpdateSettingsAsync(string userId, UserSettings settings, string emailAddress);
         Task<SyncStatus> GetSyncStatus(string userId);
         Task<AsyncWorkflowResult> SynchronizeAsync(string userId, bool fullSync = false);
