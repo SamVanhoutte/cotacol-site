@@ -9,17 +9,20 @@ namespace Cotacol.Website.Controllers
     {
         private IYearImageGenerator _imageGenerator;
         private ICotacolUserClient _userClient;
+        private readonly ILogger<YearImageController> _logger;
 
-        public YearImageController(IYearImageGenerator imageGenerator, ICotacolUserClient userClient)
+        public YearImageController(IYearImageGenerator imageGenerator, ICotacolUserClient userClient, ILogger<YearImageController> logger)
         {
             _imageGenerator = imageGenerator;
             _userClient = userClient;
+            _logger = logger;
         }
         
         [HttpGet]
         [Route("img/year/{userId}")]
         public async Task<IActionResult> Get(string userId)
         {
+            var showDebug = Request.Query.ContainsKey("debug");
             YearReview summary = null;
             try
             {
@@ -28,7 +31,11 @@ namespace Cotacol.Website.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                if (showDebug)
+                {
+                    throw;
+                }
+                _logger.LogError(e, "An error occurred while retrieving year review data");
             }
 
             try
@@ -42,9 +49,6 @@ namespace Cotacol.Website.Controllers
                 Console.WriteLine(e);
                 throw;
             }
-
-            return null;
-
         }
     }
 }

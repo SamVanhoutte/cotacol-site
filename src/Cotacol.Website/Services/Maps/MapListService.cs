@@ -205,11 +205,11 @@ namespace Cotacol.Website.Services.Maps
                         Icon = new Symbol { Path = SymbolPath.CIRCLE, Scale = 3f, StrokeColor = "red" },
                         Offset = "100%"
                     },
-                    new IconSequence
-                    {
-                        Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
-                        Offset = "50%"
-                    },
+                    // new IconSequence
+                    // {
+                    //     Icon = new Symbol {Path = SymbolPath.FORWARD_OPEN_ARROW, Scale = 3f},
+                    //     Offset = "50%"
+                    // },
                 };
             }
 
