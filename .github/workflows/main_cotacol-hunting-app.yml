@@ -89,7 +89,7 @@ jobs:
       uses: ./.github/actions/playwright
       with:
         #Variables
-        BaseUrl: ${{ needs.deployTestSite.outputs.webappUrl }}
+        baseUrl: 'https://cotacol-hunting-app-test.azurewebsites.net'
         environment: 'test'
 
 
@@ -140,7 +140,7 @@ jobs:
       uses: ./.github/actions/playwright
       with:
         #Variables
-        BaseUrl: 'https://www.cotacol.cc'
+        baseUrl: 'https://www.cotacol.cc'
         environment: 'prod'
 # H  deployprdSite:
 #     needs: buildSite
