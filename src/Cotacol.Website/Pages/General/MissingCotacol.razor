@@ -187,17 +187,26 @@
                         }
                         else
                         {
-                            <MudText Typo="Typo.body2">We believe the col does not qualify, based on that selected ride.</MudText>
-                            <MudText Typo="Typo.body2">If you believe this is not correct, fill out the details in the box below and submit.</MudText>
-                            <MudTextField T="string" Lines="5" HelperText="Provide as clear as possible description" Label="Describe your case"></MudTextField>
-                            <AeroFlexContainer Stretch="true">
-                                <AeroButton StartIcon="@Icons.Material.Filled.Download" Mode="AeroButton.ButtonMode.Subtle"
-                                            OnClick="@(async () => await DownloadReportAsync())">Download report
-                                </AeroButton>
-                                <AeroButton StartIcon="@Icons.Material.Filled.SupportAgent" 
-                                            OnClick="@(async () => await SubmitSupportRequestAsync())">Send support request
-                                </AeroButton>
-                            </AeroFlexContainer>
+                            @if(string.IsNullOrEmpty(supportCaseId))
+                            {
+                                <MudText Typo="Typo.body2">We believe the col does not qualify, based on that selected ride.</MudText>
+                                <MudText Typo="Typo.body2">If you believe this is not correct, fill out the details in the box below and submit.</MudText>
+                                <MudTextField T="string" HelperText="Email address where you will be contacted" Label="Email address" @bind-Value="@supportRequest.EmailAddress"></MudTextField>
+                                <MudTextField T="string" Lines="5" HelperText="Provide as clear as possible description" Label="Describe your case" @bind-Value="@supportRequest.Description"></MudTextField>
+                                <AeroFlexContainer Stretch="true">
+                                    <AeroButton StartIcon="@Icons.Material.Filled.Download" Mode="AeroButton.ButtonMode.Subtle"
+                                                OnClick="@(async () => await DownloadReportAsync())">Download report
+                                    </AeroButton>
+                                    <AeroButton StartIcon="@Icons.Material.Filled.SupportAgent" IsLoading="@supportRequesting"
+                                                OnClick="@(async () => await SubmitSupportRequestAsync())">Send support request
+                                    </AeroButton>
+                                </AeroFlexContainer>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2">Your support request has been submitted. We will contact you soon.</MudText>
+                                <MudText Typo="Typo.body2">Case Id: @supportCaseId</MudText>
+                            }
                         }
                         
                     </ChildContent>
@@ -228,9 +237,11 @@
     private AeroWizardStepHeader.StepResult SendResult;
     private MudExpansionPanel missingColPanel;
     private MudExpansionPanel supportPanel;
-
+    private SupportCaseRequest supportRequest = new SupportCaseRequest();
     private string SelectedUserId => UserId ?? ProfileManager.UserId;
-
+    private string? supportCaseId;
+    private bool supportRequesting  = false;
+    
     protected override async Task OnInitializedAsync()
     {
         isAdmin = ProfileManager.IsAdmin;
@@ -500,6 +511,11 @@
 
     private async Task SubmitSupportRequestAsync()
     {
-        
+        supportRequesting = true;
+        supportRequest.ReportContent = Report.ToString();
+        supportRequest.UserId = SelectedUserId;
+        supportRequest.CaseType = "MissingCol";
+        var supportCase = await CotacolClient.CreateSupportCaseAsync(supportRequest);
+        supportCaseId = supportCase.CaseId.ToString();
     }
 }

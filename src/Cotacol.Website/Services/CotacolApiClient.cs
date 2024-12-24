@@ -125,7 +125,6 @@ public class CotacolApiClient : ICotacolClient
         {
             throw;
         }
-
     }
 
     public async Task<StravaSegment> FetchStravaSegmentAsync(string stravaSegmentId,
@@ -222,5 +221,32 @@ public class CotacolApiClient : ICotacolClient
             .GetJsonAsync<SystemStatus>();
 
         return systemStatus;
+    }
+
+    public async Task<List<SupportCase>> GetSupportCasesAsync()
+    {
+        var systemStatus = await $"{_settings.ApiUrl}/support"
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .GetJsonAsync<List<SupportCase>>();
+
+        return systemStatus;
+    }
+
+    public async Task<SupportCase> CreateSupportCaseAsync(SupportCaseRequest request)
+    {
+        var response = await $"{_settings.ApiUrl}/support"
+            .AllowAnyHttpStatus()
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .PostJsonAsync(request);
+        var supportCase = await response.ResponseMessage.Content.ReadFromJsonAsync<SupportCase>();
+        return supportCase;
+    }
+
+    public async Task UpdateSupportCasesAsync(string caseId, SupportCaseUpdate request)
+    {
+        var response = await $"{_settings.ApiUrl}/support"
+            .AppendPathSegment(caseId)
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .PutJsonAsync(request);
     }
 }
