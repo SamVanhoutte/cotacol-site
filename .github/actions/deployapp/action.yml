@@ -5,6 +5,9 @@ inputs:
   appName:
     description: "The name of the web app in Azure"
     required: true
+  baseDomain:
+    description: "The base domain for the web app for sign in"
+    required: true
   slotName:
     description: "The name of the slot in Azure"
     required: true
@@ -90,12 +93,12 @@ runs:
                               },
                               {
                                 "name": "api:redirectdomain",
-                                "value": "cotacol-hunting-app.azurewebsites.net",
+                                "value": "${{ inputs.baseDomain }}",
                                 "slotSetting": true
                               },
                               {
                                 "name": "api:loginUrl",
-                                "value": "${{ steps.settings.outputs.webapp-url }}/account/signin",
+                                "value": "https://${{ inputs.baseDomain }}/account/signin",
                                 "slotSetting": true
                               },
                               {

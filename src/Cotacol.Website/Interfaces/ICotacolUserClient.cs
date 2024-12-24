@@ -1,5 +1,6 @@
 using Cotacol.Website.Models;
 using Cotacol.Website.Models.CotacolApi;
+using Cotacol.Website.Models.CotacolApi.Strava;
 
 namespace Cotacol.Website.Interfaces
 {
@@ -22,5 +23,6 @@ namespace Cotacol.Website.Interfaces
         Task<YearReview> GetYearReviewAsync(string userId, int year);
         Task<List<UserBadgeStatus>> GetBadgesAsync(string userId);
         Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId);
+        Task<StravaActivityDetailResponse> GetStravaActivityDetailAsync(string activityId, string userId = null);
     }
 }

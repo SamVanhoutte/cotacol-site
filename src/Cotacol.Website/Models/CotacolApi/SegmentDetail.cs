@@ -11,7 +11,7 @@ namespace Cotacol.Website.Models.CotacolApi
         public bool Isofficial { get; set; }
 
         [JsonPropertyName("validfrom")]
-        public object Validfrom { get; set; }
+        public DateTime? Validfrom { get; set; }
 
         [JsonPropertyName("validto")]
         public DateTime? Validto { get; set; }

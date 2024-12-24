@@ -60,6 +60,7 @@ jobs:
       with:
         #Variables
         appName: cotacol-hunting-app
+        baseDomain: cotacol-hunting-app-test.azurewebsites.net
         slotName: test
         publishProfile: ${{ secrets.PUBLISHPROFILE_TEST_SLOT }} 
         applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}
@@ -110,6 +111,7 @@ jobs:
       with:
         #Variables
         appName: cotacol-hunting-app
+        baseDomain: cotacol-hunting-app.azurewebsites.net
         slotName: production
         publishProfile: ${{ secrets.AzureAppService_PublishProfile_5aca7c36a1c04f45bf8f724d277b2979 }}
         applicationInsightsInstrumentationKey: ${{ secrets.ApplicationInsightsInstrumentationKey }}

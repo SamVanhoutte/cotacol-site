@@ -25,5 +25,8 @@ namespace Cotacol.Website.Interfaces
         Task UpdateBadgeOfMonthAsync(BadgeOfMonthData badgeOfMonthData);
         Task DeleteBadgeOfMonthAsync(int year, int month);
         Task<SystemStatus> GetSystemStatusAsync();
+        Task<List<SupportCase>> GetSupportCasesAsync(); 
+        Task<SupportCase> CreateSupportCaseAsync(SupportCaseRequest request); 
+        Task UpdateSupportCasesAsync(string caseId, SupportCaseUpdate request); 
     }
 }   
