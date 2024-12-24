@@ -74,7 +74,7 @@
                                               Result="StravaActivitiesResult"></AeroWizardStepHeader>
                     </TitleContent>
                     <ChildContent>
-                        @if (Report.ActivitiesResult.Activities != null)
+                        @if (activities != null)
                         {
                             <MudGrid>
                                 <MudItem xs="12">
@@ -95,7 +95,7 @@
                                               Result="MissingColDataResult"></AeroWizardStepHeader>
                     </TitleContent>
                     <ChildContent>
-                        @if ((Report.ActivitiesResult.UserCols?.Any() ?? false) && (Report.ActivitiesResult.Activities?.Any() ?? false))
+                        @if ((Report.ActivitiesResult.UserCols?.Any() ?? false) && (activities?.Any() ?? false))
                         {
                             <MudAutocomplete @bind-Value="Report.MissingData.Cotacol"
                                              ToStringFunc='@(s => $"#{s.Id} - {s.Name}")'
@@ -228,6 +228,7 @@
     private bool isAdmin = false;
     private bool hideSensitiveInfo = true;
 
+    private List<CotacolActivity> activities;
     private AeroWizardStepHeader.StepResult UserResult;
     private AeroWizardStepHeader.StepResult TokensResult;
     private AeroWizardStepHeader.StepResult StravaActivitiesResult;
@@ -271,9 +272,9 @@
     {
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
-            return Report.ActivitiesResult.Activities;
+            return activities;
 
-        return Report.ActivitiesResult.Activities.Where(x => x.ActivityName.Contains(value, StringComparison.InvariantCultureIgnoreCase)
+        return activities.Where(x => x.ActivityName.Contains(value, StringComparison.InvariantCultureIgnoreCase)
                                                              ||x.ActivityId.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
@@ -333,14 +334,13 @@
     {
         try
         {
-            var availableActivities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, true);
+            activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, true);
             var colDetails = await CotacolUserClient.GetClimbDataAsync(SelectedUserId);
-            Report.ActivitiesResult.StravaActivityCount = availableActivities.Count;
-            Report.ActivitiesResult.Activities = availableActivities;
+            Report.ActivitiesResult.StravaActivityCount = activities.Count;
             Report.ActivitiesResult.UserCols = colDetails;
 
             // var title = availableActivities.NewActivities.Any() ? $"{availableActivities.NewActivities.Length} Missing activities detected" : "All activities were imported";
-            StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"We have {availableActivities.Count} activities of you", Success = true, HasRun = true };
+            StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"We have {activities.Count} activities of you", Success = true, HasRun = true };
             ActiveSupportStep++;
         }
         catch (System.Exception e)
