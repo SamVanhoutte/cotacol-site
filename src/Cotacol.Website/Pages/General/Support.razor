@@ -184,29 +184,33 @@
             </ChildContent>
         </MudExpansionPanel>
     </MudItem>
-    <MudItem xs="12">
-        <AeroSubtitle>Contact us</AeroSubtitle>
-    </MudItem>
-    <MudItem xs="12">
-        @if (string.IsNullOrEmpty(supportCaseId))
-        {
-            <MudText Typo="Typo.body1">We really want to stream line support requests and would like to ask you to contact
-                us in a more structural way, so that we can have a better follow up of things
-            </MudText>
-            <MudTextField T="string" HelperText="Email address where you will be contacted" Label="Email address"
-                          @bind-Value="@supportRequest.EmailAddress"></MudTextField>
-            <MudTextField T="string" Lines="5" HelperText="Provide as clear as possible description"
-                          Label="Describe your case" @bind-Value="@supportRequest.Description"></MudTextField>
-            <AeroButton StartIcon="@Icons.Material.Filled.SupportAgent" IsLoading="@supportRequesting"
-                        OnClick="@(async () => await SubmitSupportRequestAsync())">Send support request
-            </AeroButton>
-        }
-        else
-        {
-            <MudText Typo="Typo.body2">Your support request has been submitted. We will contact you soon.</MudText>
-            <MudText Typo="Typo.body2">Case Id: @supportCaseId</MudText>
-        }
-    </MudItem>
+    @if (ProfileManager.IsAuthenticated)
+    {
+        <MudItem xs="12">
+            <AeroSubtitle>Contact us</AeroSubtitle>
+        </MudItem>
+        <MudItem xs="12">
+            @if (string.IsNullOrEmpty(supportCaseId))
+            {
+                <MudText Typo="Typo.body1">We really want to stream line support requests and would like to ask you to
+                    contact
+                    us in a more structural way, so that we can have a better follow up of things
+                </MudText>
+                <MudTextField T="string" HelperText="Email address where you will be contacted" Label="Email address"
+                              @bind-Value="@supportRequest.EmailAddress"></MudTextField>
+                <MudTextField T="string" Lines="5" HelperText="Provide as clear as possible description"
+                              Label="Describe your case" @bind-Value="@supportRequest.Description"></MudTextField>
+                <AeroButton StartIcon="@Icons.Material.Filled.SupportAgent" IsLoading="@supportRequesting"
+                            OnClick="@(async () => await SubmitSupportRequestAsync())">Send support request
+                </AeroButton>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2">Your support request has been submitted. We will contact you soon.</MudText>
+                <MudText Typo="Typo.body2">Case Id: @supportCaseId</MudText>
+            }
+        </MudItem>
+    }
 </MudGrid>
 
 
