@@ -3,14 +3,35 @@
 
 <MudGrid>
     <MudItem xs="12">
-        <AeroSubtitle>Self service support</AeroSubtitle>
+        <AeroFlexContainer CenterAlign="true">
+            <MudText Typo="Typo.body1">Before reaching out , we really suggest to follow this self-supported
+                troubleshoot wizard.
+            </MudText>
+        </AeroFlexContainer>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <AeroFlexContainer CenterAlign="true">
+            <AeroSubtitle>Check your Strava synchronization</AeroSubtitle>
+        </AeroFlexContainer>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <AeroFlexContainer CenterAlign="true">
+            <AeroSubtitle>Think you're missing a Col?</AeroSubtitle>
+        </AeroFlexContainer>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <AeroFlexContainer CenterAlign="true">
+            <AeroButton Href="/support/scan" StartIcon="@Icons.Material.Filled.Troubleshoot">Activity scan</AeroButton>
+        </AeroFlexContainer>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <AeroFlexContainer CenterAlign="true">
+            <AeroButton Href="/support/missingcol" StartIcon="@Icons.Material.Filled.MiscellaneousServices">Troubleshoot
+            </AeroButton>
+        </AeroFlexContainer>
     </MudItem>
     <MudItem xs="12">
-        <AeroButton Href="/support/wizard" StartIcon="@Icons.Material.Filled.Troubleshoot">Self support wizard</AeroButton>
-        <MudText Typo="Typo.body1">Before reaching out , we really suggest to follow this self-supported troubleshoot wizard.</MudText>
-    </MudItem>
-    <MudItem xs="12">
-    <AeroSubtitle>Strava integration</AeroSubtitle>
+        <AeroSubtitle>Strava integration</AeroSubtitle>
     </MudItem>
     <MudItem xs="12">
         <MudExpansionPanel>
@@ -20,15 +41,19 @@
             </TitleContent>
             <ChildContent>
                 <MudText Typo="Typo.body1">
-                    In order for Cotacol to be able to read your activities and efforts, we need our users to authorize access to the Strava data.
-                    The only person able to give us the right permissions (or rights) to do so, is you, the user and the owner of your data.
+                    In order for Cotacol to be able to read your activities and efforts, we need our users to authorize
+                    access to the Strava data.
+                    The only person able to give us the right permissions (or rights) to do so, is you, the user and the
+                    owner of your data.
                 </MudText>
                 <MudText Typo="Typo.body1">
-                    Sometimes, the permissions we have received from you, might not be enough. And for that, it will be needed to 're-authorize' Cotacol
+                    Sometimes, the permissions we have received from you, might not be enough. And for that, it will be
+                    needed to 're-authorize' Cotacol
                     That can happen by navigating to the <a href="settings">settings</a> page in your Strava profile.
                     (You need to be logged in, at the cotacol website)
                     Here you can see a checklist of our access to your strava account.
-                    If our permissions are not good enough, please click the 'Re-Authorize Strava' button at the bottom of the page
+                    If our permissions are not good enough, please click the 'Re-Authorize Strava' button at the bottom
+                    of the page
                 </MudText>
             </ChildContent>
         </MudExpansionPanel>
@@ -39,9 +64,12 @@
             </TitleContent>
             <ChildContent>
                 <MudText Typo="Typo.body1">
-                    It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the actual Strava Segment (that you can find in the col list) has been ridden.
-                    We have chosen to stick true to the actual descriptions and routes of the original book, which means that the popular track of a col is not always the exact matching one.
-                    If you feel there is indeed an activity that has not been matched well by the backend, please contact us, so we can follow up
+                    It can happen that someone thinks to have conquered a Cotacol, but in fact, it is important that the
+                    actual Strava Segment (that you can find in the col list) has been ridden.
+                    We have chosen to stick true to the actual descriptions and routes of the original book, which means
+                    that the popular track of a col is not always the exact matching one.
+                    If you feel there is indeed an activity that has not been matched well by the backend, please
+                    contact us, so we can follow up
                 </MudText>
                 @* <MatStringField Label="Activity ID" @bind-value="@MissingActivityId" HelperText="The Strava activity id is part of the url of your strava activity page"></MatStringField> *@
                 @* <MatStringField Label="Cotacol Number" @bind-value="@MissingCotacolId"></MatStringField> *@
@@ -55,24 +83,30 @@
             </TitleContent>
             <ChildContent>
                 <MudText Typo="Typo.body1">
-                    It is important to understand that the total points you see in the different apps or site are the points for the unique (distinct) Cotacols you rode.
+                    It is important to understand that the total points you see in the different apps or site are the
+                    points for the unique (distinct) Cotacols you rode.
                 </MudText>
                 <MudText Typo="Typo.body1">
-                    So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride it, you'll only get the 81 points once.
+                    So, if your weekly training loop contains the Berendries (#792), no matter how many times you ride
+                    it, you'll only get the 81 points once.
                 </MudText>
             </ChildContent>
         </MudExpansionPanel>
         <MudExpansionPanel>
             <TitleContent>
                 <MudText Typo="Typo.subtitle1">Multiple efforts per activity?</MudText>
-                <MudText Typo="Typo.subtitle2">Multiple efforts of the same Cotacol in 1 activity only count for one.</MudText>
+                <MudText Typo="Typo.subtitle2">Multiple efforts of the same Cotacol in 1 activity only count for one.
+                </MudText>
             </TitleContent>
             <ChildContent>
                 <MudText Typo="Typo.body1">
-                    This is because of the current implementation in the synchronization backend. It is planned to update this in the future, but this will require a resync for those activities, normally. Please follow this article for the latest news.
+                    This is because of the current implementation in the synchronization backend. It is planned to
+                    update this in the future, but this will require a resync for those activities, normally. Please
+                    follow this article for the latest news.
                 </MudText>
                 <MudText Typo="Typo.body1">
-                    When implemented, this will finally turn your Everesting activities into become a Cotacol Local Legend.
+                    When implemented, this will finally turn your Everesting activities into become a Cotacol Local
+                    Legend.
                 </MudText>
             </ChildContent>
         </MudExpansionPanel>
@@ -82,13 +116,25 @@
                 <MudText Typo="Typo.subtitle2">How can I show the cols in my strava ride descriptions.</MudText>
             </TitleContent>
             <ChildContent>
-                <MudText Typo="Typo.body1">We can update the activity description of an activity on strava, to show and indicate the different cotacols and badges you conquered.
-                    This is not only nice to show off your climbing skills, but it also can drive other users to our community.</MudText>
+                <MudText Typo="Typo.body1">We can update the activity description of an activity on strava, to show and
+                    indicate the different cotacols and badges you conquered.
+                    This is not only nice to show off your climbing skills, but it also can drive other users to our
+                    community.
+                </MudText>
                 <MudText Typo="Typo.body1">In order to achieve this, two things are needed:</MudText>
                 <MudList T="string">
-                    <MudListItem><MudText Typo="Typo.body1">Strava needs your permission to update the activity descriptions. For that, it is important that you enable the checkbox <b>Upload your activities from Cotacol Hunting to Strava</b> when logging on to Strava</MudText></MudListItem>
-                    <MudListItem><MudImage Src="images/support/strava-permissions.png" Width="200"></MudImage> <MudText Typo="Typo.body1"></MudText></MudListItem>
-                    <MudListItem>If you want to review or update your Strava permissions, you can navigate to our <a href="settings">settings page</a></MudListItem>
+                    <MudListItem>
+                        <MudText Typo="Typo.body1">Strava needs your permission to update the activity descriptions. For
+                            that, it is important that you enable the checkbox <b>Upload your activities from Cotacol
+                                Hunting to Strava</b> when logging on to Strava
+                        </MudText>
+                    </MudListItem>
+                    <MudListItem>
+                        <MudImage Src="images/support/strava-permissions.png" Width="200"></MudImage>
+                        <MudText Typo="Typo.body1"></MudText>
+                    </MudListItem>
+                    <MudListItem>If you want to review or update your Strava permissions, you can navigate to our <a
+                            href="settings">settings page</a></MudListItem>
                 </MudList>
             </ChildContent>
         </MudExpansionPanel>
@@ -112,15 +158,20 @@
                 <MudText Typo="Typo.subtitle2">I don't want to show up in public pages.</MudText>
             </TitleContent>
             <ChildContent>
-                <p>When joining Cotacol.cc, you automatically will be joined to the Cotacol leader boards, where your Full Name will be visible.</p>
-                <p>Your name will only be visible for users that are registered and logged in. For anonymous users, only the initials will be shown in leader boards</p>
-                <p>A new feature is coming, where you can opt out of leader boards and stats. There is already a check box in your profile where you can indicate you don't want to be part of the leader boards. For that, you can navigate to your <a href="/Identity/Account/Manage/Settings">profile page</a> and check the <b>Private profile</b> checkbox</p>
+                <p>When joining Cotacol.cc, you automatically will be joined to the Cotacol leader boards, where your
+                    Full Name will be visible.</p>
+                <p>Your name will only be visible for users that are registered and logged in. For anonymous users, only
+                    the initials will be shown in leader boards</p>
+                <p>A new feature is coming, where you can opt out of leader boards and stats. There is already a check
+                    box in your profile where you can indicate you don't want to be part of the leader boards. For that,
+                    you can navigate to your <a href="/Identity/Account/Manage/Settings">profile page</a> and check the
+                    <b>Private profile</b> checkbox</p>
             </ChildContent>
         </MudExpansionPanel>
     </MudItem>
-        <MudItem xs="12">
-            <AeroSubtitle>Incidents history</AeroSubtitle>
-        </MudItem>
+    <MudItem xs="12">
+        <AeroSubtitle>Incidents history</AeroSubtitle>
+    </MudItem>
     <MudItem xs="12">
         <MudExpansionPanel>
             <TitleContent>
@@ -142,8 +193,7 @@
     private bool _dataSubmitted = false;
     private string _missingDataMessage = "";
 
-    [CascadingParameter]
-    public MainLayout Layout { get; set; } = null!;
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
     protected override void OnInitialized()
     {

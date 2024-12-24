@@ -1,6 +1,7 @@
 using Cotacol.Website.Interfaces;
 using Cotacol.Website.Models;
 using Cotacol.Website.Models.CotacolApi;
+using Cotacol.Website.Models.CotacolApi.Strava;
 using Cotacol.Website.Models.Settings;
 using Cotacol.Website.Services.Extensions;
 
@@ -47,8 +48,6 @@ public class CotacolApiUserClient : ICotacolUserClient
         return userClimbs;
     }
 
-
-
     public async Task<List<CotacolActivity>> GetActivitiesAsync(string userId = null, bool allActivities = true)
     {
         userId ??= currentUserId;
@@ -59,7 +58,6 @@ public class CotacolApiUserClient : ICotacolUserClient
 
         return cols;
     }
-
 
     public async Task<bool> BookmarkClimbAsync(string climbId, string userId = null)
     {
@@ -144,6 +142,16 @@ public class CotacolApiUserClient : ICotacolUserClient
             .GetJsonAsync<StravaActivitiesResponse>();
 
         return activities;
+    }
+    
+    public async Task<StravaActivityDetailResponse> GetStravaActivityDetailAsync(string activityId , string userId = null)
+    {
+        userId ??= currentUserId;
+        var activity = await $"{_settings.ApiUrl}/user/{userId}/strava/activity/{activityId}"
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .GetJsonAsync<StravaActivityDetailResponse>();
+
+        return activity;
     }
 
     public async Task UpdateSettingsAsync(string userId, UserSettings settings, string email)
