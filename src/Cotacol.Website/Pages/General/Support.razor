@@ -1,6 +1,7 @@
 @page "/support"
-@inject ICotacolUserClient CotacolClient
-
+@using Cotacol.Website.Models.CotacolApi
+@inject IUserProfileManager ProfileManager
+@inject ICotacolClient CotacolClient
 <MudGrid>
     <MudItem xs="12">
         <AeroFlexContainer CenterAlign="true">
@@ -183,6 +184,29 @@
             </ChildContent>
         </MudExpansionPanel>
     </MudItem>
+    <MudItem xs="12">
+        <AeroSubtitle>Contact us</AeroSubtitle>
+    </MudItem>
+    <MudItem xs="12">
+        @if (string.IsNullOrEmpty(supportCaseId))
+        {
+            <MudText Typo="Typo.body1">We really want to stream line support requests and would like to ask you to contact
+                us in a more structural way, so that we can have a better follow up of things
+            </MudText>
+            <MudTextField T="string" HelperText="Email address where you will be contacted" Label="Email address"
+                          @bind-Value="@supportRequest.EmailAddress"></MudTextField>
+            <MudTextField T="string" Lines="5" HelperText="Provide as clear as possible description"
+                          Label="Describe your case" @bind-Value="@supportRequest.Description"></MudTextField>
+            <AeroButton StartIcon="@Icons.Material.Filled.SupportAgent" IsLoading="@supportRequesting"
+                        OnClick="@(async () => await SubmitSupportRequestAsync())">Send support request
+            </AeroButton>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2">Your support request has been submitted. We will contact you soon.</MudText>
+            <MudText Typo="Typo.body2">Case Id: @supportCaseId</MudText>
+        }
+    </MudItem>
 </MudGrid>
 
 
@@ -192,6 +216,9 @@
     private string MissingCotacolId;
     private bool _dataSubmitted = false;
     private string _missingDataMessage = "";
+    private string? supportCaseId;
+    private SupportCaseRequest supportRequest = new SupportCaseRequest();
+    private bool supportRequesting = false;
 
     [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
@@ -201,26 +228,14 @@
         base.OnInitialized();
     }
 
-    private async Task SubmitMissingColAsync()
+    private async Task SubmitSupportRequestAsync()
     {
-        Console.WriteLine($"{MissingActivityId} - {MissingCotacolId}");
-        try
-        {
-            var httpStatus = await CotacolClient.SubmitMissingSegmentAsync(MissingActivityId, MissingCotacolId);
-            if (httpStatus < 200 || httpStatus >= 300)
-            {
-                _dataSubmitted = false;
-                _missingDataMessage = $"❌ (HTTP error {httpStatus})";
-            }
-            else
-            {
-                _missingDataMessage = "Submitted";
-            }
-        }
-        catch (Exception e)
-        {
-            _missingDataMessage = e.Message;
-        }
+        supportRequesting = true;
+        supportRequest.ReportContent = "";
+        supportRequest.UserId = ProfileManager.UserId;
+        supportRequest.CaseType = "General";
+        var supportCase = await CotacolClient.CreateSupportCaseAsync(supportRequest);
+        supportCaseId = supportCase.CaseId.ToString();
     }
 
 }

@@ -15,13 +15,15 @@ main {
     position: fixed;
     bottom: 0;
     left: 0;
-    /*width: 100%; !* Ensuring it spans the full width of the viewport *!*/
+    justify-content: space-between;
+    width: 100%;
     /*background-color: #fff; !* Or any color you prefer *!*/
     z-index: 1000; /* To ensure it stays on top of other content */
 }
 .sidebar {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
     min-width: 220px;
+    height: 100vh;
 }
 
 .top-row-left {

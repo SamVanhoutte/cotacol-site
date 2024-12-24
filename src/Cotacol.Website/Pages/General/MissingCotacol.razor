@@ -237,9 +237,9 @@
     private AeroWizardStepHeader.StepResult SendResult;
     private MudExpansionPanel missingColPanel;
     private MudExpansionPanel supportPanel;
-    private SupportCaseRequest supportRequest = new SupportCaseRequest();
     private string SelectedUserId => UserId ?? ProfileManager.UserId;
     private string? supportCaseId;
+    private SupportCaseRequest supportRequest = new SupportCaseRequest();
     private bool supportRequesting  = false;
     
     protected override async Task OnInitializedAsync()
@@ -290,7 +290,7 @@
             Report.UserResult.UserId = SelectedUserId;
             Report.UserResult.Email = userProfile.EmailAddress;
             Report.UserResult.FullName = userProfile.FullName;
-
+            supportRequest.EmailAddress = userProfile.EmailAddress;
             UserResult = new AeroWizardStepHeader.StepResult { Result = $"User details successfully loaded", Success = true, HasRun = true };
         }
         catch (System.Exception e)
