@@ -10,6 +10,6 @@ public class SupportCaseUpdate
     [JsonPropertyName("Description")]
     public string Description { get; set; }
 
-    [JsonPropertyName("ReportContent")]
-    public string ReportContent { get; set; }
+    [JsonPropertyName("NewStatus")]
+    public CaseStatus NewStatus { get; set; }
 }
