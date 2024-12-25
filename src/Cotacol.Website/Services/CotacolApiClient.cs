@@ -242,7 +242,7 @@ public class CotacolApiClient : ICotacolClient
         return supportCase;
     }
 
-    public async Task UpdateSupportCasesAsync(string caseId, SupportCaseUpdate request)
+    public async Task UpdateSupportCaseAsync(string caseId, SupportCaseUpdate request)
     {
         var response = await $"{_settings.ApiUrl}/support"
             .AppendPathSegment(caseId)

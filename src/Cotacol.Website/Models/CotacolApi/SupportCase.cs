@@ -14,13 +14,19 @@ public class SupportCase
     public string EmailAddress { get; set; }
 
     [JsonPropertyName("creationTime")]
-    public string CreationTime { get; set; }
+    public DateTime CreationTime { get; set; }
 
     [JsonPropertyName("updatedTime")]
-    public string UpdatedTime { get; set; }
+    public DateTime UpdatedTime { get; set; }
 
     [JsonPropertyName("status")]
-    public long Status { get; set; }
+    public int Status { get; set; }
+    
+    [JsonIgnore]
+    public CaseStatus ActiveStatus {
+        get => (CaseStatus)Status;
+        set => Status = (int)value;
+    }
 
     [JsonPropertyName("caseType")]
     public string CaseType { get; set; }
@@ -30,4 +36,12 @@ public class SupportCase
 
     [JsonPropertyName("reportContent")]
     public string ReportContent { get; set; }
+}
+
+public enum CaseStatus
+{
+    New = 0,
+    WaitingForUser = -1,
+    Solved=1,
+    Closed=-2
 }
