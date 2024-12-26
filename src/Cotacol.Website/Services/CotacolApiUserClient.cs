@@ -133,11 +133,12 @@ public class CotacolApiUserClient : ICotacolUserClient
         return profile;
     }
 
-    public async Task<StravaActivitiesResponse> GetStravaActivitiesAsync(string userId = null, int maxActivities = 0)
+    public async Task<StravaActivitiesResponse> GetStravaActivitiesAsync(string userId = null, int maxActivities = 0, int offset = 0)
     {
         userId ??= currentUserId;
         var activities = await $"{_settings.ApiUrl}/user/{userId}/strava/activities"
-            .SetQueryParam("maxActivityCount", maxActivities == 0 ? 10000 : 100)
+            .SetQueryParam("maxActivityCount", maxActivities == 0 ? 10000 : maxActivities)
+            .SetQueryParam("offset", offset)
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .GetJsonAsync<StravaActivitiesResponse>();
 

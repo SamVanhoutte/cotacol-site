@@ -1,5 +1,5 @@
-@page "/support/wizard"
 @page "/support/scan"
+@page "/support/scan/{UserId}"
 @using System.Text
 @using Cotacol.Website.Models.CotacolApi
 @using Cotacol.Website.Models.Support
@@ -28,134 +28,143 @@
         }
     </NotAuthorized>
     <Authorized>
-        <MudGrid>
-            <MudItem xs="12" md="8">
-                <AeroSubtitle>Welcome to the self support wizard</AeroSubtitle>
-                <AeroButton OnClick="@(async () => await StartScanAsync())" Disabled="@(ActiveSupportStep > 0)"
-                            StartIcon="@Icons.Material.Filled.Start">Get started
-                </AeroButton>
-            </MudItem>
-            <MudItem xs="4"></MudItem>
-            @if (ActiveSupportStep > 0)
-            {
-                <MudItem xs="11" lg="8">
-                    <MudExpansionPanels>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 1">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 1" Text='Scanning user details'
-                                                      Result="UserResult"></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                <MudGrid>
-                                    <MudItem xs="6">
-                                        <AeroLabel Name="User Id" Value="@Report.UserResult.UserId"></AeroLabel>
-                                    </MudItem>
-                                    <MudItem xs="6">
-                                        <AeroLabel Name="User Email" Value="@Report.UserResult.Email"></AeroLabel>
-                                    </MudItem>
-                                </MudGrid>
-                            </ChildContent>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 2">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 2"
-                                                      Text='Scanning strava authorization'
-                                                      Result="TokensResult"></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                <MudGrid>
-                                    <MudItem xs="4">
-                                        <AeroLabel Name="Valid tokens"
-                                                   Value="@Report.StravaTokenResult.ValidTokens.ToString()"></AeroLabel>
-                                    </MudItem>
-                                    <MudItem xs="4">
-                                        <AeroLabel Name="Can update descriptions"
-                                                   Value="@Report.StravaTokenResult.CanUpdateDescriptions.ToString()"></AeroLabel>
-                                    </MudItem>
-                                    <MudItem xs="4">
-                                        <AeroLabel Name="Can read activities"
-                                                   Value="@Report.StravaTokenResult.CanReadActivities.ToString()"></AeroLabel>
-                                    </MudItem>
-                                </MudGrid>
-                            </ChildContent>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 3">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 3"
-                                                      Text='Retrieving strava activities'
-                                                      Result="StravaActivitiesResult"></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                @if (Report.StravaActivitiesResult.ActivitySummary != null)
-                                {
+        @if (SelectedUserId != ProfileManager.UserId && !ProfileManager.IsAdmin)
+        {
+            <MudText Typo="Typo.subtitle1" Color="Color.Warning">You are not authorized to scan this user</MudText>
+        }
+        else
+        {
+            <MudGrid>
+                <MudItem xs="12" md="8">
+                    <AeroSubtitle>Welcome to the self support wizard</AeroSubtitle>
+                    <AeroButton OnClick="@(async () => await StartScanAsync())" Disabled="@(ActiveSupportStep > 0)"
+                                StartIcon="@Icons.Material.Filled.Start">Get started
+                    </AeroButton>
+                </MudItem>
+                <MudItem xs="4"></MudItem>
+                @if (ActiveSupportStep > 0)
+                {
+                    <MudItem xs="11" lg="8">
+                        <MudExpansionPanels>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 1">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 1"
+                                                          Text='Scanning user details'
+                                                          Result="UserResult"></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
                                     <MudGrid>
-                                        <MudItem xs="12">
-                                            <AeroLabel Name="Strava activity count"
-                                                       Value="@Report.StravaActivitiesResult.StravaActivityCount.ToString()"></AeroLabel>
+                                        <MudItem xs="6">
+                                            <AeroLabel Name="User Id" Value="@Report.UserResult.UserId"></AeroLabel>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            <AeroLabel Name="User Email" Value="@Report.UserResult.Email"></AeroLabel>
                                         </MudItem>
                                     </MudGrid>
-                                }
-                                @if (!string.IsNullOrEmpty(Report.StravaActivitiesResult.Error))
-                                {
-                                    <AeroWarning>@Report.StravaActivitiesResult.Error</AeroWarning>
-                                }
-                            </ChildContent>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 4">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 4"
-                                                      Text='Detecting missing activities'
-                                                      Result="MissingActivitiesResult"></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                @if (Report.StravaActivitiesResult.ActivitySummary != null)
-                                {
-                                    <ul>
-                                        @foreach (var activity in Report.StravaActivitiesResult.ActivitySummary.NewActivities)
-                                        {
-                                            <li>
-                                                <AeroLabel Target="_blank"
-                                                           Href='@($"https://www.strava.com/activities/{activity.Id}")'
-                                                           CopyValue="@activity.Id" Value="@activity.Name"></AeroLabel>
-                                            </li>
-                                        }
-                                    </ul>
-                                }
-                                @if (!string.IsNullOrEmpty(Report.StravaActivitiesResult.Error))
-                                {
-                                    <AeroWarning>@Report.StravaActivitiesResult.Error</AeroWarning>
-                                }
-                            </ChildContent>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 5">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 5"
-                                                      Text='Synchronizing missing activities'
-                                                      Result="SyncedActivitiesResult"></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                @if (!string.IsNullOrEmpty(Report.SyncActivitiesResult.Error))
-                                {
-                                    <AeroWarning>@Report.SyncActivitiesResult.Error</AeroWarning>
-                                }
-                            </ChildContent>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Disabled="ActiveSupportStep < 6">
-                            <TitleContent>
-                                <AeroWizardStepHeader IsRunning="ActiveSupportStep == 6" Text='Download report'
-                                                      Result='SendResult'></AeroWizardStepHeader>
-                            </TitleContent>
-                            <ChildContent>
-                                <AeroButton StartIcon="@Icons.Material.Filled.Download"
-                                            OnClick="@(async () => await DownloadReportAsync())">Download report
-                                </AeroButton>
-                            </ChildContent>
-                        </MudExpansionPanel>
-                    </MudExpansionPanels>
-                </MudItem>
-                <MudItem xs="1" lg="4"/>
-            }
-        </MudGrid>
+                                </ChildContent>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 2">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 2"
+                                                          Text='Scanning strava authorization'
+                                                          Result="TokensResult"></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
+                                    <MudGrid>
+                                        <MudItem xs="4">
+                                            <AeroLabel Name="Valid tokens"
+                                                       Value="@Report.StravaTokenResult.ValidTokens.ToString()"></AeroLabel>
+                                        </MudItem>
+                                        <MudItem xs="4">
+                                            <AeroLabel Name="Can update descriptions"
+                                                       Value="@Report.StravaTokenResult.CanUpdateDescriptions.ToString()"></AeroLabel>
+                                        </MudItem>
+                                        <MudItem xs="4">
+                                            <AeroLabel Name="Can read activities"
+                                                       Value="@Report.StravaTokenResult.CanReadActivities.ToString()"></AeroLabel>
+                                        </MudItem>
+                                    </MudGrid>
+                                </ChildContent>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 3">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 3"
+                                                          Text="@StravaActivityStatus"
+                                                          Result="StravaActivitiesResult"></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
+                                    @if (Report.StravaActivitiesResult.ExistingActivities != null)
+                                    {
+                                        <MudGrid>
+                                            <MudItem xs="12">
+                                                <AeroLabel Name="Strava activity count"
+                                                           Value="@Report.StravaActivitiesResult.StravaActivityCount.ToString()"></AeroLabel>
+                                            </MudItem>
+                                        </MudGrid>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Report.StravaActivitiesResult.Error))
+                                    {
+                                        <AeroWarning>@Report.StravaActivitiesResult.Error</AeroWarning>
+                                    }
+                                </ChildContent>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 4">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 4"
+                                                          Text='Detecting missing activities'
+                                                          Result="MissingActivitiesResult"></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
+                                    @if (Report.StravaActivitiesResult.NewActivities != null)
+                                    {
+                                        <ul>
+                                            @foreach (var activity in Report.StravaActivitiesResult.NewActivities)
+                                            {
+                                                <li>
+                                                    <AeroLabel Target="_blank"
+                                                               Href='@($"https://www.strava.com/activities/{activity.Id}")'
+                                                               CopyValue="@activity.Id"
+                                                               Value="@activity.Name"></AeroLabel>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Report.StravaActivitiesResult.Error))
+                                    {
+                                        <AeroWarning>@Report.StravaActivitiesResult.Error</AeroWarning>
+                                    }
+                                </ChildContent>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 5">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 5"
+                                                          Text='Synchronizing missing activities'
+                                                          Result="SyncedActivitiesResult"></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
+                                    @if (!string.IsNullOrEmpty(Report.SyncActivitiesResult.Error))
+                                    {
+                                        <AeroWarning>@Report.SyncActivitiesResult.Error</AeroWarning>
+                                    }
+                                </ChildContent>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Disabled="ActiveSupportStep < 6">
+                                <TitleContent>
+                                    <AeroWizardStepHeader IsRunning="ActiveSupportStep == 6" Text='Download report'
+                                                          Result='SendResult'></AeroWizardStepHeader>
+                                </TitleContent>
+                                <ChildContent>
+                                    <AeroButton StartIcon="@Icons.Material.Filled.Download"
+                                                OnClick="@(async () => await DownloadReportAsync())">Download report
+                                    </AeroButton>
+                                </ChildContent>
+                            </MudExpansionPanel>
+                        </MudExpansionPanels>
+                    </MudItem>
+                    <MudItem xs="1" lg="4"/>
+                }
+            </MudGrid>
+        }
     </Authorized>
 </AuthorizeView>
 
@@ -167,7 +176,7 @@
     private SelfsupportReport Report = new SelfsupportReport();
     private int ActiveSupportStep = 0;
     private string? userId;
-
+    private string StravaActivityStatus = "Retrieving strava activities";
     private AeroWizardStepHeader.StepResult UserResult;
     private AeroWizardStepHeader.StepResult TokensResult;
     private AeroWizardStepHeader.StepResult StravaActivitiesResult;
@@ -246,13 +255,30 @@
     {
         try
         {
-            var availableActivities = await CotacolUserClient.GetStravaActivitiesAsync(SelectedUserId);
-            Report.StravaActivitiesResult.StravaActivityCount = availableActivities.ExistingActivities.Length + availableActivities.NewActivities.Length;
-            Report.StravaActivitiesResult.MissingActivityCount = availableActivities.NewActivities.Length;
-            Report.StravaActivitiesResult.ActivitySummary = availableActivities;
+            List<ActivityDetail> existingActivities = new();
+            List<ActivityDetail> newActivities = new();
+            var maxActivityCount = 400;
+            var offset = 0;
+            var finished = false;
+            while (!finished)
+            {
+                StravaActivityStatus = $"Retrieving strava activities ({existingActivities.Count + newActivities.Count})";
+                var availableActivities = await CotacolUserClient.GetStravaActivitiesAsync(SelectedUserId);
+                existingActivities.AddRange(availableActivities.ExistingActivities);
+                newActivities.AddRange(availableActivities.NewActivities);
+                finished = availableActivities.Finished;
+                offset++;
+            }
+
+            StravaActivityStatus = $"Strava activities retrieved ({existingActivities.Count + newActivities.Count})";
+
+            Report.StravaActivitiesResult.StravaActivityCount = existingActivities.Count + newActivities.Count;
+            Report.StravaActivitiesResult.MissingActivityCount = newActivities.Count;
+            Report.StravaActivitiesResult.ExistingActivities = existingActivities;
+            Report.StravaActivitiesResult.NewActivities = newActivities;
 
             // var title = availableActivities.NewActivities.Any() ? $"{availableActivities.NewActivities.Length} Missing activities detected" : "All activities were imported";
-            StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"{availableActivities.ExistingActivities.Length + availableActivities.NewActivities.Length} Strava activities found", Success = true, HasRun = true };
+            StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"{existingActivities.Count + newActivities.Count} Strava activities found", Success = true, HasRun = true };
             ActiveSupportStep++;
         }
         catch (System.Exception e)
@@ -272,8 +298,8 @@
         try
         {
             await Task.Delay(500);
-            Report.MissingActivitiesResult.SynchedActivities = Report.StravaActivitiesResult.ActivitySummary.ExistingActivities.Length;
-            Report.MissingActivitiesResult.MissingActivities = Report.StravaActivitiesResult.ActivitySummary.NewActivities.Length;
+            Report.MissingActivitiesResult.SynchedActivities = Report.StravaActivitiesResult.ExistingActivities.Count;
+            Report.MissingActivitiesResult.MissingActivities = Report.StravaActivitiesResult.NewActivities.Count;
             MissingActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"{Report.StravaActivitiesResult.MissingActivityCount} Activities missing", Success = true, HasRun = true };
         }
         catch (System.Exception e)
@@ -292,12 +318,12 @@
     {
         try
         {
-            foreach (var newActivity in Report.StravaActivitiesResult.ActivitySummary.NewActivities)
+            foreach (var newActivity in Report.StravaActivitiesResult.NewActivities)
             {
                 await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, newActivity.Id);
             }
 
-            SyncedActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"Sync of {Report.StravaActivitiesResult.ActivitySummary.NewActivities.Length} activities submitted.", Success = true, HasRun = true };
+            SyncedActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"Sync of {Report.StravaActivitiesResult.NewActivities.Count} activities submitted.", Success = true, HasRun = true };
         }
         catch (System.Exception e)
         {
@@ -316,17 +342,12 @@
         try
         {
             Console.WriteLine("Submitting report step");
-            if (string.IsNullOrEmpty(UserId))
+            var payload = Report.ToString();
+            await CotacolClient.CreateSupportCaseAsync(new SupportCaseRequest
             {
-                var payload = Report.ToString();
-                //var supportClient = new SupportApiClient(SfinxClient);
-                //var result = await ApiErrorHandler.ExecuteAndHandleExceptionsAsync(async () => await supportClient.SubmitSelfSupportScanAsync(new SelfSupportScanRequest { Payload = payload }));
-                //SendResult = new AeroWizardStepHeader.StepResult { Result = result.Success ? "Report sent" : result.ErrorMessage, Success = result.Success, HasRun = true };
-            }
-            else
-            {
-                SendResult = new AeroWizardStepHeader.StepResult { Result = "Report available", Success = true, HasRun = true };
-            }
+                UserId = SelectedUserId, Description = "Self service scan result", EmailAddress = UserProfile.Email ?? "", CaseType = "SelfServiceScan", ReportContent = payload
+            });
+            SendResult = new AeroWizardStepHeader.StepResult { Result = "Report available", Success = true, HasRun = true };
         }
         catch (System.Exception e)
         {

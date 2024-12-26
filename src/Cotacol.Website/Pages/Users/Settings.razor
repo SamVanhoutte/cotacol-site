@@ -166,6 +166,9 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="@(async () => await PerformUserSyncAsync())"></MudIconButton>
                     </AeroFlexContainer>
                 </MudItem>
+                <MudItem xs="12">
+                    <AeroLabel AllowCopy="true" Name="User Id" Value="@UserProfile.UserId"></AeroLabel>
+                </MudItem>
             </MudGrid>
         </MudItem>
 

@@ -4,6 +4,9 @@ namespace Cotacol.Website.Models.CotacolApi;
 
 public class StravaActivitiesResponse
 {
+    [JsonPropertyName("totalActivities")] public long TotalActivities { get; set; }
+    [JsonPropertyName("offset")] public int Offset { get; set; }
+    [JsonPropertyName("finished")] public bool Finished { get; set; }
     [JsonPropertyName("existing")] public ActivityDetail[] ExistingActivities { get; set; }
     [JsonPropertyName("new")] public ActivityDetail[] NewActivities { get; set; }
 }
