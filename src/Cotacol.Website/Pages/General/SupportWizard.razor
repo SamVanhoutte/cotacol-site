@@ -263,11 +263,11 @@
             while (!finished)
             {
                 StravaActivityStatus = $"Retrieving strava activities ({existingActivities.Count + newActivities.Count})";
-                var availableActivities = await CotacolUserClient.GetStravaActivitiesAsync(SelectedUserId);
+                var availableActivities = await CotacolUserClient.GetStravaActivitiesAsync(SelectedUserId, maxActivityCount, offset);
                 existingActivities.AddRange(availableActivities.ExistingActivities);
                 newActivities.AddRange(availableActivities.NewActivities);
                 finished = availableActivities.Finished;
-                offset++;
+                offset+=maxActivityCount;
             }
 
             StravaActivityStatus = $"Strava activities retrieved ({existingActivities.Count + newActivities.Count})";
