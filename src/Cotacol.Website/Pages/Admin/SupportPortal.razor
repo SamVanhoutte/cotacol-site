@@ -90,8 +90,8 @@
                 <MudTd><AeroLabel Href='@($"admin/support/{supportCase.CaseId}")' ForeColor="Color.Secondary" AllowCopy="true" Value="@supportCase.CaseId.ToString()"></AeroLabel></MudTd>
                 <MudTd><AeroLabel Href='@($"admin/users/{supportCase.UserId}")' ForeColor="Color.Secondary" AllowCopy="true" Value="@supportCase.UserId"></AeroLabel></MudTd>
                 <MudTd>@supportCase.EmailAddress</MudTd>
-                <MudTd>@supportCase.CreationTime.PrintHistoricalDate()</MudTd>
-                <MudTd>@supportCase.UpdatedTime.PrintHistoricalDate()</MudTd>
+                <MudTd>@supportCase.CreationTime.PrintHistoricalTime()</MudTd>
+                <MudTd>@supportCase.UpdatedTime.PrintHistoricalTime()</MudTd>
                 <MudTd>@supportCase.ActiveStatus</MudTd>
                 <MudTd>@supportCase.CaseType</MudTd>
                 <MudTd>@supportCase.Description</MudTd>
@@ -134,6 +134,7 @@ else
             queryLaunched = true;
             supportList = null;
             supportList = await CotacolClient.GetSupportCasesAsync();
+            supportList = supportList.OrderByDescending(sc => sc.UpdatedTime).ToList();
         }
     }
 
