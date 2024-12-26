@@ -11,22 +11,60 @@
             </MudItem>
         </MudHidden>
     }
-    <MudItem xs="12" lg="4" md="4" sm="12">
+    <MudItem xs="12" lg="5" md="5" sm="12">
         <MudGrid Spacing="0">
+            @if (ShowWrapped)
+            {
+                <MudItem xs="12">
+                    <AeroSubtitle>Cotacol 2024 unwrapped</AeroSubtitle>
+                </MudItem>
+                <MudItem xs="12">
+                    <AeroFlexContainer CenterAlign="true">
+                        <MudCarousel Style="width:100%; height: 400px;" ShowArrows="true" ShowBullets="false"
+                                     EnableSwipeGesture="true" AutoCycle="true" TData="object">
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_01.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_02.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_03.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_04.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_05.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                            <MudCarouselItem Transition="Transition.Slide">
+                                <MudImage Src="images/yearstats/2024_06.png" Height="400"></MudImage>
+                            </MudCarouselItem>
+                        </MudCarousel>
+                    </AeroFlexContainer>
+                </MudItem>
+            }
             <MudItem xs="12">
                 <AeroSubtitle>How it all started</AeroSubtitle>
             </MudItem>
             <MudItem xs="12">
                 <MudText Typo="Typo.body1">
-                    The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.
-                    Each climb is described by several facts: name, a short description, height, grade, length, what state the road surface is in, average climbing time for an amateur or a professional road cyclist.
-                    The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396 meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book. Each hill has a so-called COTACOL score. This score is determined using several parameters: grade, length, road surface. A higher score means a tougher climb.
-                    More than 30 years later, some cycling &amp; tech enthousiasts virtually got together and built apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer as much Cotacols as possible and automatically flag them when integrating with Strava.
+                    The COTACOL is a belgian reference book about cycling uphill, made by Daniel Gobert and Jean-Pierre
+                    Legros in 1989. In it are descriptions of the thousand toughest climbs for cyclists.
+                    Each climb is described by several facts: name, a short description, height, grade, length, what
+                    state the road surface is in, average climbing time for an amateur or a professional road cyclist.
+                    The combined authors measured <strong>1.869.800 km</strong>, rode up a height of <strong>112.396
+                        meters</strong> and measured nearly <strong>30.000 data points</strong> to compose this book.
+                    Each hill has a so-called COTACOL score. This score is determined using several parameters: grade,
+                    length, road surface. A higher score means a tougher climb.
+                    More than 30 years later, some cycling &amp; tech enthousiasts virtually got together and built
+                    apps, web sites and integrated with Strava, so that the modern cyclist can now plan rides to conquer
+                    as much Cotacols as possible and automatically flag them when integrating with Strava.
                 </MudText>
             </MudItem>
         </MudGrid>
     </MudItem>
-    <MudItem xs="12" lg="4" md="4" sm="12">
+    <MudItem xs="12" lg="5" md="5" sm="12">
         <HomeStatsComponent/>
     </MudItem>
     <MudItem xs="12" lg="2" md="2" sm="12">
@@ -44,12 +82,24 @@
 
 @code{
 
-    [CascadingParameter]
-    public MainLayout Layout { get; set; } = null!;
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
     protected override void OnInitialized()
     {
         Layout.Title = "Your cotacol bucket list";
+    }
+
+    private bool ShowWrapped
+    {
+        get
+        {
+            return DateTime.UtcNow.Month switch
+            {
+                12 => DateTime.UtcNow.Day >= 30,
+                1 or 2 => true,
+                _ => false
+            };
+        }
     }
 
 }
