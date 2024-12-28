@@ -95,7 +95,7 @@
         {
             return DateTime.UtcNow.Month switch
             {
-                12 => DateTime.UtcNow.Day >= 30,
+                12 => DateTime.UtcNow.Day >= 28,
                 1 or 2 => true,
                 _ => false
             };
