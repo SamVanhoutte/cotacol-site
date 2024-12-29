@@ -152,8 +152,12 @@
                 <AeroSubtitle>Your attempts</AeroSubtitle>
                 @if (climbDetail?.UserColDetail?.Activities?.Any() ?? false)
                 {
+                    @if (climbDetail.UserColDetail.Activities.Count > 5)
+                    {
+                        <MudText Typo="Typo.body1">@climbDetail.UserColDetail.Activities.Count attempts</MudText>
+                    }
                     <MudList T="string">
-                        @foreach (var activity in climbDetail.UserColDetail.Activities)
+                        @foreach (var activity in climbDetail.UserColDetail.Activities.OrderByDescending(a=>a.StartTime))
                         {
                             <MudListItem Icon="@(activity.Duration.Equals(BestDuration) ? Icons.Material.Filled.FlashOn : Icons.Material.Filled.Timelapse)" Dense="true" Href='@($"https://www.strava.com/activities/{activity.Id}")'>
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">@(TimeSpan.FromSeconds(activity.Duration).ToString("g")) - @(activity.StartTime.ToString("D"))</MudText>
@@ -245,12 +249,10 @@
 
 @code {
 
-    [CascadingParameter]
-    public MainLayout Layout { get; set; } = null!;
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
 
 
-    [Parameter]
-    public string CotacolId { get; set; }
+    [Parameter] public string CotacolId { get; set; }
 
     private ClimbUserDetail? climbDetail;
     private List<ClimbData> comparableCols = new List<ClimbData>();
@@ -303,6 +305,7 @@
             climb.FirstAchievement = climbDetail.UserColDetail.Activities.Min(a => a.StartTime);
             climb.Done = climbDetail.UserColDetail.Activities.Any();
         }
+
         return climb;
     }
 
