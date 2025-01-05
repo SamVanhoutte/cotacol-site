@@ -1,13 +1,5 @@
 @page "/admin/support/{TicketId}"
-@using System.Text
-@using AeroBlazor.Extensions
-@using AeroBlazor.Theming
-@using Cotacol.Website.Models.CotacolApi
-@inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
-@inject NavigationManager NavManager
-@inject IThemeManager ThemeManager
-@inject IJSRuntime JSRuntime
 <script>
     function downloadFileFromByteArray(filename, contentType, byteArray) {
         const blob = new Blob([new Uint8Array(byteArray)], {type: contentType});
@@ -21,90 +13,7 @@
 </script>
 @if (UserProfile.IsAdmin)
 {
-    @if (queryLaunched && supportCase == null)
-    {
-        <MudItem xs="12">
-            <AeroLoader WaitingMessage="Loading ticket"></AeroLoader>
-        </MudItem>
-    }
-
-    <hr/>
-    @if (supportCase != null)
-    {
-        <MudGrid>
-            <MudItem xs="3">
-                <AeroLabel Name="Created on" Value="@supportCase.CreationTime.PrintHistoricalDate()"></AeroLabel>
-            </MudItem>
-            <MudItem xs="3">
-                <AeroLabel Name="Updated on" Value="@supportCase.UpdatedTime.PrintHistoricalDate()"></AeroLabel>
-            </MudItem>
-            <MudItem xs="3">
-                <AeroLabel Name="Active status" Value="@supportCase.ActiveStatus.ToString()"/>
-            </MudItem>
-            <MudItem xs="3">
-                <AeroLabel Name="Case type" Value="@supportCase.CaseType"/>
-            </MudItem>
-        </MudGrid>
-        <MudGrid>
-            <MudItem xs="12">
-                <AeroDivider Type="AeroDividerType.Line"></AeroDivider>
-                <AeroFlexContainer CenterAlign="true">
-                    <UserAdminLinks UserId="@supportCase.UserId"></UserAdminLinks>
-                </AeroFlexContainer>
-            </MudItem>
-            <MudItem xs="4">
-                <AeroLabel Href='@($"admin/support/{supportCase.CaseId}")' Name="Case id" AllowCopy="true"
-                           Value="@supportCase.CaseId.ToString()"></AeroLabel>
-            </MudItem>
-            <MudItem xs="4">
-                <AeroFlexContainer CenterAlign="true" FullWidth="true">
-                    <AeroLabel Name="User Id" Href='@($"admin/users/{supportCase.UserId}")' AllowCopy="true"
-                               Value="@supportCase.UserId"></AeroLabel>
-                </AeroFlexContainer>
-            </MudItem>
-            <MudItem xs="4">
-                <AeroFlexContainer RightAlign="true" FullWidth="true">
-                    @if (!string.IsNullOrEmpty(supportCase.ReportContent))
-                    {
-                        <AeroButton OnClick="@(async () => await DownloadReportAsync())">Download report</AeroButton>
-                    }
-                </AeroFlexContainer>
-            </MudItem>
-            <MudItem xs="12">
-                <MudTextField T="string" @bind-Value="@supportCase.EmailAddress" Label="Email address"></MudTextField>
-            </MudItem>
-        </MudGrid>
-        <MudGrid>
-            <MudItem xs="12">
-                <MudTextField Lines="10" T="string" Variant="Variant.Text" @bind-Value="@supportCase.Description"
-                              Label="Case details">
-                </MudTextField>
-                <AeroFlexContainer>
-                    <AeroButton Mode="AeroButton.ButtonMode.Subtle" IsLoading="@updateRequested"
-                                OnClick="@(async () => await UpdateCaseAsync(supportCase.ActiveStatus))">Update case
-                    </AeroButton>
-                    <AeroDivider Minimal="false" Type="AeroDividerType.Blank"></AeroDivider>
-                    <AeroButton IsLoading="@updateRequested"
-                                OnClick="@(async () => await UpdateCaseAsync(CaseStatus.Closed))">Close case
-                    </AeroButton>
-                    <AeroDivider Minimal="true" Type="AeroDividerType.Blank"></AeroDivider>
-                    <AeroButton IsLoading="@updateRequested"
-                                OnClick="@(async () => await UpdateCaseAsync(CaseStatus.Solved))">Case solved
-                    </AeroButton>
-                    <AeroDivider Minimal="true" Type="AeroDividerType.Blank"></AeroDivider>
-                    <AeroButton IsLoading="@updateRequested"
-                                OnClick="@(async () => await UpdateCaseAsync(CaseStatus.WaitingForUser))">Wait for user
-                    </AeroButton>
-                </AeroFlexContainer>
-            </MudItem>
-            @if (!string.IsNullOrEmpty(supportCase.ReportContent))
-            {
-                <MudItem xs="12">
-                    <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Secondary"/>
-                </MudItem>
-            }
-        </MudGrid>
-    }
+    <SupportCaseComponent AdminView="true" CaseId="@TicketId" />
 }
 else
 {
@@ -117,53 +26,10 @@ else
 
     [CascadingParameter] public MainLayout Layout { get; set; } = null!;
     [Parameter] public string TicketId { get; set; }
-    SupportCase? supportCase;
-    private bool loadSync = false;
-    private bool queryLaunched = false;
-    private string searchString;
-    private bool updateRequested = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Layout.Title = "Support cases";
-        await LoadTicketAsync();
-    }
-
-    private async Task LoadTicketAsync()
-    {
-        if (UserProfile.IsAdmin)
-        {
-            queryLaunched = true;
-            var supportList = await CotacolClient.GetSupportCasesAsync();
-            supportCase = supportList.FirstOrDefault(sc => sc.CaseId.ToString() == TicketId);
-            queryLaunched = false;
-        }
-    }
-
-    private async Task UpdateCaseAsync(CaseStatus newStatus)
-    {
-        try
-        {
-            updateRequested = true;
-            await CotacolClient.UpdateSupportCaseAsync(TicketId, new SupportCaseUpdate
-            {
-                Description = supportCase.Description, EmailAddress = supportCase.EmailAddress, NewStatus = newStatus
-            });
-            NavManager.NavigateTo("admin/support");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        finally
-        {
-            updateRequested = false;
-        }
-    }
-
-    private async Task DownloadReportAsync()
-    {
-        await JSRuntime.InvokeVoidAsync("downloadFileFromByteArray", $"report-{TicketId}.json", "text/json", Encoding.UTF8.GetBytes(supportCase.ReportContent));
+        Layout.Title = "Support case";
     }
 
 }

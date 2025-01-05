@@ -106,7 +106,7 @@
                                                       Result="MissingColDataResult"></AeroWizardStepHeader>
                             </TitleContent>
                             <ChildContent>
-                                @if ((Report.ActivitiesResult.UserCols?.Any() ?? false) && (activities?.Any() ?? false))
+                                @if ((UserCols?.Any() ?? false) && (activities?.Any() ?? false))
                                 {
                                     <MudAutocomplete @bind-Value="Report.MissingData.Cotacol"
                                                      ToStringFunc='@(s => $"#{s.Id} - {s.Name}")'
@@ -254,6 +254,12 @@
 
 @code {
     [Parameter] public string? UserId { get; set; }
+    [Parameter] 
+    [SupplyParameterFromQuery(Name = "activityid")]
+    public string? ActivityId { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "cotacolid")]
+    public string? CotacolId { get; set; }
 
 
     private HttpClient? SfinxClient;
@@ -276,6 +282,8 @@
     private SupportCaseRequest supportRequest = new SupportCaseRequest();
     private bool supportRequesting = false;
 
+    private List<UserClimb> UserCols { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
     }
@@ -294,9 +302,9 @@
     {
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
-            return Report.ActivitiesResult.UserCols;
+            return UserCols;
 
-        return Report.ActivitiesResult.UserCols.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return UserCols.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
     private async Task<IEnumerable<CotacolActivity>> SearchActivity(string value, CancellationToken token)
@@ -368,8 +376,17 @@
             activities = await CotacolUserClient.GetActivitiesAsync(SelectedUserId, true);
             var colDetails = await CotacolUserClient.GetClimbDataAsync(SelectedUserId);
             Report.ActivitiesResult.StravaActivityCount = activities.Count;
-            Report.ActivitiesResult.UserCols = colDetails;
+            UserCols = colDetails;
 
+            if (!string.IsNullOrEmpty(CotacolId))
+            {
+                Report.MissingData.Cotacol = UserCols.FirstOrDefault(c => c.Id == CotacolId);
+            }
+
+            if (!string.IsNullOrEmpty(ActivityId))
+            {
+                Report.MissingData.Activity = activities.FirstOrDefault(a => a.ActivityId == ActivityId);
+            }
             // var title = availableActivities.NewActivities.Any() ? $"{availableActivities.NewActivities.Length} Missing activities detected" : "All activities were imported";
             StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"We have {activities.Count} activities of you", Success = true, HasRun = true };
             ActiveSupportStep++;
@@ -390,7 +407,14 @@
     {
         try
         {
-            await missingColPanel.ExpandAsync();
+            if(Report.MissingData.Activity==null || Report.MissingData.Cotacol==null)
+            {
+                await missingColPanel.ExpandAsync();
+            }
+            else
+            {
+                await ConfirmMissingInformationAsync();
+            }
         }
         catch (System.Exception e)
         {

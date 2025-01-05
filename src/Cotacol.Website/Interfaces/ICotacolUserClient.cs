@@ -24,5 +24,8 @@ namespace Cotacol.Website.Interfaces
         Task<List<UserBadgeStatus>> GetBadgesAsync(string userId);
         Task<UserBadgeStatus> GetBadgeAsync(string badgeId, string userId);
         Task<StravaActivityDetailResponse> GetStravaActivityDetailAsync(string activityId, string userId = null);
+        Task<List<SupportCase>> GetSupportCasesAsync(string userId);
+        Task<SupportStatusResponse> GetSupportStatusAsync(string userId);
+
     }
 }

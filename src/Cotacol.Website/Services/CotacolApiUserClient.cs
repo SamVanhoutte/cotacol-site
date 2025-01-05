@@ -155,6 +155,24 @@ public class CotacolApiUserClient : ICotacolUserClient
         return activity;
     }
 
+    public async Task<List<SupportCase>> GetSupportCasesAsync(string userId)
+    {
+        var cases = await $"{_settings.ApiUrl}/user/{userId}/support"
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .GetJsonAsync<List<SupportCase>>();
+
+        return cases;
+    }
+
+    public async Task<SupportStatusResponse> GetSupportStatusAsync(string userId)
+    {
+        var supportStatus = await $"{_settings.ApiUrl}/user/{userId}/support/status"
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .GetJsonAsync<SupportStatusResponse>();
+
+        return supportStatus;
+    }
+
     public async Task UpdateSettingsAsync(string userId, UserSettings settings, string email)
     {
         var req = new UserSetupRequest

@@ -249,4 +249,23 @@ public class CotacolApiClient : ICotacolClient
             .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
             .PutJsonAsync(request);
     }
+
+    public async Task<SupportCase> GetSupportCaseAsync(string caseId)
+    {
+        var systemStatus = await $"{_settings.ApiUrl}/support"
+            .AppendPathSegment(caseId)
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .GetJsonAsync<SupportCase>();
+
+        return systemStatus;
+    }
+
+    public async Task AddSupportCaseMessageAsync(string caseId, SupportChat message)
+    {
+        var response = await $"{_settings.ApiUrl}/support"
+            .AppendPathSegment(caseId)
+            .AppendPathSegment("message")
+            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+            .PostJsonAsync(message);
+    }
 }

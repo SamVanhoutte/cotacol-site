@@ -1,0 +1,35 @@
+@using AeroBlazor.Extensions
+@using AeroBlazor.Theming
+@using Cotacol.Website.Models.CotacolApi
+@using System.Text
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+@inject IThemeManager ThemeManager
+@inject IJSRuntime JSRuntime
+
+<AeroDialogWindow Title="Reply message" ButtonText="Send" Submitted="@(async () => await SendChatMessageAsync())">
+    <AeroLabel Name="This Email will be used" Value="@Email"></AeroLabel>
+    <MudTextField T="string" Label="Message" FullWidth="true" @bind-Value="@chatMessageRequest.Message" Lines="5"></MudTextField>
+</AeroDialogWindow>
+@code 
+{
+    [Parameter]
+    public string? Email { get; set; }
+    [Parameter]
+    public string? CaseId { get; set; }
+    private SupportChat chatMessageRequest = new SupportChat();
+
+    protected async override Task OnInitializedAsync()
+    {
+        chatMessageRequest = new SupportChat
+        {
+            UserId = UserProfile.UserId, EmailAddress = Email
+        };
+    }
+
+    private async Task SendChatMessageAsync()
+    {
+        await CotacolClient.AddSupportCaseMessageAsync(CaseId, chatMessageRequest);
+    }
+}

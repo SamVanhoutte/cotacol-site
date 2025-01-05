@@ -39,8 +39,6 @@ namespace Cotacol.Website.Models
 
         [JsonPropertyName("strava_segment")]
         public string StravaSegment { get; set; }
-        
-        
 
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -56,7 +54,7 @@ namespace Cotacol.Website.Models
         [JsonPropertyName("total_attempts")]
         public int TotalAttempts { get; set; }
         [JsonPropertyName("local_legends")]
-        public List<LocalLegend> LocalLegends { get; set; }
+        public List<LocalLegend>? LocalLegends { get; set; }
         public int CurrentLegendLimit => LocalLegends?.FirstOrDefault()?.Attempts ?? 5;
     }
 }

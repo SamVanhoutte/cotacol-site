@@ -1,0 +1,25 @@
+@page "/support/{CaseId}"
+@using Cotacol.Website.Models.CotacolApi
+@inject IUserProfileManager ProfileManager
+@inject ICotacolClient CotacolClient
+<MudGrid>
+    <MudItem xs="12">
+        <SupportCaseComponent AdminView="false" CaseId="@CaseId" />
+    </MudItem>
+</MudGrid>
+
+
+
+@code {
+
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
+    [Parameter] public string CaseId { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "Support case";
+        base.OnInitialized();
+    }
+
+
+}

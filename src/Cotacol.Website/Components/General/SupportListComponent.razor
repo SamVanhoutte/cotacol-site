@@ -1,0 +1,192 @@
+@using System.Text
+@using AeroBlazor.Extensions
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+<script>
+    function downloadFileFromByteArray(filename, contentType, byteArray) {
+        const blob = new Blob([new Uint8Array(byteArray)], {type: contentType});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+<CotacolEmailVerification @bind-Email="@emailAddress"></CotacolEmailVerification>
+@if (!string.IsNullOrEmpty(emailAddress))
+{
+    @if (supportList != null)
+    {
+        <MudItem xs="12">
+            @if (AdminView)
+            {
+                <MudText Typo="Typo.body1">
+                    @supportList.Count tickets // @OpenTickets open tickets // @UserCount users
+                </MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1">
+                    @supportList.Count tickets // @OpenTickets open tickets
+                </MudText>
+            }
+        </MudItem>
+    }
+
+    @if (queryLaunched && supportList == null)
+    {
+        <MudItem xs="12">
+            <AeroLoader WaitingMessage="Loading tickets"></AeroLoader>
+        </MudItem>
+    }
+
+    <hr/>
+    @if (supportList != null)
+    {
+        <MudTable FixedHeader="true" Height="100%"
+                  LoadingProgressColor="Color.Secondary"
+                  Filter="new Func<SupportCase, bool>(FilterCase)" Items="@supportList" RowsPerPage="50"
+                  Style="width: 100%; background-color: transparent">
+            <ToolBarContent>
+                <MudSpacer/>
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                              Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.CreationTime)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Created</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                @if (AdminView)
+                {
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.UserId)">
+                            <MudText Typo="Typo.subtitle1">User</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                    <MudTh Style="@HeaderStyle">
+                        <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.EmailAddress)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Email</MudText>
+                        </MudTableSortLabel>
+                    </MudTh>
+                }
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.UpdatedTime)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Updated</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.ActiveStatus)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Status</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.CaseType)">
+                        <MudText Typo="Typo.subtitle1" Align="Align.Right">Type</MudText>
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudText Typo="Typo.subtitle1" Align="Align.Left">Description</MudText>
+                </MudTh>
+                <MudTh Style="@HeaderStyle">
+                    <MudText Typo="Typo.subtitle1" Align="Align.Right">Report</MudText>
+                </MudTh>
+            </HeaderContent>
+            <RowTemplate Context="supportCase">
+                <MudTd>
+                    <AeroLabel Href='@(TicketLink(supportCase.CaseId.ToString()))' ForeColor="Color.Secondary"
+                               AllowCopy="true" Value="@supportCase.CreationTime.PrintHistoricalTime()"
+                               CopyValue="@supportCase.CaseId.ToString()"></AeroLabel>
+                </MudTd>
+                @if (AdminView)
+                {
+                    <MudTd>
+                        <AeroLabel Href='@($"admin/users/{supportCase.UserId}")' ForeColor="Color.Secondary"
+                                   AllowCopy="true" Value="@(supportCase.UserName ?? supportCase.UserId)"></AeroLabel>
+                    </MudTd>
+                    <MudTd>@supportCase.EmailAddress</MudTd>
+                }
+                <MudTd>@supportCase.UpdatedTime.PrintHistoricalTime()</MudTd>
+                <MudTd>@supportCase.ActiveStatus</MudTd>
+                <MudTd>@supportCase.CaseType</MudTd>
+                <MudTd>@supportCase.Description</MudTd>
+                <MudTd>
+                    @if (!string.IsNullOrEmpty(supportCase.ReportContent))
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Download"
+                                       OnClick="@(async () => await DownloadReportAsync(supportCase))"
+                                       Color="Color.Secondary"/>
+                    }
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+}
+
+@code {
+    [Parameter] public bool AdminView { get; set; }
+    [Parameter] public string Email { get; set; }
+
+    List<SupportCase> supportList;
+    private bool loadSync = false;
+    private bool queryLaunched = false;
+    private string searchString;
+    private string HeaderStyle => "background-color: #dcd5cb; font-weight: bold";
+    private string HeaderStyleRight => "background-color: #dcd5cb; font-weight: bold; text-align: right";
+    private string? emailAddress = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTicketsAsync();
+    }
+
+    private async Task LoadTicketsAsync()
+    {
+        if (UserProfile.IsAdmin)
+        {
+            queryLaunched = true;
+            supportList = null;
+            if (AdminView)
+            {
+                supportList = await CotacolClient.GetSupportCasesAsync();
+            }
+            else
+            {
+                supportList = await CotacolUserClient.GetSupportCasesAsync(UserProfile.UserId);
+            }
+
+            supportList = supportList.OrderByDescending(sc => sc.UpdatedTime).ToList();
+        }
+    }
+
+    private string TicketLink(string ticketId)
+    {
+        return AdminView ? $"admin/support/{ticketId}" : $"support/{ticketId}";
+    }
+
+    private int UserCount => supportList.DistinctBy(sc => sc.UserId).Count();
+    private int OpenTickets => supportList.Count(sc => sc.ActiveStatus != CaseStatus.Closed);
+
+    private bool FilterCase(SupportCase supportCase, string query)
+    {
+        if (string.IsNullOrEmpty(query)) return true;
+        if (supportCase.CaseType.Contains(query, StringComparison.OrdinalIgnoreCase)) return true;
+        if (supportCase.Description.Contains(query, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
+
+    private bool FilterCase(SupportCase supportCase) => FilterCase(supportCase, searchString);
+
+    private async Task DownloadReportAsync(SupportCase supportCase)
+    {
+        await JSRuntime.InvokeVoidAsync("downloadFileFromByteArray", $"report-{supportCase.CaseId}.json", "text/json", Encoding.UTF8.GetBytes(supportCase.ReportContent));
+    }
+
+}

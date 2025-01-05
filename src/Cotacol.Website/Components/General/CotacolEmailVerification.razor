@@ -1,0 +1,40 @@
+@using Cotacol.Website.Models.CotacolApi
+@inject ICotacolUserClient CotacolUserClient
+@inject IUserProfileManager UserProfile
+@if (userProfile == null)
+{
+    <AeroLoader Small="true" WaitingMessage="Checking email..." />
+}
+else
+{
+    @if (string.IsNullOrEmpty(userProfile.EmailAddress))
+    {
+        <AeroWarning Error="false">@Warning</AeroWarning>
+        <AeroButton Href="settings">Update it here...</AeroButton>
+    }
+}
+@code {
+    private string? email;
+
+    [Parameter] public string? UserId { get; set; }
+    [Parameter] public string? Warning { get; set; } = "We need your email address.";
+    [Parameter] public EventCallback<string?> EmailChanged { get; set; }
+    
+    [Parameter]
+    public string? Email
+    {
+        get;
+        set;
+    }
+    
+    private UserProfile userProfile;
+    internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+        Email = userProfile.EmailAddress;
+        await EmailChanged.InvokeAsync(Email);
+    }
+
+}
