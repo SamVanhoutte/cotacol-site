@@ -1,0 +1,42 @@
+@page "/support/cases"
+@using Cotacol.Website.Models.CotacolApi
+@inject IUserProfileManager ProfileManager
+@inject ICotacolClient CotacolClient
+<MudGrid>
+    <MudItem xs="12">
+        <SupportListComponent AdminView="false"></SupportListComponent>
+    </MudItem>
+    
+</MudGrid>
+
+
+
+@code {
+    private string MissingActivityId;
+    private string MissingCotacolId;
+    private bool _dataSubmitted = false;
+    private string _missingDataMessage = "";
+    private string? supportCaseId;
+    private SupportCaseRequest supportRequest = new SupportCaseRequest();
+    private bool supportRequesting = false;
+
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Layout.Title = "Support";
+        base.OnInitialized();
+    }
+
+    //
+    // private async Task SubmitSupportRequestAsync()
+    // {
+    //     supportRequesting = true;
+    //     supportRequest.ReportContent = "";
+    //     supportRequest.UserId = ProfileManager.UserId;
+    //     supportRequest.CaseType = "General";
+    //     var supportCase = await CotacolClient.CreateSupportCaseAsync(supportRequest);
+    //     supportCaseId = supportCase.CaseId.ToString();
+    // }
+
+}

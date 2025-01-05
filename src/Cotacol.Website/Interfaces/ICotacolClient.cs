@@ -27,6 +27,8 @@ namespace Cotacol.Website.Interfaces
         Task<SystemStatus> GetSystemStatusAsync();
         Task<List<SupportCase>> GetSupportCasesAsync(); 
         Task<SupportCase> CreateSupportCaseAsync(SupportCaseRequest request); 
-        Task UpdateSupportCaseAsync(string caseId, SupportCaseUpdate request); 
+        Task UpdateSupportCaseAsync(string caseId, SupportCaseUpdate request);
+        Task<SupportCase> GetSupportCaseAsync(string caseId);
+        Task AddSupportCaseMessageAsync(string caseId, SupportChat message);
     }
 }   

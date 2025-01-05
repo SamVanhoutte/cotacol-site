@@ -43,7 +43,7 @@
             else
             {
                 <MudGrid>
-                    @if (_userProfile != null)
+                    @if (userProfile != null)
                     {
                         <MudItem xs="12">
                             <AeroSubtitle>Your settings</AeroSubtitle>
@@ -55,17 +55,17 @@
                             </MudItem>
                         }
                         <MudItem xs="12">
-                            <AeroTextField T="string" @bind-Value="@_userProfile.EmailAddress" FullWidth="true" HelperText="Can be used for notifications" Label="Email address"></AeroTextField>
+                            <AeroTextField T="string" @bind-Value="@userProfile.EmailAddress" FullWidth="true" HelperText="Can be used for notifications" Label="Email address"></AeroTextField>
                             @* <MudTextField T="string" HelperText="Email" Label="Email address"></MudTextField> *@
                         </MudItem>
                         <MudItem xs="12">
-                            <AeroToggle @bind-Value="@_userProfile.Settings.EnableBetaFeatures" Label="Join beta features"></AeroToggle>
+                            <AeroToggle @bind-Value="@userProfile.Settings.EnableBetaFeatures" Label="Join beta features"></AeroToggle>
                         </MudItem>
                         <MudItem xs="12">
-                            <AeroToggle @bind-Value="@_userProfile.Settings.UpdateActivityDescription" Label="Update activity descriptions"></AeroToggle>
+                            <AeroToggle @bind-Value="@userProfile.Settings.UpdateActivityDescription" Label="Update activity descriptions"></AeroToggle>
                         </MudItem>
                         <MudItem xs="12">
-                            <AeroToggle @bind-Value="@_userProfile.Settings.PrivateProfile" Label="Hide profile from stats"></AeroToggle>
+                            <AeroToggle @bind-Value="@userProfile.Settings.PrivateProfile" Label="Hide profile from stats"></AeroToggle>
                             <AeroDivider></AeroDivider>
                         </MudItem>
                         <MudItem xs="12">
@@ -205,7 +205,7 @@
     private bool confirmationDialogOpen = false;
     private string StatusMessage;
     internal string UserIdToShow => string.IsNullOrEmpty(UserId) ? UserProfile.UserId : UserId;
-    private UserProfile _userProfile;
+    private UserProfile userProfile;
     private string _notAuthorizedMessage;
     private string _stravaNotAuthorizedMessage;
     private StravaUserProfile _stravaProfile;
@@ -223,16 +223,16 @@
             }
             else
             {
-                _userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
-                if (_userProfile?.RequiresBackendSync ?? true)
+                userProfile = await CotacolUserClient.GetProfileAsync(UserIdToShow);
+                if (userProfile?.RequiresBackendSync ?? true)
                 {
                     StravaAuthRequired = true;
                     return;
                 }
-                if (_userProfile.Settings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
+                if (userProfile.Settings.PrivateProfile && !string.IsNullOrEmpty(UserId) && !UserProfile.IsAdmin)
                 {
                     _notAuthorizedMessage = "The user profile is not public";
-                    _userProfile = null;
+                    userProfile = null;
                 }
             }
         }
@@ -254,7 +254,7 @@
 
     private async Task SaveSettingsAsync()
     {
-        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, _userProfile.Settings, _userProfile.EmailAddress);
+        await CotacolUserClient.UpdateSettingsAsync(UserIdToShow, userProfile.Settings, userProfile.EmailAddress);
         StatusMessage = "Settings were successfully updated.";
     }
 
@@ -269,7 +269,7 @@
         {
             return $"({UserProfile.FullName})";
         }
-        return string.IsNullOrEmpty(_userProfile?.FullName) ? "" : $"({_userProfile?.FullName})";
+        return string.IsNullOrEmpty(userProfile?.FullName) ? "" : $"({userProfile?.FullName})";
     }
 
     private async Task PerformUserSyncAsync()

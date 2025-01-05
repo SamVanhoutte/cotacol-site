@@ -24,6 +24,19 @@
                     <MudText Typo="Typo.body1">@totalPoints.Number() pts</MudText>
                 </span>
             }
+            @if(supportCaseCount > 0)
+            {
+                <MudBadge Content="@supportCaseCount" Color="Color.Warning" Bordered="true" Overlap="true" Class="mx-6 my-4">
+                    @if(UserProfile.IsAdmin)
+                    {
+                        <MudLink Href="admin/support" Color="Color.Secondary" Typo="Typo.body1">Support</MudLink>
+                    }
+                    else
+                    {
+                        <MudLink Href="support/cases" Color="Color.Secondary" Typo="Typo.body1">Support</MudLink>
+                    }
+                </MudBadge>
+            }
             <AeroDivider Minimal="true" Type="AeroDividerType.Horizontal"></AeroDivider>
             <MudLink Href="settings" Color="Color.Secondary" Typo="Typo.body1">Settings</MudLink>
             <MudLink Href="signout" Color="Color.Secondary" Typo="Typo.body1">Log out</MudLink>
@@ -39,7 +52,7 @@
 @code {
     private int uniqueCols = -1;
     private int totalPoints = -1;
-
+    private int supportCaseCount = 2;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,6 +60,8 @@
         {
             try
             {
+                var supportStatus = await CotacolUserClient.GetSupportStatusAsync(UserProfile.UserId);
+                supportCaseCount = UserProfile.IsAdmin ? supportStatus.OpenCases: supportStatus.OpenUserCases;
                 var stats = await CotacolUserClient.GetAchievementsAsync(UserProfile.UserId);
                 uniqueCols = stats.UniqueCols;
                 totalPoints = stats.TotalScore;

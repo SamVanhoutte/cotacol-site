@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json.Serialization;
 
 namespace Cotacol.Website.Models.CotacolApi;
@@ -9,6 +10,8 @@ public class SupportCase
 
     [JsonPropertyName("userId")]
     public string UserId { get; set; }
+    [JsonPropertyName("userName")]
+    public string? UserName { get; set; }
 
     [JsonPropertyName("emailAddress")]
     public string EmailAddress { get; set; }
@@ -36,6 +39,9 @@ public class SupportCase
 
     [JsonPropertyName("reportContent")]
     public string ReportContent { get; set; }
+
+    [JsonPropertyName("chats")]
+    public SupportChat[] Chats { get; set; }
 }
 
 public enum CaseStatus

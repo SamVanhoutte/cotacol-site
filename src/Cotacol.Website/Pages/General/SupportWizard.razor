@@ -93,7 +93,7 @@
                                                           Result="StravaActivitiesResult"></AeroWizardStepHeader>
                                 </TitleContent>
                                 <ChildContent>
-                                    @if (Report.StravaActivitiesResult.ExistingActivities != null)
+                                    @if (ExistingActivities != null)
                                     {
                                         <MudGrid>
                                             <MudItem xs="12">
@@ -115,10 +115,10 @@
                                                           Result="MissingActivitiesResult"></AeroWizardStepHeader>
                                 </TitleContent>
                                 <ChildContent>
-                                    @if (Report.StravaActivitiesResult.NewActivities != null)
+                                    @if (NewActivities != null)
                                     {
                                         <ul>
-                                            @foreach (var activity in Report.StravaActivitiesResult.NewActivities)
+                                            @foreach (var activity in NewActivities)
                                             {
                                                 <li>
                                                     <AeroLabel Target="_blank"
@@ -183,7 +183,9 @@
     private AeroWizardStepHeader.StepResult MissingActivitiesResult;
     private AeroWizardStepHeader.StepResult SyncedActivitiesResult;
     private AeroWizardStepHeader.StepResult SendResult;
-
+    public List<ActivityDetail> ExistingActivities { get; set; }
+    public List<ActivityDetail> NewActivities { get; set; }
+    
     private string SelectedUserId => UserId ?? ProfileManager.UserId;
 
     private async Task StartScanAsync()
@@ -274,8 +276,8 @@
 
             Report.StravaActivitiesResult.StravaActivityCount = existingActivities.Count + newActivities.Count;
             Report.StravaActivitiesResult.MissingActivityCount = newActivities.Count;
-            Report.StravaActivitiesResult.ExistingActivities = existingActivities;
-            Report.StravaActivitiesResult.NewActivities = newActivities;
+            ExistingActivities = existingActivities;
+            NewActivities = newActivities;
 
             // var title = availableActivities.NewActivities.Any() ? $"{availableActivities.NewActivities.Length} Missing activities detected" : "All activities were imported";
             StravaActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"{existingActivities.Count + newActivities.Count} Strava activities found", Success = true, HasRun = true };
@@ -298,8 +300,8 @@
         try
         {
             await Task.Delay(500);
-            Report.MissingActivitiesResult.SynchedActivities = Report.StravaActivitiesResult.ExistingActivities.Count;
-            Report.MissingActivitiesResult.MissingActivities = Report.StravaActivitiesResult.NewActivities.Count;
+            Report.MissingActivitiesResult.SynchedActivities = ExistingActivities.Count;
+            Report.MissingActivitiesResult.MissingActivities = NewActivities.Count;
             MissingActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"{Report.StravaActivitiesResult.MissingActivityCount} Activities missing", Success = true, HasRun = true };
         }
         catch (System.Exception e)
@@ -318,12 +320,12 @@
     {
         try
         {
-            foreach (var newActivity in Report.StravaActivitiesResult.NewActivities)
+            foreach (var newActivity in NewActivities)
             {
                 await CotacolUserClient.SynchronizeActivityAsync(SelectedUserId, newActivity.Id);
             }
 
-            SyncedActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"Sync of {Report.StravaActivitiesResult.NewActivities.Count} activities submitted.", Success = true, HasRun = true };
+            SyncedActivitiesResult = new AeroWizardStepHeader.StepResult { Result = $"Sync of {NewActivities.Count} activities submitted.", Success = true, HasRun = true };
         }
         catch (System.Exception e)
         {

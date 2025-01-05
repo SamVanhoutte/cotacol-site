@@ -1,0 +1,28 @@
+@using AeroBlazor.Extensions
+@using AeroBlazor.Theming
+@using Cotacol.Website.Models.CotacolApi
+@using System.Text
+@inject ICotacolClient CotacolClient
+@inject IUserProfileManager UserProfile
+@inject NavigationManager NavManager
+@inject IThemeManager ThemeManager
+@inject IJSRuntime JSRuntime
+
+<AeroDialogWindow Title="We need your e-mail address" ButtonText="Update" Submitted="@(async() => await UpdateEmailAsync())">
+    <AeroTextField T="string" Label="Email address" @bind-Value="@Email"></AeroTextField>
+    <AeroToggle @bind-Value="allowCommunication" Label="Okay to send notifications and updates. (can be turned off later)"></AeroToggle>
+</AeroDialogWindow>
+@code 
+{
+    [Parameter]
+    public string? Email { get; set; }
+
+    private bool allowCommunication = true;
+    protected async override Task OnInitializedAsync()
+    {
+    }
+
+    private async Task UpdateEmailAsync()
+    {
+    }
+}
