@@ -12,4 +12,8 @@ public class SupportCaseUpdate
 
     [JsonPropertyName("NewStatus")]
     public CaseStatus NewStatus { get; set; }
+    
+    [JsonPropertyName("AssigneeId")]
+    public string? AssigneeId { get; set; }
+    
 }

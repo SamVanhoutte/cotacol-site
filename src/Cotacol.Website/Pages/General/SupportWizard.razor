@@ -345,10 +345,11 @@
         {
             Console.WriteLine("Submitting report step");
             var payload = Report.ToString();
-            await CotacolClient.CreateSupportCaseAsync(new SupportCaseRequest
+            var supportCase = await CotacolClient.CreateSupportCaseAsync(new SupportCaseRequest
             {
                 UserId = SelectedUserId, Description = "Self service scan result", EmailAddress = UserProfile.Email ?? "", CaseType = "SelfServiceScan", ReportContent = payload
             });
+            await CotacolClient.UpdateSupportCaseAsync(supportCase.CaseId.ToString(), new SupportCaseUpdate{Description = supportCase.Description, EmailAddress = supportCase.EmailAddress, NewStatus = CaseStatus.Closed});
             SendResult = new AeroWizardStepHeader.StepResult { Result = "Report available", Success = true, HasRun = true };
         }
         catch (System.Exception e)

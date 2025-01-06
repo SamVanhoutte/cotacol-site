@@ -30,12 +30,17 @@ public class SupportCase
         get => (CaseStatus)Status;
         set => Status = (int)value;
     }
+    
+    public bool IsClosed => ActiveStatus == CaseStatus.Closed || ActiveStatus == CaseStatus.Solved;
 
     [JsonPropertyName("caseType")]
     public string CaseType { get; set; }
 
     [JsonPropertyName("description")]
     public string Description { get; set; }
+    
+    [JsonPropertyName("assigneeId")]
+    public string AssigneeId { get; set; }
 
     [JsonPropertyName("reportContent")]
     public string ReportContent { get; set; }

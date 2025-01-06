@@ -3,6 +3,8 @@
 @using Cotacol.Website.Models.CotacolApi
 @using System.Text
 @using Cotacol.Website.Components.Dialogs
+@using Cotacol.Website.Models.Settings
+@using Microsoft.Extensions.Options
 @using Newtonsoft.Json.Linq
 @inject ICotacolClient CotacolClient
 @inject IUserProfileManager UserProfile
@@ -10,6 +12,7 @@
 @inject IThemeManager ThemeManager
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
+@inject IOptions<AdminSettings> adminSettings
 <script>
     function downloadFileFromByteArray(filename, contentType, byteArray) {
         const blob = new Blob([new Uint8Array(byteArray)], {type: contentType});
@@ -24,7 +27,6 @@
 <CotacolEmailVerification @bind-Email="@emailAddress"></CotacolEmailVerification>
 @if (!string.IsNullOrEmpty(emailAddress))
 {
-
     @if (queryLaunched && supportCase == null)
     {
         <MudItem xs="12">
@@ -33,7 +35,7 @@
     }
 
     <hr/>
-    
+
     @if (supportCase != null)
     {
         <MudGrid>
@@ -71,14 +73,15 @@
                            Value="@(supportCase.UserName ?? supportCase.UserId)"></AeroLabel>
             </MudItem>
             <MudItem xs="3">
-                @if(!string.IsNullOrEmpty(activityId))
+                @if (!string.IsNullOrEmpty(activityId))
                 {
-                    <AeroLabel Name="Activity" AllowCopy="true" Href="@($"https://www.strava.com/activities/{activityId}")" Target="_blank" 
+                    <AeroLabel Name="Activity" AllowCopy="true"
+                               Href="@($"https://www.strava.com/activities/{activityId}")" Target="_blank"
                                Value="@activityId"></AeroLabel>
                 }
             </MudItem>
             <MudItem xs="3">
-                @if(!string.IsNullOrEmpty(cotacolId))
+                @if (!string.IsNullOrEmpty(cotacolId))
                 {
                     <AeroLabel Name="Cotacol" AllowCopy="true" Href="@($"/admin/segments/{cotacolId}")" Target="_blank"
                                Value="@cotacolName" CopyValue="@cotacolId"></AeroLabel>
@@ -104,6 +107,22 @@
                 <MudTextField Lines="10" T="string" Variant="Variant.Text" @bind-Value="@supportCase.Description"
                               Label="Case details">
                 </MudTextField>
+                @if (AdminView)
+                {
+                    @if (adminUsers == null)
+                    {
+                        <AeroLoader Small="true" WaitingMessage="Loading admins"></AeroLoader>
+                    }
+                    else
+                    {
+                        <MudSelect @bind-Value="supportCase.AssigneeId" T="string" Label="Assign to admin">
+                            @foreach (var admin in adminUsers)
+                            {
+                                <MudSelectItem Value="@admin.Key">@admin.Value</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                }
                 <AeroFlexContainer>
                     <AeroButton Mode="AeroButton.ButtonMode.Subtle" IsLoading="@updateRequested"
                                 OnClick="@(async () => await UpdateCaseAsync(supportCase.ActiveStatus))">Update case
@@ -120,7 +139,8 @@
                     {
                         <AeroDivider Minimal="true" Type="AeroDividerType.Blank"></AeroDivider>
                         <AeroButton IsLoading="@updateRequested"
-                                    OnClick="@(async () => await UpdateCaseAsync(CaseStatus.WaitingForUser))">Wait for user
+                                    OnClick="@(async () => await UpdateCaseAsync(CaseStatus.WaitingForUser))">Wait for
+                            user
                         </AeroButton>
                     }
                 </AeroFlexContainer>
@@ -139,13 +159,18 @@
                                 <AeroLabel Value="@(chat.UserName ?? chat.UserId)"></AeroLabel>
                             </MudItem>
                             <MudItem xs="6">
-                                <AeroLabel Value="@chat.Timestamp.PrintHistoricalTime()"></AeroLabel>
+                                <AeroFlexContainer RightAlign="true">
+                                    <AeroLabel Value="@chat.Timestamp.PrintHistoricalTime()"></AeroLabel>
+                                </AeroFlexContainer>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudTextField ReadOnly="true" T="string" Variant="Variant.Text" Value="@chat.Message"
-                                              Label="Message"></MudTextField>
+                                <AeroFlexContainer RightAlign="@(chat.UserId != supportCase.UserId)">
+                                    <MudText Typo="Typo.body2">@chat.Message</MudText>
+                                </AeroFlexContainer>
+                                <AeroDivider Type="AeroDividerType.Line"></AeroDivider>
                             </MudItem>
                         }
+
                         <MudItem xs="12">
                             <AeroButton OnClick="@(async () => await ReplyAsync())">Reply</AeroButton>
                         </MudItem>
@@ -176,23 +201,45 @@
     private string cotacolId;
     private string cotacolName;
     private bool updateRequested = false;
-    private AeroDialogWindow chatPopup=null!;
+    private AeroDialogWindow chatPopup = null!;
+    private IDictionary<string, string>? adminUsers;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadTicketAsync();
+        if (AdminView)
+        {
+            await LoadAdminsAsync();
+        }
     }
 
     private async Task LoadTicketAsync(bool afterChat = false)
     {
         if (UserProfile.IsAdmin)
         {
-            queryLaunched = afterChat ==false;
+            queryLaunched = afterChat == false;
             chatsLoading = afterChat;
             StateHasChanged();
             supportCase = await CotacolClient.GetSupportCaseAsync(CaseId);
             await LoadMissingDataAsync();
             queryLaunched = false;
             chatsLoading = false;
+        }
+    }
+
+    private async Task LoadAdminsAsync()
+    {
+        adminUsers = new Dictionary<string, string>();
+        if (adminSettings.Value != null)
+        {
+            foreach (var adminUserId in adminSettings.Value.UserIds)
+            {
+                var user = await CotacolUserClient.GetProfileAsync(adminUserId);
+                if (user != null)
+                {
+                    adminUsers.Add(adminUserId, user.FullName);
+                }
+            }
         }
     }
 
@@ -206,17 +253,17 @@
                 {
                     var jsonObject = JObject.Parse(supportCase.ReportContent);
                     activityId = jsonObject.SelectToken("MissingData.Activity.ActivityId")?.ToString();
-                cotacolId = jsonObject.SelectToken("MissingData.Cotacol.id")?.ToString();
-                cotacolName = jsonObject.SelectToken("MissingData.Cotacol.name")?.ToString();
+                    cotacolId = jsonObject.SelectToken("MissingData.Cotacol.id")?.ToString();
+                    cotacolName = jsonObject.SelectToken("MissingData.Cotacol.name")?.ToString();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
-
             }
         }
     }
+
     private async Task UpdateCaseAsync(CaseStatus newStatus)
     {
         try
@@ -224,7 +271,8 @@
             updateRequested = true;
             await CotacolClient.UpdateSupportCaseAsync(CaseId, new SupportCaseUpdate
             {
-                Description = supportCase.Description, EmailAddress = supportCase.EmailAddress, NewStatus = newStatus
+                Description = supportCase.Description, EmailAddress = supportCase.EmailAddress,
+                NewStatus = newStatus, AssigneeId = supportCase.AssigneeId
             });
             NavManager.NavigateTo("admin/support");
         }
@@ -257,4 +305,5 @@
             await LoadTicketAsync(true);
         }
     }
+
 }

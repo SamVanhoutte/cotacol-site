@@ -7,7 +7,9 @@ namespace Cotacol.Website.Models.Settings
         public bool IsAdmin(string userId)
         {
             if (string.IsNullOrEmpty(Admins)) return false;
-            return Admins.Split(',').Contains(userId);
+            return UserIds.Contains(userId);
         }
+
+        public List<string> UserIds => Admins.Split(',').ToList();
     }
 }
