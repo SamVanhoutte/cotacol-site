@@ -109,7 +109,7 @@ public class CotacolApiUserClient : ICotacolUserClient
         }
     }
 
-    public async Task<UserProfile> GetProfileAsync(string userId = null)
+    public async Task<UserProfile?> GetProfileAsync(string userId = null)
     {
         userId ??= currentUserId;
         var response = await $"{_settings.ApiUrl}/user/{userId}"

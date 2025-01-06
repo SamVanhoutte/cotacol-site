@@ -20,25 +20,22 @@
 <CotacolEmailVerification @bind-Email="@emailAddress"></CotacolEmailVerification>
 @if (!string.IsNullOrEmpty(emailAddress))
 {
-    @if (supportList != null)
+    @if (filteredSupportList != null)
     {
         <MudItem xs="12">
-            @if (AdminView)
-            {
-                <MudText Typo="Typo.body1">
-                    @supportList.Count tickets // @OpenTickets open tickets // @UserCount users
-                </MudText>
-            }
-            else
-            {
-                <MudText Typo="Typo.body1">
-                    @supportList.Count tickets // @OpenTickets open tickets
-                </MudText>
-            }
+            <AeroFlexContainer>
+                <MudLink OnClick="@(() => FilterCases(true))">@cachedSupportList.Count tickets</MudLink>
+                <MudText>-</MudText>
+                <MudLink OnClick="@(() => FilterCases(false))">@OpenTickets open tickets</MudLink>
+                @if (AdminView)
+                {
+                    <MudText>-@UserCount users</MudText>
+                }
+            </AeroFlexContainer>
         </MudItem>
     }
 
-    @if (queryLaunched && supportList == null)
+    @if (queryLaunched && filteredSupportList == null)
     {
         <MudItem xs="12">
             <AeroLoader WaitingMessage="Loading tickets"></AeroLoader>
@@ -46,11 +43,11 @@
     }
 
     <hr/>
-    @if (supportList != null)
+    @if (filteredSupportList != null)
     {
         <MudTable FixedHeader="true" Height="100%"
                   LoadingProgressColor="Color.Secondary"
-                  Filter="new Func<SupportCase, bool>(FilterCase)" Items="@supportList" RowsPerPage="50"
+                  Filter="new Func<SupportCase, bool>(FilterCase)" Items="@filteredSupportList" RowsPerPage="50"
                   Style="width: 100%; background-color: transparent">
             <ToolBarContent>
                 <MudSpacer/>
@@ -72,8 +69,8 @@
                         </MudTableSortLabel>
                     </MudTh>
                     <MudTh Style="@HeaderStyle">
-                        <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.EmailAddress)">
-                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Email</MudText>
+                        <MudTableSortLabel SortBy="new Func<SupportCase, object>(x => x.AssigneeId)">
+                            <MudText Typo="Typo.subtitle1" Align="Align.Right">Assigned</MudText>
                         </MudTableSortLabel>
                     </MudTh>
                 }
@@ -111,7 +108,7 @@
                         <AeroLabel Href='@($"admin/users/{supportCase.UserId}")' ForeColor="Color.Secondary"
                                    AllowCopy="true" Value="@(supportCase.UserName ?? supportCase.UserId)"></AeroLabel>
                     </MudTd>
-                    <MudTd>@supportCase.EmailAddress</MudTd>
+                    <MudTd>@supportCase.AssigneeId</MudTd>
                 }
                 <MudTd>@supportCase.UpdatedTime.PrintHistoricalTime()</MudTd>
                 <MudTd>@supportCase.ActiveStatus</MudTd>
@@ -134,7 +131,8 @@
     [Parameter] public bool AdminView { get; set; }
     [Parameter] public string Email { get; set; }
 
-    List<SupportCase> supportList;
+    List<SupportCase> filteredSupportList;
+    List<SupportCase> cachedSupportList;
     private bool loadSync = false;
     private bool queryLaunched = false;
     private string searchString;
@@ -145,25 +143,23 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadTicketsAsync();
+
     }
 
     private async Task LoadTicketsAsync()
     {
-        if (UserProfile.IsAdmin)
+        queryLaunched = true;
+        filteredSupportList = null;
+        if (AdminView)
         {
-            queryLaunched = true;
-            supportList = null;
-            if (AdminView)
-            {
-                supportList = await CotacolClient.GetSupportCasesAsync();
-            }
-            else
-            {
-                supportList = await CotacolUserClient.GetSupportCasesAsync(UserProfile.UserId);
-            }
-
-            supportList = supportList.OrderByDescending(sc => sc.UpdatedTime).ToList();
+            cachedSupportList = await CotacolClient.GetSupportCasesAsync();
         }
+        else
+        {
+            cachedSupportList = await CotacolUserClient.GetSupportCasesAsync(UserProfile.UserId);
+        }
+        filteredSupportList = cachedSupportList.OrderByDescending(sc => sc.UpdatedTime).ToList();
+        FilterCases(false);
     }
 
     private string TicketLink(string ticketId)
@@ -171,8 +167,8 @@
         return AdminView ? $"admin/support/{ticketId}" : $"support/{ticketId}";
     }
 
-    private int UserCount => supportList.DistinctBy(sc => sc.UserId).Count();
-    private int OpenTickets => supportList.Count(sc => sc.ActiveStatus != CaseStatus.Closed);
+    private int UserCount => cachedSupportList.DistinctBy(sc => sc.UserId).Count();
+    private int OpenTickets => cachedSupportList.Count(sc => !sc.IsClosed);
 
     private bool FilterCase(SupportCase supportCase, string query)
     {
@@ -189,4 +185,8 @@
         await JSRuntime.InvokeVoidAsync("downloadFileFromByteArray", $"report-{supportCase.CaseId}.json", "text/json", Encoding.UTF8.GetBytes(supportCase.ReportContent));
     }
 
+    private void FilterCases(bool includeClosedCases)
+    {
+        filteredSupportList = cachedSupportList.Where(sc=>!sc.IsClosed || sc.IsClosed==includeClosedCases).ToList();
+    }
 }
