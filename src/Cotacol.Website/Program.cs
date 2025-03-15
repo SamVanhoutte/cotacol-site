@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using AeroBlazor;
 using AeroBlazor.Theming;
+using AeroBlazor.Web;
 // using AeroBlazor;
 // using AeroBlazor.Configuration;
 // using AeroBlazor.Theming;
@@ -131,10 +132,10 @@ namespace Cotacol.Website
                 .Configure<MapSettings>(options => configuration.GetSection("maps").Bind(options))
                 .Configure<AdminSettings>(options => configuration.GetSection("admin").Bind(options));
 
-            builder.Services.AddAeroBlazorWebServices(options =>
+            builder.Services.AddAeroBlazorWebServices<CotacolThemeManager>(options =>
             {
                 // options.EnableLocationServices = true;
-                // mapsOptions.DefaultMarkerIcon = "images/sfinx-map-icon.png";
+                // mapsOptions.DefaultMarkerIcon = "images/cotacol-icon.png";
                 // options.ConfigureMaps(mapsOptions);
             });
             var app = builder.Build();

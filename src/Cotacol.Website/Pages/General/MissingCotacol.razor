@@ -262,7 +262,7 @@
     public string? CotacolId { get; set; }
 
 
-    private HttpClient? SfinxClient;
+    private HttpClient? ApiClient;
     private ColSearchReport Report = new ColSearchReport();
     private int ActiveSupportStep = 0;
     private string? userId;
@@ -544,7 +544,7 @@
             if (string.IsNullOrEmpty(UserId))
             {
                 var payload = Report.ToString();
-                //var supportClient = new SupportApiClient(SfinxClient);
+                //var supportClient = new SupportApiClient(ApiClient);
                 //var result = await ApiErrorHandler.ExecuteAndHandleExceptionsAsync(async () => await supportClient.SubmitSelfSupportScanAsync(new SelfSupportScanRequest { Payload = payload }));
                 //SendResult = new AeroWizardStepHeader.StepResult { Result = result.Success ? "Report sent" : result.ErrorMessage, Success = result.Success, HasRun = true };
             }

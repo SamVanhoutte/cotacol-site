@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AeroBlazor", "..\aeroblazor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotacol.WebTests", "Cotacol.WebTests\Cotacol.WebTests.csproj", "{32DA718C-09FF-43E4-9D37-29949F8F193B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AeroBlazor.Web", "..\aeroblazor\src\AeroBlazor.Web\AeroBlazor.Web.csproj", "{D2374AE4-F45C-47A4-8740-811058519E1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{32DA718C-09FF-43E4-9D37-29949F8F193B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32DA718C-09FF-43E4-9D37-29949F8F193B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32DA718C-09FF-43E4-9D37-29949F8F193B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2374AE4-F45C-47A4-8740-811058519E1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2374AE4-F45C-47A4-8740-811058519E1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2374AE4-F45C-47A4-8740-811058519E1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2374AE4-F45C-47A4-8740-811058519E1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
