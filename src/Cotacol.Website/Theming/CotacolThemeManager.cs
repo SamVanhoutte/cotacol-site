@@ -6,9 +6,12 @@ namespace Cotacol.Website.Theming;
 
 public class CotacolThemeManager : IThemeManager
 {
-    public string PageTitle { get; set; } = "Rental manager";
-    
-    
+    public string PageTitle { get; set; } = "Cotacol";
+
+
+    public string? TitleIcon => null;
+    public string? SubtitleIcon => null;
+
     public MudTheme CurrentTheme => new MudTheme
     {
         PaletteLight = new PaletteLight()
