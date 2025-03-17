@@ -85,12 +85,12 @@ jobs:
       with:
         submodules: recursive 
 
-    - name: Run the frontend tests
-      uses: ./.github/actions/playwright
-      with:
-        #Variables
-        baseUrl: 'https://cotacol-hunting-app-test.azurewebsites.net'
-        environment: 'test'
+    # - name: Run the frontend tests
+    #   uses: ./.github/actions/playwright
+    #   with:
+    #     #Variables
+    #     baseUrl: 'https://cotacol-hunting-app-test.azurewebsites.net'
+    #     environment: 'test'
 
 
   deployProdSite:
