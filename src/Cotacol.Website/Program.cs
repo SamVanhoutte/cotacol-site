@@ -161,7 +161,7 @@ namespace Cotacol.Website
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 
-            app.Run();
+            await app.RunAsync();
         }
 
         private static void InjectServices(WebApplicationBuilder builder)
