@@ -314,23 +314,32 @@ else
 
     private async Task VerifyNewSegment(string segmentId)
     {
-        Console.WriteLine(segmentId);
-        var segmentResponse = await CotacolClient.FetchStravaSegmentAsync(segmentId);
-        if (segmentResponse != null)
+        try
         {
-            NewSegmentDetail = segmentResponse;
+            Console.WriteLine(segmentId);
+            var segmentResponse = await CotacolClient.FetchStravaSegmentAsync(segmentId);
+            if (segmentResponse != null)
+            {
+                NewSegmentDetail = segmentResponse;
+            }
+            else
+            {
+                ErrorMessage = "Strava segment retrieval failed";
+                Console.WriteLine(ErrorMessage);
+            }
+            _cotacol.Segments.Add(new Models.CotacolApi.SegmentDetail
+            {
+                Confidence = "new",
+                Distance = NewSegmentDetail.Distance, Name = NewSegmentDetail.Name, Polyline = NewSegmentDetail.Polyline, Segmentid = NewSegmentDetail.Id.ToString()
+            });
+            StateHasChanged();
+
         }
-        else
+        catch (Exception e)
         {
-            ErrorMessage = "Strava segment retrieval failed";
-            Console.WriteLine(ErrorMessage);
+            Console.WriteLine(e);
+            throw;
         }
-        _cotacol.Segments.Add(new Models.CotacolApi.SegmentDetail
-        {
-            Confidence = "new",
-            Distance = NewSegmentDetail.Distance, Name = NewSegmentDetail.Name, Polyline = NewSegmentDetail.Polyline, Segmentid = NewSegmentDetail.Id.ToString()
-        });
-        StateHasChanged();
     }
 
     private string PickColor(SegmentDetail context)
