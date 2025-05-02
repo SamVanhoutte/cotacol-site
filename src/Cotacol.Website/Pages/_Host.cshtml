@@ -18,5 +18,14 @@
     <script src="_content/BlazorGoogleMaps/js/objectManager.js"></script>
     <script src="https://unpkg.com/@@googlemaps/markerclusterer/dist/index.min.js"></script>
     <script src="_content/AeroBlazor/scripts/AeroBlazor.js"></script>
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+        kofiWidgetOverlay.draw('cotacol', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': 'Support me',
+            'floating-chat.donateButton.background-color': '#e35654',
+            'floating-chat.donateButton.text-color': '#fff'
+        });
+    </script>
 </head>
 <component type="typeof(App)" render-mode="ServerPrerendered"/>

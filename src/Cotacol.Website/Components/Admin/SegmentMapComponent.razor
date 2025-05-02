@@ -34,11 +34,9 @@
             {
                 <MudFileUpload T="IBrowserFile" Accept=".gpx" OnFilesChanged="@(async (files) => await UploadGpxAsync(files))" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
                                @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
-                    <ButtonTemplate>
                         <MudPaper Height="50px" Outlined="true" Class="@DragClass">
                             <MudText Typo="Typo.body1">Upload or drop segment GPX</MudText>
                         </MudPaper>
-                    </ButtonTemplate>
                 </MudFileUpload>
             }
 
