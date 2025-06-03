@@ -35,7 +35,7 @@
                             </ToolBarContent>
                             <HeaderContent>
                                 <MudTh Style="@HeaderStyle">
-                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => x.CotacolId)">
+                                    <MudTableSortLabel SortBy="new Func<SegmentDataValidation, object>(x => int.Parse(x.CotacolId)">
                                         <MudText Typo="Typo.subtitle1">#</MudText>
                                     </MudTableSortLabel>
                                 </MudTh>

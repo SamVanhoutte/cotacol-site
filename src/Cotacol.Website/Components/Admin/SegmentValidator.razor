@@ -1,0 +1,37 @@
+@inject ILogger<SegmentValidator> logger
+@inject ICotacolClient cotacolClient
+@if (segmentChecked)
+{
+    if(SegmentExists)
+    {
+        <MudLink Href="@($"https://www.strava.com/segments/{SegmentId}")" Target="_blank">
+            <MudImage Src="images/strava-logo-small.png"></MudImage>
+        </MudLink>
+    }
+    else
+    {
+        <MudIcon Color="Color.Error" Icon="@Icons.Material.Filled.Error"></MudIcon>
+    }
+}
+else
+{
+    <AeroLoader Small="true" />
+}
+@code {
+    [Parameter] public string SegmentId { get; set; }
+    [Parameter] public bool SegmentExists { get; set; }
+
+    private bool segmentChecked = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (!segmentChecked)
+        {
+            var segment = await cotacolClient.FetchStravaSegmentAsync(SegmentId);
+            segmentChecked = true;
+            SegmentExists = segment != null;
+            StateHasChanged();
+        }
+    }
+
+}

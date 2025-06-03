@@ -87,9 +87,10 @@
                     </MudTd>
                     <MudTd>@context.Remark</MudTd>
                     <MudTd>
-                        <MudLink Href="@($"https://www.strava.com/segments/{context.Segmentid}")" Target="_blank">
-                            <MudImage Src="images/strava-logo-small.png"></MudImage>
-                        </MudLink>
+                        @* <MudLink Href="@($"https://www.strava.com/segments/{context.Segmentid}")" Target="_blank"> *@
+                        @*     <MudImage Src="images/strava-logo-small.png"></MudImage> *@
+                        @* </MudLink> *@
+                        <SegmentValidator SegmentId="@context.Segmentid"></SegmentValidator>
                     </MudTd>
                 </RowTemplate>
             </MudTable>

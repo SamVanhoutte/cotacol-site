@@ -135,12 +135,19 @@ public class CotacolApiClient : ICotacolClient
             stravaSegmentId = stravaSegmentId.Split('/').Last();
         }
 
-        var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
-            .SetQueryParam("UpdateMetadata", persistMetadata)
-            .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
-            .GetJsonAsync<StravaSegment>();
+        if (int.TryParse(stravaSegmentId, out int segmentId))
+        {
+            var segmentResponse = await $"{_settings.ApiUrl}/segments/strava/{stravaSegmentId}"
+                .SetQueryParam("UpdateMetadata", persistMetadata)
+                .WithHeader(_settings.SharedKeyHeaderName, _settings.SharedKeyValue)
+                .GetJsonAsync<StravaSegment>();
 
-        return segmentResponse;
+            return segmentResponse;
+        }
+        else
+        {
+            throw new Exception($"Strava segment ID {stravaSegmentId} is not a valid integer.");
+        }
     }
 
     public async Task<int> UpdateSegmentAsync(string cotacolId, UpdateSegmentRequest update)
