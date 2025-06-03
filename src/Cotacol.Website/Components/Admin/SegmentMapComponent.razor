@@ -6,6 +6,7 @@
 @using Columbae.World
 @using System.IO
 @using AeroBlazor.Theming
+@using Cotacol.Website.Components.Dialogs
 @using Cotacol.Website.Models.CotacolApi
 @using Cotacol.Website.Services.Maps
 @using MouseEvent = GoogleMapsComponents.Maps.MouseEvent
@@ -15,6 +16,7 @@
 @inject ICotacolClient CotacolClient
 @inject IHttpContextAccessor HttpContextManager
 @inject IThemeManager CurrentThemeManager
+@inject IDialogService DialogService
 @if (_cotacol != null)
 {
     <MudGrid>
@@ -97,23 +99,7 @@
         </MudItem>
     </MudGrid>
 
-    <MudDialog @bind-IsVisible="@dialogIsOpen">
-        <TitleContent>
-            <MudText Typo="Typo.subtitle1">#@_cotacol.Id @_cotacol.Name</MudText>
-        </TitleContent>
-        <DialogContent>
-            <MudText Typo="Typo.body1" Color="Color.Warning">Verify details before updating the segment on the backend</MudText>
-            <MudSelect T="string" Label="Confidence" @bind-Value="@confidence">
-                <MudSelectItem Value='"official"'>Official</MudSelectItem>
-                <MudSelectItem Value='"goodenough"'>Good enough</MudSelectItem>
-            </MudSelect>
-            <MudTextField T="string" Label="Remark" @bind-Value="@remark"></MudTextField>
-        </DialogContent>
-        <DialogActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(async () => await UpdateSegmentAsync())">OK</MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(e => { dialogIsOpen = false; })">No Thanks</MudButton>
-        </DialogActions>
-    </MudDialog>
+    
     <MudDialog @bind-IsVisible="@routeDialogIsOpen">
         <TitleContent>
             <MudText Typo="Typo.subtitle1">#@_cotacol.Id @_cotacol.Name</MudText>
@@ -147,8 +133,6 @@ else
 
     private bool routeDialogIsOpen = false;
     private bool dialogIsOpen = false;
-    private string remark;
-    private string confidence;
     private List<string> _colors = new List<string> {"#E49969", "#B2C891", "#AD85BA", "#95A1C3", "#74A18E", "#81SFB5", "#C88691"};
     private GoogleMap _googleMap;
     private MapOptions _mapOptions;
@@ -353,8 +337,13 @@ else
 
     private async Task ConfirmSegmentAsync(string? contextSegmentid)
     {
-        dialogIsOpen = true;
         NewSegmentId = contextSegmentid;
+        var parameters = new DialogParameters<SegmentConfirmationDialog>
+        {
+            { nameof(SegmentConfirmationDialog.Cotacol), _cotacol },
+            { nameof(SegmentConfirmationDialog.NewSegmentId), NewSegmentId }
+        };
+        var dialog = await DialogService.ShowAsync<SegmentConfirmationDialog>(_cotacol.Name, parameters, AeroDialog.BlurryDialogOptions);
     }
 
     private async Task UploadGpxAsync(InputFileChangeEventArgs files)
@@ -400,30 +389,7 @@ else
         }
     }
 
-    private async Task UpdateSegmentAsync()
-    {
-        try
-        {
-            var userId = HttpContextManager.HttpContext.User.GetUserId();
-            var stravaSegment = _cotacol.Segments.First(s => s.Segmentid.Equals(NewSegmentId));
-            var updateRequest = new UpdateSegmentRequest
-            {
-                Remark = remark, SegmentConfidence = confidence, UserId = userId,
-                Distance = (int)stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
-                StravaSegmentId = stravaSegment.Segmentid
-            };
-            Console.WriteLine($"Will update {NewSegmentId}");
-            var status = await CotacolClient.UpdateSegmentAsync(_cotacol.Id, updateRequest);
-            Console.WriteLine($"Segment updated with Status code {status}");
-            dialogIsOpen = false;
-            stravaSegment.Confidence = confidence;
-            StateHasChanged();
-        }
-        catch (Exception e)
-        {
-            ErrorMessage = e.Message;
-        }
-    }
+
 
     private void ShowSegment(object segment)
     {
