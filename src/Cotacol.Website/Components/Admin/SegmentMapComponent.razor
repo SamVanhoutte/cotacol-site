@@ -72,7 +72,12 @@
                 <RowTemplate>
                     <MudTd Style="@($"background-color: {@PickColor(context)}")">@context.Segmentid</MudTd>
                     <MudTd>@context.Name</MudTd>
-                    <MudTd>@context.Validto.Date()</MudTd>
+                    <MudTd>
+                        <AeroFlexContainer>
+                            <AeroText>@context.Validto.Date()</AeroText>
+                            <MudLink Color="Color.Secondary" OnClick="@(async () => await MakeSegmentActiveAsync(context.Segmentid))">set current</MudLink>
+                        </AeroFlexContainer>
+                    </MudTd>
                     <MudTd>@context.Distance.Number() m (@Math.Abs(context.Distance - _cotacol.Distance))</MudTd>
                     <MudTd>
                         @if (context.Confidence.Equals("new"))
@@ -398,6 +403,26 @@ else
         {
             var o = _lineList.Polylines[segmentDetail.Segmentid];
             o.SetOptions(new PolylineOptions {StrokeColor = "#000000"});
+        }
+    }
+
+    private async Task MakeSegmentActiveAsync(string? contextSegmentid)
+    {
+        if (int.TryParse(contextSegmentid, out _))
+        {
+            var userId = HttpContextManager.HttpContext.User.GetUserId();
+            var stravaSegment = Cotacol.Segments.First(s => s.Segmentid.Equals(contextSegmentid));
+            var updateRequest = new UpdateSegmentRequest
+            {
+                Remark = "Reset to current", SegmentConfidence = "official", UserId = userId,
+                Distance = (int)stravaSegment.Distance, Name = stravaSegment.Name, Polyline = stravaSegment.Polyline,
+                StravaSegmentId = stravaSegment.Segmentid
+            };
+            Console.WriteLine($"Will update {NewSegmentId}");
+            var status = await CotacolClient.UpdateSegmentAsync(Cotacol.Id, updateRequest);
+            Console.WriteLine($"Segment updated with Status code {status}");
+            stravaSegment.Confidence = "official";
+            StateHasChanged();
         }
     }
 
